@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, initial-scale=1.0">
+    <title>项目详情 - 技术服务项目</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tdesign-icons-web@latest/dist/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'td-brand': '#0052D9',
+                        'td-brand-hover': '#366EF4',
+                        'td-brand-active': '#003CAB',
+                        'td-bg': '#F5F5F5',
+                        'td-component': '#FFFFFF',
+                        'td-border': '#E7E7E7',
+                        'td-text-primary': 'rgba(0, 0, 0, 0.87)',
+                        'td-text-secondary': 'rgba(0, 0, 0, 0.6)',
+                        'td-text-placeholder': 'rgba(0, 0, 0, 0.4)',
+                        'td-gray-1': '#F3F3F3',
+                        'td-gray-2': '#EEEEEE',
+                        'td-gray-3': '#E7E7E7',
+                    },
+                    fontSize: {
+                        'xs': '12px',
+                        'sm': '14px',
+                        'base': '16px',
+                    },
+                    borderRadius: {
+                        'td': '3px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #F5F5F5;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            color: rgba(0, 0, 0, 0.87);
+        }
+
+        /* Custom Scrollbar for TDesign */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C1C1C1;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A8A8A8;
+        }
+
+        .td-card {
+            background: #FFFFFF;
+            border-radius: 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            border: 1px solid #E7E7E7;
+        }
+
+        .td-section-title {
+            position: relative;
+            padding-left: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            color: rgba(0,0,0,0.87);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .td-section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 16px;
+            background: #0052D9;
+            border-radius: 2px;
+        }
+
+        .td-tag-blue {
+            background: #ECF2FE;
+            color: #0052D9;
+            border: 1px solid #D4E3FC;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .td-tag-gray {
+            background: #F5F5F5;
+            color: rgba(0,0,0,0.6);
+            border: 1px solid #E7E7E7;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .td-btn-primary {
+            background: #0052D9;
+            color: white;
+            border: 1px solid #0052D9;
+            padding: 6px 24px;
+            border-radius: 3px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .td-btn-primary:hover {
+            background: #366EF4;
+            border-color: #366EF4;
+        }
+
+        .td-btn-secondary {
+            background: white;
+            color: rgba(0,0,0,0.6);
+            border: 1px solid #E7E7E7;
+            padding: 6px 24px;
+            border-radius: 3px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .td-btn-secondary:hover {
+            border-color: #0052D9;
+            color: #0052D9;
+        }
+
+        .td-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .td-table th {
+            background: #F5F5F5;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            color: rgba(0,0,0,0.6);
+            border-bottom: 1px solid #E7E7E7;
+        }
+
+        .td-table td {
+            padding: 16px;
+            border-bottom: 1px solid #E7E7E7;
+            font-size: 14px;
+            color: rgba(0,0,0,0.87);
+        }
+
+        .td-table tr:hover td {
+            background: #F5F5F5;
+        }
+
+        .td-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: rgba(0,0,0,0.6);
+            font-size: 14px;
+            text-align: right;
+            padding-right: 16px;
+            line-height: 22px;
+            font-weight: 400;
+        }
+
+        .info-value {
+            color: rgba(0,0,0,0.87);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 22px;
+            word-break: break-all;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .attachment-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .icon-pdf { background: #FFEDEC; color: #E34D59; }
+        .icon-word { background: #ECF2FE; color: #0052D9; }
+        .icon-image { background: #E8F8F5; color: #00A870; }
+    </style>
+<base target="_blank">
+</head>
+<body class="flex flex-col">
+
+    <!-- Header -->
+    <header class="h-16 bg-white border-b border-td-gray-3 flex items-center px-6 justify-between shrink-0 z-20">
+        <div class="flex items-center gap-4">
+            <button class="flex items-center text-td-text-secondary hover:text-td-text-primary transition-colors text-sm">
+                <i class="t-icon t-icon-chevron-left mr-1 text-lg"></i>
+                返回
+            </button>
+            <div class="h-4 w-px bg-td-gray-3"></div>
+            <h1 class="text-lg font-medium text-td-text-primary tracking-tight">项目详情</h1>
+            <span class="td-tag-blue ml-2">技术服务项目</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="td-btn-secondary">关闭</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-6 pb-24 animate-fade-in">
+        <div class="max-w-full mx-auto space-y-4">
+            
+            <!-- 基本信息 Card -->
+            <div class="td-card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="td-section-title">基本信息</div>
+                    <button class="td-btn-text text-td-brand hover:text-td-brand-hover text-sm flex items-center gap-1">
+                        <i class="t-icon t-icon-edit"></i>
+                        编辑
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-x-8 gap-y-6">
+                    <!-- Row 1 -->
+                    <div class="flex items-start">
+                        <div class="w-28 info-label shrink-0">项目编号</div>
+                        <div class="flex-1">
+                            <div class="td-tag-gray inline-block font-mono text-td-brand font-medium">1100Q20260001</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-28 info-label shrink-0">客户名称</div>
+                        <div class="flex-1 info-value">
+                            华夏科技有限公司
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-28 info-label shrink-0">项目类型</div>
+                        <div class="flex-1">
+                            <span class="td-tag-blue">技术服务项目</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="flex items-start">
+                        <div class="w-28 info-label shrink-0">关键场所机构</div>
+                        <div class="flex-1 info-value">
+                            北京总部研发中心
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-28 info-label shrink-0">业务来源机构</div>
+                        <div class="flex-1 info-value">
+                            华北区业务部
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-28 info-label shrink-0">计划启动日期</div>
+                        <div class="flex-1 info-value font-mono">
+                            2026-04-01
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="flex items-start col-span-3">
+                        <div class="w-28 info-label shrink-0">审核人天数</div>
+                        <div class="flex-1 info-value">
+                            <span class="text-td-brand font-semibold">15</span> <span class="text-td-text-secondary text-sm ml-1">人天</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 附件信息 Card -->
+            <div class="td-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="td-section-title">附件信息</div>
+                    <div class="text-sm text-td-text-secondary">
+                        共 <span class="text-td-brand font-medium" id="fileCount">4</span> 个文件
+                    </div>
+                </div>
+
+                <!-- 附件列表 Table -->
+                <div class="border border-td-gray-3 rounded-td overflow-hidden">
+                    <table class="td-table">
+                        <thead>
+                            <tr>
+                                <th class="w-1/3">附件名称</th>
+                                <th>文件大小</th>
+                                <th>上传人</th>
+                                <th>上传日期</th>
+                                <th class="w-24 text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attachmentTableBody">
+                            <!-- 模拟数据将通过JS渲染 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 其他信息 Card -->
+            <div class="td-card p-6">
+                <div class="td-section-title mb-6">其他信息</div>
+                <div class="grid grid-cols-3 gap-x-8 gap-y-5">
+                    <div class="flex items-start">
+                        <div class="w-24 info-label shrink-0">创建人</div>
+                        <div class="flex-1 info-value flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-td-brand text-white flex items-center justify-center text-xs font-medium">
+                                李
+                            </div>
+                            李俊峰
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="w-24 info-label shrink-0">创建时间</div>
+                        <div class="flex-1 info-value font-mono text-td-text-secondary">
+                            2026-03-23 14:32:18
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="w-24 info-label shrink-0">最后更新</div>
+                        <div class="flex-1 info-value font-mono text-td-text-secondary">
+                            2026-03-24 09:15:42
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Actions -->
+    <footer class="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-td-gray-3 flex items-center justify-end px-6 gap-3 z-30 shadow-[0_-2px_8px_rgba(0,0,0,0.02)]">
+        <button class="td-btn-secondary">返回列表</button>
+        <button class="td-btn-primary">
+            <i class="t-icon t-icon-edit"></i>
+            编辑项目
+        </button>
+    </footer>
+
+    <script>
+        // 模拟附件数据
+        const attachments = [
+            {
+                name: '技术服务合同-华夏科技.pdf',
+                size: '2.5 MB',
+                type: 'pdf',
+                uploader: '张三',
+                date: '2026-03-20',
+                icon: 't-icon-file-pdf',
+                iconClass: 'icon-pdf'
+            },
+            {
+                name: '项目实施方案及进度计划表.docx',
+                size: '1.8 MB',
+                type: 'docx',
+                uploader: '李四',
+                date: '2026-03-21',
+                icon: 't-icon-file-word',
+                iconClass: 'icon-word'
+            },
+            {
+                name: '现场勘查照片集合.zip',
+                size: '856 KB',
+                type: 'zip',
+                uploader: '王五',
+                date: '2026-03-22',
+                icon: 't-icon-file-zip',
+                iconClass: 'icon-image'
+            },
+            {
+                name: '客户资质证明文件.pdf',
+                size: '3.2 MB',
+                type: 'pdf',
+                uploader: '赵六',
+                date: '2026-03-23',
+                icon: 't-icon-file-pdf',
+                iconClass: 'icon-pdf'
+            }
+        ];
+
+        function renderAttachments() {
+            const tbody = document.getElementById('attachmentTableBody');
+            
+            tbody.innerHTML = attachments.map((file, index) => `
+                <tr class="group transition-colors cursor-pointer">
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="attachment-icon ${file.iconClass}">
+                                <i class="t-icon ${file.icon}"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-medium text-td-text-primary text-sm">${file.name}</span>
+                                <span class="text-xs text-td-text-secondary mt-0.5">${file.type.toUpperCase()} 文件</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-td-text-secondary font-mono text-sm">${file.size}</td>
+                    <td class="text-sm">
+                        <div class="flex items-center gap-2">
+                            <div class="w-5 h-5 rounded-full bg-td-gray-2 text-td-text-secondary flex items-center justify-center text-xs">
+                                ${file.uploader.charAt(0)}
+                            </div>
+                            ${file.uploader}
+                        </div>
+                    </td>
+                    <td class="text-td-text-secondary font-mono text-sm">${file.date}</td>
+                    <td class="text-center">
+                        <button class="text-td-brand hover:text-td-brand-hover transition-colors p-2 rounded hover:bg-blue-50" title="下载">
+                            <i class="t-icon t-icon-download"></i>
+                        </button>
+                        <button class="text-td-text-secondary hover:text-td-brand transition-colors p-2 rounded hover:bg-blue-50 ml-1" title="预览">
+                            <i class="t-icon t-icon-browse"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // 更新文件计数
+            document.getElementById('fileCount').textContent = attachments.length;
+        }
+
+        // 初始化渲染
+        renderAttachments();
+
+        // 添加点击行下载的交互
+        document.addEventListener('click', function(e) {
+            const row = e.target.closest('tr');
+            if (row && row.closest('#attachmentTableBody')) {
+                // 如果点击的不是按钮，则触发预览
+                if (!e.target.closest('button')) {
+                    console.log('预览文件');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
