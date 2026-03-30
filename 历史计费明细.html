@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目历史计费明细 - TDesign风格</title>
+    <style>
+        /* TDesign Design Tokens */
+        :root {
+            /* 品牌色 */
+            --td-brand-color-1: #f2f3ff;
+            --td-brand-color-2: #d9e1ff;
+            --td-brand-color-3: #b5c7ff;
+            --td-brand-color-4: #8eabff;
+            --td-brand-color-5: #618dff;
+            --td-brand-color-6: #366ef4;
+            --td-brand-color-7: #0052d9;
+            --td-brand-color-8: #003cab;
+            --td-brand-color-9: #002a7c;
+            --td-brand-color-10: #001a57;
+            
+            /* 功能色 */
+            --td-success-color-5: #2ba471;
+            --td-error-color-6: #d54941;
+            --td-warning-color-5: #e37318;
+            
+            /* 中性色 */
+            --td-gray-color-1: #f3f3f3;
+            --td-gray-color-2: #eee;
+            --td-gray-color-3: #e7e7e7;
+            --td-gray-color-4: #dcdcdc;
+            --td-gray-color-5: #c5c5c5;
+            --td-gray-color-6: #a6a6a6;
+            --td-gray-color-7: #8b8b8b;
+            --td-gray-color-8: #777;
+            --td-gray-color-9: #5e5e5e;
+            --td-gray-color-10: #4b4b4b;
+            
+            /* 文字颜色 */
+            --td-font-gray-1: rgba(0, 0, 0, 0.9);
+            --td-font-gray-2: rgba(0, 0, 0, 0.6);
+            --td-font-gray-3: rgba(0, 0, 0, 0.4);
+            --td-font-gray-4: rgba(0, 0, 0, 0.26);
+            
+            /* 背景色 */
+            --td-bg-color-page: var(--td-gray-color-2);
+            --td-bg-color-container: #fff;
+            --td-bg-color-container-hover: var(--td-gray-color-1);
+            --td-bg-color-secondarycontainer: var(--td-gray-color-1);
+            
+            /* 边框 */
+            --td-border-level-1-color: var(--td-gray-color-3);
+            --td-border-level-2-color: var(--td-gray-color-4);
+            --td-component-stroke: var(--td-gray-color-3);
+            
+            /* 字体 */
+            --td-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Source Han Sans CN", sans-serif;
+            
+            /* 字号 */
+            --td-font-size-body-small: 12px;
+            --td-font-size-body-medium: 14px;
+            --td-font-size-title-small: 14px;
+            --td-font-size-title-medium: 16px;
+            --td-font-size-title-large: 20px;
+            
+            /* 圆角 */
+            --td-radius-default: 4px;
+            --td-radius-medium: 8px;
+            
+            /* 阴影 */
+            --td-shadow-1: 0 2px 4px rgba(0, 0, 0, 0.06);
+            --td-shadow-2: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--td-font-family);
+            background-color: var(--td-bg-color-page);
+            color: var(--td-font-gray-1);
+            font-size: var(--td-font-size-body-medium);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* 页面容器 - 为侧拉内容留出空间 */
+        .page-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 主内容区（可放置其他页面内容） */
+        .main-content {
+            flex: 1;
+            padding: 24px;
+        }
+
+        /* 侧拉面板 - 现在作为固定侧边栏显示 */
+        .side-panel {
+            width: 1200px;
+            min-height: 100vh;
+            background-color: var(--td-bg-color-container);
+            box-shadow: var(--td-shadow-2);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* 头部区域 */
+        .drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--td-component-stroke);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--td-bg-color-container);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .title-text {
+            font-size: var(--td-font-size-title-large);
+            font-weight: 600;
+            color: var(--td-font-gray-1);
+            letter-spacing: 0.5px;
+        }
+
+        .version-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background-color: var(--td-brand-color-1);
+            color: var(--td-brand-color-7);
+            font-size: var(--td-font-size-body-small);
+            border-radius: var(--td-radius-default);
+            border: 1px solid var(--td-brand-color-2);
+            font-weight: 500;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: var(--td-radius-default);
+            transition: all 0.2s;
+            color: var(--td-font-gray-2);
+        }
+
+        .close-btn:hover {
+            background-color: var(--td-bg-color-container-hover);
+            color: var(--td-font-gray-1);
+        }
+
+        /* 内容区域 */
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background-color: var(--td-bg-color-page);
+        }
+
+        /* 区块标题 */
+        .section {
+            margin-bottom: 24px;
+            background-color: var(--td-bg-color-container);
+            border-radius: var(--td-radius-medium);
+            padding: 24px;
+            box-shadow: var(--td-shadow-1);
+        }
+
+        .section-title {
+            font-size: var(--td-font-size-title-medium);
+            font-weight: 600;
+            color: var(--td-font-gray-1);
+            margin-bottom: 20px;
+            padding-left: 12px;
+            border-left: 3px solid var(--td-brand-color-7);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--td-brand-color-7);
+        }
+
+        /* 信息网格布局 */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px 40px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .info-label {
+            font-size: var(--td-font-size-body-small);
+            color: var(--td-font-gray-3);
+            font-weight: 400;
+        }
+
+        .info-value {
+            font-size: var(--td-font-size-body-medium);
+            color: var(--td-font-gray-1);
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .info-value.amount {
+            color: var(--td-brand-color-7);
+            font-size: var(--td-font-size-title-medium);
+            font-weight: 600;
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid var(--td-border-level-1-color);
+            border-radius: var(--td-radius-default);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--td-font-size-body-medium);
+        }
+
+        .data-table thead {
+            background-color: var(--td-bg-color-secondarycontainer);
+        }
+
+        .data-table th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--td-font-gray-1);
+            border-bottom: 1px solid var(--td-border-level-1-color);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--td-border-level-1-color);
+            color: var(--td-font-gray-1);
+            vertical-align: top;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background-color: var(--td-bg-color-container-hover);
+        }
+
+        .data-table td.amount {
+            color: var(--td-font-gray-1);
+            font-weight: 500;
+            font-family: "Tahoma", sans-serif;
+        }
+
+        /* 标签样式 */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: var(--td-radius-default);
+            font-size: var(--td-font-size-body-small);
+            font-weight: 500;
+        }
+
+        .tag-enterprise {
+            background-color: var(--td-brand-color-1);
+            color: var(--td-brand-color-7);
+        }
+
+        .tag-personal {
+            background-color: #fff0e9;
+            color: var(--td-warning-color-5);
+        }
+
+        /* 底部区域 */
+        .drawer-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--td-component-stroke);
+            background-color: var(--td-bg-color-container);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .statistics {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-label {
+            font-size: var(--td-font-size-body-medium);
+            color: var(--td-font-gray-2);
+        }
+
+        .stat-value {
+            font-size: var(--td-font-size-title-medium);
+            font-weight: 600;
+            font-family: "Tahoma", sans-serif;
+        }
+
+        .stat-income {
+            color: var(--td-success-color-5);
+        }
+
+        .stat-cost {
+            color: var(--td-error-color-6);
+        }
+
+        .stat-net {
+            color: var(--td-brand-color-7);
+            font-size: 18px;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* TDesign按钮样式 */
+        .btn {
+            padding: 6px 20px;
+            border-radius: var(--td-radius-default);
+            font-size: var(--td-font-size-body-medium);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            outline: none;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .btn-default {
+            background-color: var(--td-bg-color-container);
+            border-color: var(--td-border-level-2-color);
+            color: var(--td-font-gray-1);
+        }
+
+        .btn-default:hover {
+            border-color: var(--td-brand-color-7);
+            color: var(--td-brand-color-7);
+        }
+
+        .btn-primary {
+            background-color: var(--td-brand-color-7);
+            border-color: var(--td-brand-color-7);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--td-brand-color-6);
+            border-color: var(--td-brand-color-6);
+        }
+
+        /* 备注文字 */
+        .remark-text {
+            color: var(--td-font-gray-2);
+            font-size: var(--td-font-size-body-small);
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 滚动条样式 */
+        .drawer-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .drawer-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .drawer-body::-webkit-scrollbar-thumb {
+            background-color: var(--td-gray-color-4);
+            border-radius: 4px;
+        }
+
+        .drawer-body::-webkit-scrollbar-thumb:hover {
+            background-color: var(--td-gray-color-6);
+        }
+
+        /* 占位内容样式（左侧） */
+        .placeholder-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--td-font-gray-3);
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <!-- 左侧主内容区域（占位） -->
+        <div class="main-content placeholder-content">
+            <div>主页面内容区域</div>
+        </div>
+
+        <!-- 右侧侧拉面板（直接显示，无需触发） -->
+        <div class="side-panel">
+            <!-- 头部 -->
+            <div class="drawer-header">
+                <div class="header-title">
+                    <span class="title-text">项目历史计费明细</span>
+                    <span class="version-tag">当前版本：V1.0</span>
+                </div>
+                <div class="close-btn" onclick="window.close()" title="关闭">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 8.707l3.646 3.647.707-.707L8.707 8l3.646-3.646-.707-.707L8 7.293 4.354 3.646l-.707.707L7.293 8l-3.646 3.646.707.707L8 8.707z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 内容区 -->
+            <div class="drawer-body">
+                <!-- 收费信息 -->
+                <div class="section">
+                    <div class="section-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                            <path d="M16 2v4M8 2v4M3 10h18"></path>
+                        </svg>
+                        收费信息
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">关联业务合同</span>
+                            <span class="info-value">QMS/W0/2026/1100-001</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">收费金额</span>
+                            <span class="info-value amount">300,000.00 元</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">归属机构</span>
+                            <span class="info-value">中国检验认证公司北京有限公司</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">归属部门</span>
+                            <span class="info-value">体系认证一部</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 成本信息 -->
+                <div class="section">
+                    <div class="section-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                        成本信息
+                    </div>
+                    
+                    <div style="margin-bottom: 16px; font-weight: 600; color: var(--td-font-gray-2); font-size: var(--td-font-size-body-small); display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--td-brand-color-7);">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        成本明细
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>成本类型</th>
+                                    <th>外付类型</th>
+                                    <th>外付对象</th>
+                                    <th>成本金额（元）</th>
+                                    <th>归属机构</th>
+                                    <th>归属部门</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>技术服务费（0102分包）</td>
+                                    <td><span class="tag tag-enterprise">企业</span></td>
+                                    <td>广州市华南认证审核中心</td>
+                                    <td class="amount">5,000.00</td>
+                                    <td>中国检验认证公司北京有限公司</td>
+                                    <td>体系认证一部</td>
+                                    <td><span class="remark-text">华南地区技术外包服务</span></td>
+                                </tr>
+                                <tr>
+                                    <td>差旅费</td>
+                                    <td><span class="tag tag-enterprise">企业</span></td>
+                                    <td>广州市华南认证审核中心</td>
+                                    <td class="amount">3,500.00</td>
+                                    <td>中国检验认证公司北京有限公司</td>
+                                    <td>体系认证一部</td>
+                                    <td><span class="remark-text">广州现场审核往返交通</span></td>
+                                </tr>
+                                <tr>
+                                    <td>专家咨询费</td>
+                                    <td><span class="tag tag-personal">个人</span></td>
+                                    <td>李俊峰</td>
+                                    <td class="amount">1,500.00</td>
+                                    <td>中国检验认证公司北京有限公司</td>
+                                    <td>体系认证一部</td>
+                                    <td><span class="remark-text">项目技术顾问费用</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部 -->
+            <div class="drawer-footer">
+                <div class="statistics">
+                    <div class="stat-item">
+                        <span class="stat-label">总收入：</span>
+                        <span class="stat-value stat-income">¥ 300,000.00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">总成本：</span>
+                        <span class="stat-value stat-cost">¥ 10,000.00</span>
+                    </div>
+                    <div class="stat-item" style="padding-left: 16px; border-left: 1px solid var(--td-border-level-1-color);">
+                        <span class="stat-label">净收入：</span>
+                        <span class="stat-value stat-net">¥ 290,000.00</span>
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <button class="btn btn-default" onclick="handleCancel()">取消</button>
+                    <button class="btn btn-primary" onclick="handleConfirm()">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 取消操作
+        function handleCancel() {
+            console.log('取消操作');
+            // 可以添加返回或关闭逻辑
+        }
+
+        // 确定操作
+        function handleConfirm() {
+            // 添加视觉反馈
+            const btn = document.querySelector('.btn-primary');
+            const originalText = btn.textContent;
+            btn.textContent = '提交中...';
+            btn.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.opacity = '1';
+                console.log('已确认项目历史计费明细');
+                // 这里可以添加实际业务逻辑，如表单提交等
+            }, 600);
+        }
+    </script>
+</body>
+</html>
