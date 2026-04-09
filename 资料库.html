@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资料库 - 选择资料</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tdesign-vue-next@latest/dist/tdesign.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tdesign-icons-vue-next@latest/dist/tdesign-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            background-color: #333; /* 模拟深色外层背景 */
+            color: rgba(0, 0, 0, 0.9);
+            font-size: 14px;
+            overflow: hidden; /* 作为弹窗底层，禁止滚动 */
+        }
+
+        /* TDesign 色彩系统 */
+        :root {
+            --td-brand-color: #0052D9;
+            --td-brand-color-hover: #366EF4;
+            --td-brand-color-active: #003BB3;
+            --td-bg-color-container: #fff;
+            --td-bg-color-secondarycontainer: #f3f3f3;
+            --td-border-level-1-color: #e7e7e7;
+            --td-border-level-2-color: #ddd;
+            --td-text-color-primary: rgba(0, 0, 0, 0.9);
+            --td-text-color-secondary: rgba(0, 0, 0, 0.6);
+            --td-text-color-placeholder: rgba(0, 0, 0, 0.4);
+            --td-radius-default: 6px;
+            --td-radius-small: 3px;
+            --td-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.03);
+            --td-shadow-2: 0 3px 6px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        /* --- 弹窗遮罩及固定尺寸样式 --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .page-container.modal-box {
+            width: 1200px !important;
+            height: 800px !important;
+            border-radius: 8px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            background-color: #f0f2f5;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            transition: color 0.2s;
+            font-size: 20px;
+        }
+
+        .modal-close-btn:hover {
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .page-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 左侧边栏 */
+        .sidebar {
+            width: 260px;
+            background-color: var(--td-bg-color-container);
+            border-right: 1px solid var(--td-border-level-1-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--td-border-level-1-color);
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--td-text-color-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: var(--td-text-color-secondary);
+        }
+
+        .category-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .tree-node {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: var(--td-radius-default);
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tree-node:hover {
+            background-color: #f5f5f5;
+        }
+
+        .tree-node.active {
+            background-color: #E8F0FF;
+            color: var(--td-brand-color);
+            font-weight: 500;
+        }
+
+        .tree-node-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .tree-icon {
+            font-size: 16px;
+            color: inherit;
+        }
+
+        .tree-label {
+            flex: 1;
+        }
+
+        .tree-badge {
+            background-color: var(--td-bg-color-secondarycontainer);
+            color: var(--td-text-color-secondary);
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .tree-node.active .tree-badge {
+            background-color: var(--td-brand-color);
+            color: white;
+        }
+
+        .tree-children {
+            padding-left: 24px;
+        }
+
+        /* 右侧内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--td-bg-color-container);
+        }
+
+        .content-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--td-border-level-1-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--td-text-color-secondary);
+        }
+
+        .breadcrumb-item {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-item:hover {
+            color: var(--td-brand-color);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--td-text-color-primary);
+            font-weight: 500;
+        }
+
+        .breadcrumb-separator {
+            color: var(--td-text-color-placeholder);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            border-bottom: 1px solid var(--td-border-level-1-color);
+            gap: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .search-box {
+            position: relative;
+            width: 320px;
+        }
+
+        /* 调整高度，保持协调 */
+        .search-input {
+            width: 100%;
+            height: 32px;
+            padding: 0 12px 0 36px;
+            border: 1px solid var(--td-border-level-2-color);
+            border-radius: var(--td-radius-default);
+            font-size: 14px;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--td-brand-color);
+            box-shadow: 0 0 0 2px rgba(0, 82, 217, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--td-text-color-placeholder);
+            font-size: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 调整高度，保持协调 */
+        .filter-select {
+            height: 32px;
+            padding: 0 12px;
+            border: 1px solid var(--td-border-level-2-color);
+            border-radius: var(--td-radius-default);
+            font-size: 14px;
+            background-color: #fff;
+            cursor: pointer;
+            outline: none;
+            min-width: 120px;
+        }
+
+        .filter-select:focus {
+            border-color: var(--td-brand-color);
+        }
+
+        .toolbar-right {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0; /* 防止被左侧较长区域挤压导致换行 */
+        }
+
+        /* 基础按钮样式 */
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--td-radius-default);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 400;
+            line-height: 1.5;
+            white-space: nowrap; /* 防止按钮内的文字换行 */
+        }
+
+        /* 针对工具栏右侧按钮调整高度比例 */
+        .toolbar-right .btn {
+            height: 32px;
+            padding: 0 16px;
+        }
+
+        .btn-primary {
+            background-color: var(--td-brand-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--td-brand-color-hover);
+        }
+
+        .btn-primary:active {
+            background-color: var(--td-brand-color-active);
+        }
+
+        .btn-default {
+            background-color: #fff;
+            border: 1px solid var(--td-border-level-2-color);
+            color: var(--td-text-color-primary);
+        }
+
+        .btn-default:hover {
+            border-color: var(--td-brand-color);
+            color: var(--td-brand-color);
+        }
+
+        .btn-text {
+            background-color: transparent;
+            color: var(--td-brand-color);
+            padding: 8px 12px;
+        }
+
+        .btn-text:hover {
+            background-color: rgba(0, 82, 217, 0.05);
+        }
+
+        /* 表格区域 */
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            padding: 0 24px 24px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+        }
+
+        .data-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table th {
+            background-color: #f5f5f5;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            color: var(--td-text-color-primary);
+            border-bottom: 1px solid var(--td-border-level-1-color);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--td-border-level-1-color);
+            color: var(--td-text-color-primary);
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .data-table tbody tr.selected {
+            background-color: #E8F0FF;
+        }
+
+        /* 复选框 */
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--td-border-level-2-color);
+            border-radius: var(--td-radius-small);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+
+        .checkbox:hover {
+            border-color: var(--td-brand-color);
+        }
+
+        .checkbox.checked {
+            background-color: var(--td-brand-color);
+            border-color: var(--td-brand-color);
+            color: white;
+        }
+
+        /* 类型标签 */
+        .type-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: var(--td-radius-small);
+            font-size: 12px;
+            font-weight: 500;
+            gap: 4px;
+        }
+
+        .type-attachment {
+            background-color: #E8F8FF;
+            color: #0066CC;
+        }
+
+        .type-form {
+            background-color: #FFF2E8;
+            color: #D46B08;
+        }
+
+        /* 资料名称 */
+        .doc-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--td-text-color-primary);
+            font-weight: 500;
+        }
+
+        .doc-icon {
+            font-size: 20px;
+            color: var(--td-brand-color);
+        }
+
+        /* 环节标签 */
+        .stage-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: var(--td-bg-color-secondarycontainer);
+            color: var(--td-text-color-secondary);
+        }
+
+        .stage-auth { background-color: #E8F0FF; color: var(--td-brand-color); }
+        .stage-plan { background-color: #F0F5FF; color: #2F54EB; }
+        .stage-audit { background-color: #FFF2F0; color: #CF1322; }
+
+        /* 底部操作栏 */
+        .bottom-bar {
+            padding: 16px 24px;
+            background-color: #fff;
+            border-top: 1px solid var(--td-border-level-1-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .selection-info {
+            color: var(--td-text-color-secondary);
+            font-size: 14px;
+        }
+
+        .selection-count {
+            color: var(--td-brand-color);
+            font-weight: 500;
+        }
+
+        .bottom-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--td-text-color-secondary);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-btn {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--td-border-level-2-color);
+            background-color: #fff;
+            border-radius: var(--td-radius-small);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--td-brand-color);
+            color: var(--td-brand-color);
+        }
+
+        .page-btn.active {
+            background-color: var(--td-brand-color);
+            border-color: var(--td-brand-color);
+            color: white;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+    <div class="modal-overlay" id="fileModal">
+        <div class="page-container modal-box">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">
+                        <i class="t-icon t-icon-folder-open"></i>
+                        客户认证审核资料
+                    </div>
+                    <div class="sidebar-subtitle">共 128 份资料</div>
+                </div>
+
+                <div class="category-tree">
+                    <div class="tree-node active" data-category="all">
+                        <div class="tree-node-content">
+                            <i class="t-icon t-icon-folder tree-icon"></i>
+                            <span class="tree-label">全部资料</span>
+                        </div>
+                        <span class="tree-badge">128</span>
+                    </div>
+
+                    <div class="tree-node" data-category="auth">
+                        <div class="tree-node-content">
+                            <i class="t-icon t-icon-credential tree-icon"></i>
+                            <span class="tree-label">认证申请资料</span>
+                        </div>
+                        <span class="tree-badge">32</span>
+                    </div>
+
+                    <div class="tree-node" data-category="plan">
+                        <div class="tree-node-content">
+                            <i class="t-icon t-icon-edit-1 tree-icon"></i>
+                            <span class="tree-label">方案策划资料</span>
+                        </div>
+                        <span class="tree-badge">28</span>
+                    </div>
+
+                    <div class="tree-node" data-category="audit">
+                        <div class="tree-node-content">
+                            <i class="t-icon t-icon-search tree-icon"></i>
+                            <span class="tree-label">认证审核资料</span>
+                        </div>
+                        <span class="tree-badge">45</span>
+                    </div>
+
+                    <div class="tree-node" data-category="report">
+                        <div class="tree-node-content">
+                            <i class="t-icon t-icon-file-paste tree-icon"></i>
+                            <span class="tree-label">审核报告</span>
+                        </div>
+                        <span class="tree-badge">23</span>
+                    </div>
+
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--td-border-level-1-color);">
+                        <div style="font-size: 12px; color: var(--td-text-color-placeholder); margin-bottom: 8px; padding-left: 12px;">
+                            更多分类
+                        </div>
+                        <div class="tree-node" data-category="contract">
+                            <div class="tree-node-content">
+                                <i class="t-icon t-icon-file-open tree-icon"></i>
+                                <span class="tree-label">合同协议</span>
+                            </div>
+                            <span class="tree-badge">15</span>
+                        </div>
+                        <div class="tree-node" data-category="certificate">
+                            <div class="tree-node-content">
+                                <i class="t-icon t-icon-certificate tree-icon"></i>
+                                <span class="tree-label">资质证书</span>
+                            </div>
+                            <span class="tree-badge">12</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="content-header">
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">首页</span>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-item">资料库</span>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-item active">客户认证审核资料</span>
+                    </div>
+                    <div class="header-actions">
+                        <button class="modal-close-btn" onclick="closeModal()" title="关闭弹窗">
+                            <i class="t-icon t-icon-close"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <div class="search-box">
+                            <i class="t-icon t-icon-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="搜索资料名称、上传人..." id="searchInput">
+                        </div>
+                        <div class="filter-group">
+                            <select class="filter-select" id="typeFilter">
+                                <option value="">全部类型</option>
+                                <option value="attachment">附件</option>
+                                <option value="form">表单</option>
+                            </select>
+                            <select class="filter-select" id="stageFilter">
+                                <option value="">全部环节</option>
+                                <option value="认证申请">认证申请</option>
+                                <option value="方案策划">方案策划</option>
+                                <option value="认证审核">认证审核</option>
+                            </select>
+                            <select class="filter-select">
+                                <option value="">时间范围</option>
+                                <option value="today">今天</option>
+                                <option value="week">近一周</option>
+                                <option value="month">近一月</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn btn-default" onclick="refreshData()">
+                            <i class="t-icon t-icon-refresh"></i>
+                            刷新
+                        </button>
+                        <button class="btn btn-primary" onclick="confirmSelection()">
+                            <i class="t-icon t-icon-check"></i>
+                            确认选择
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th width="40">
+                                    <span class="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                                        <i class="t-icon t-icon-check" style="font-size: 12px; display: none;"></i>
+                                    </span>
+                                </th>
+                                <th width="40">#</th>
+                                <th>资料名称</th>
+                                <th width="100">类型</th>
+                                <th width="160">上传时间</th>
+                                <th width="120">上传人</th>
+                                <th width="120">上传环节</th>
+                                <th width="100">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            </tbody>
+                    </table>
+
+                    <div class="empty-state" id="emptyState" style="display: none;">
+                        <i class="t-icon t-icon-folder-open empty-icon"></i>
+                        <p>暂无资料数据</p>
+                        <button class="btn btn-text" style="margin-top: 12px;">
+                            <i class="t-icon t-icon-refresh"></i>
+                            重新加载
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bottom-bar">
+                    <div class="selection-info">
+                        已选择 <span class="selection-count" id="selectedCount">0</span> 项资料
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 24px;">
+                        <div class="pagination">
+                            <button class="page-btn" onclick="changePage('prev')" id="prevBtn">
+                                <i class="t-icon t-icon-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn" onclick="changePage(2)">2</button>
+                            <button class="page-btn" onclick="changePage(3)">3</button>
+                            <span style="color: var(--td-text-color-placeholder);">...</span>
+                            <button class="page-btn" onclick="changePage(10)">10</button>
+                            <button class="page-btn" onclick="changePage('next')" id="nextBtn">
+                                <i class="t-icon t-icon-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="bottom-actions">
+                            <button class="btn btn-default" onclick="cancelSelection()">取消</button>
+                            <button class="btn btn-primary" onclick="confirmSelection()">
+                                确认选择 (<span id="confirmCount">0</span>)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // --- 关闭弹窗逻辑 ---
+        function closeModal() {
+            document.getElementById('fileModal').style.display = 'none';
+        }
+
+        // 模拟数据
+        const mockData = [
+            { id: 1, name: "客户基本信息登记表.pdf", type: "form", uploadTime: "2024-01-15 09:23", uploader: "张经理", stage: "认证申请", size: "2.4MB" },
+            { id: 2, name: "营业执照扫描件.jpg", type: "attachment", uploadTime: "2024-01-15 10:45", uploader: "李助理", stage: "认证申请", size: "1.8MB" },
+            { id: 3, name: "认证方案策划书.docx", type: "form", uploadTime: "2024-01-16 14:30", uploader: "王主管", stage: "方案策划", size: "3.2MB" },
+            { id: 4, name: "现场审核记录表.xlsx", type: "form", uploadTime: "2024-01-17 16:20", uploader: "审核员A", stage: "认证审核", size: "1.5MB" },
+            { id: 5, name: "不符合项报告.pdf", type: "attachment", uploadTime: "2024-01-18 09:00", uploader: "审核员B", stage: "认证审核", size: "856KB" },
+            { id: 6, name: "整改证据材料.zip", type: "attachment", uploadTime: "2024-01-20 11:30", uploader: "张经理", stage: "认证审核", size: "15.6MB" },
+            { id: 7, name: "审核计划表.xlsx", type: "form", uploadTime: "2024-01-16 08:15", uploader: "王主管", stage: "方案策划", size: "980KB" },
+            { id: 8, name: "组织机构代码证.pdf", type: "attachment", uploadTime: "2024-01-15 11:20", uploader: "李助理", stage: "认证申请", size: "2.1MB" },
+            { id: 9, name: "管理体系文件.pdf", type: "attachment", uploadTime: "2024-01-19 15:45", uploader: "张经理", stage: "认证审核", size: "8.4MB" },
+            { id: 10, name: "认证合同.docx", type: "form", uploadTime: "2024-01-14 16:00", uploader: "陈总监", stage: "认证申请", size: "1.2MB" },
+            { id: 11, name: "年度监督审核报告.pdf", type: "attachment", uploadTime: "2024-01-21 10:30", uploader: "审核员A", stage: "认证审核", size: "3.8MB" },
+            { id: 12, name: "客户满意度调查表.xlsx", type: "form", uploadTime: "2024-01-18 14:20", uploader: "王主管", stage: "方案策划", size: "1.1MB" }
+        ];
+
+        let selectedItems = new Set();
+        let currentData = [...mockData];
+
+        // 初始化表格
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'flex';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tbody.innerHTML = data.map((item, index) => `
+                <tr class="${selectedItems.has(item.id) ? 'selected' : ''}" data-id="${item.id}">
+                    <td>
+                        <span class="checkbox ${selectedItems.has(item.id) ? 'checked' : ''}" onclick="toggleSelect(${item.id}, event)">
+                            <i class="t-icon t-icon-check" style="font-size: 12px; ${selectedItems.has(item.id) ? '' : 'display: none;'}"></i>
+                        </span>
+                    </td>
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="doc-name">
+                            <i class="t-icon t-icon-${item.type === 'form' ? 'file-paste' : 'file'} doc-icon"></i>
+                            <span>${item.name}</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--td-text-color-placeholder); margin-top: 4px; margin-left: 28px;">
+                            ${item.size}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="type-tag ${item.type === 'attachment' ? 'type-attachment' : 'type-form'}">
+                            <i class="t-icon t-icon-${item.type === 'attachment' ? 'attach' : 'file-open'}"></i>
+                            ${item.type === 'attachment' ? '附件' : '表单'}
+                        </span>
+                    </td>
+                    <td>${item.uploadTime}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #0052D9; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                                ${item.uploader.charAt(0)}
+                            </div>
+                            ${item.uploader}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="stage-tag stage-${item.stage === '认证申请' ? 'auth' : item.stage === '方案策划' ? 'plan' : 'audit'}">
+                            ${item.stage}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-text" style="padding: 4px 8px;" onclick="previewDoc(${item.id})">
+                            <i class="t-icon t-icon-browse"></i>
+                        </button>
+                        <button class="btn btn-text" style="padding: 4px 8px;" onclick="downloadDoc(${item.id})">
+                            <i class="t-icon t-icon-download"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 选择/取消选择
+        function toggleSelect(id, event) {
+            if (event) event.stopPropagation();
+
+            if (selectedItems.has(id)) {
+                selectedItems.delete(id);
+            } else {
+                selectedItems.add(id);
+            }
+
+            updateSelectionUI();
+            renderTable(currentData);
+        }
+
+        // 全选/取消全选
+        function toggleSelectAll() {
+            const allCheckbox = document.getElementById('selectAll');
+            const isChecked = allCheckbox.classList.contains('checked');
+
+            if (isChecked) {
+                selectedItems.clear();
+            } else {
+                currentData.forEach(item => selectedItems.add(item.id));
+            }
+
+            updateSelectionUI();
+            renderTable(currentData);
+        }
+
+        // 更新选择状态UI
+        function updateSelectionUI() {
+            const count = selectedItems.size;
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('confirmCount').textContent = count;
+
+            const allCheckbox = document.getElementById('selectAll');
+            if (count === currentData.length && currentData.length > 0) {
+                allCheckbox.classList.add('checked');
+                allCheckbox.querySelector('i').style.display = 'block';
+            } else {
+                allCheckbox.classList.remove('checked');
+                allCheckbox.querySelector('i').style.display = 'none';
+            }
+        }
+
+        // 分类切换
+        document.querySelectorAll('.tree-node').forEach(node => {
+            node.addEventListener('click', function() {
+                document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('active'));
+                this.classList.add('active');
+
+                const category = this.dataset.category;
+                filterByCategory(category);
+            });
+        });
+
+        // 按分类筛选
+        function filterByCategory(category) {
+            if (category === 'all') {
+                currentData = [...mockData];
+            } else if (category === 'auth') {
+                currentData = mockData.filter(item => item.stage === '认证申请');
+            } else if (category === 'plan') {
+                currentData = mockData.filter(item => item.stage === '方案策划');
+            } else if (category === 'audit') {
+                currentData = mockData.filter(item => item.stage === '认证审核');
+            } else {
+                currentData = mockData.slice(0, 6);
+            }
+            selectedItems.clear();
+            updateSelectionUI();
+            renderTable(currentData);
+        }
+
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase();
+            if (keyword === '') {
+                currentData = [...mockData];
+            } else {
+                currentData = mockData.filter(item => 
+                    item.name.toLowerCase().includes(keyword) || 
+                    item.uploader.toLowerCase().includes(keyword)
+                );
+            }
+            selectedItems.clear();
+            updateSelectionUI();
+            renderTable(currentData);
+        });
+
+        // 类型筛选
+        document.getElementById('typeFilter').addEventListener('change', function(e) {
+            const type = e.target.value;
+            if (type === '') {
+                currentData = [...mockData];
+            } else {
+                currentData = mockData.filter(item => item.type === type);
+            }
+            selectedItems.clear();
+            updateSelectionUI();
+            renderTable(currentData);
+        });
+
+        // 环节筛选
+        document.getElementById('stageFilter').addEventListener('change', function(e) {
+            const stage = e.target.value;
+            if (stage === '') {
+                currentData = [...mockData];
+            } else {
+                currentData = mockData.filter(item => item.stage === stage);
+            }
+            selectedItems.clear();
+            updateSelectionUI();
+            renderTable(currentData);
+        });
+
+        // 刷新数据
+        function refreshData() {
+            const btn = document.querySelector('.btn-refresh');
+            document.querySelector('.t-icon-refresh').style.animation = 'spin 1s linear';
+            setTimeout(() => {
+                currentData = [...mockData];
+                selectedItems.clear();
+                updateSelectionUI();
+                renderTable(currentData);
+                document.querySelector('.t-icon-refresh').style.animation = '';
+            }, 500);
+        }
+
+        // 确认选择
+        function confirmSelection() {
+            if (selectedItems.size === 0) {
+                alert('请至少选择一份资料');
+                return;
+            }
+            const selectedDocs = mockData.filter(item => selectedItems.has(item.id));
+            console.log('已选择的资料：', selectedDocs);
+            
+            // --- 确认选择后关闭弹窗 ---
+            closeModal();
+        }
+
+        // 取消选择
+        function cancelSelection() {
+            selectedItems.clear();
+            updateSelectionUI();
+            renderTable(currentData);
+        }
+
+        // 预览文档
+        function previewDoc(id) {
+            const doc = mockData.find(item => item.id === id);
+            alert(`预览：${doc.name}`);
+        }
+
+        // 下载文档
+        function downloadDoc(id) {
+            const doc = mockData.find(item => item.id === id);
+            alert(`开始下载：${doc.name}`);
+        }
+
+        // 分页（模拟）
+        function changePage(page) {
+            console.log('切换到页面：', page);
+        }
+
+        // 初始化
+        renderTable(currentData);
+
+        // 添加旋转动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
