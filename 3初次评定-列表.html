@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初次评定管理 - 审核材料归档系统</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: #f0f2f5;
+            color: rgba(0, 0, 0, 0.9);
+            overflow-x: auto;
+            min-width: 1400px;
+        }
+
+        :root {
+            --qms-color: #0052D9;
+            --ems-color: #00A870;
+            --ohsms-color: #FF7D00;
+            --its-color: #7B4DFE;
+            --common-color: #5E5E5E;
+            --pass-color: #00A870;
+            --reject-color: #E34D59;
+            --pending-color: #ED7B2F;
+            --primary-bg: #f0f2f5;
+            --white: #fff;
+            --border-color: #e7e7e7;
+        }
+
+        /* 页面容器 */
+        .page-container {
+            min-width: 1400px;
+            max-width: 1920px;
+            margin: 0 auto;
+            background-color: var(--primary-bg);
+            min-height: 100vh;
+        }
+
+        /* 顶部标题栏 */
+        .top-header {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* 白色卡片容器 */
+        .white-card {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        /* 标签导航栏 */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            background: #fff;
+            padding: 0 20px;
+        }
+
+        .tab-item {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .tab-item:hover {
+            color: var(--qms-color);
+        }
+
+        .tab-item.active {
+            color: var(--qms-color);
+            border-bottom-color: var(--qms-color);
+            font-weight: 600;
+        }
+
+        .tab-badge {
+            background: var(--reject-color);
+            color: #fff;
+            font-size: 12px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: normal;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* 筛选区域 */
+        .filter-section {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+        }
+
+        .filter-input {
+            padding: 6px 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            width: 160px;
+            font-family: inherit;
+        }
+
+        .filter-input:focus {
+            border-color: var(--qms-color);
+        }
+
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            width: 160px;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .date-picker-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .date-picker {
+            padding: 6px 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 140px;
+            font-family: inherit;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .btn-primary {
+            background: var(--qms-color);
+            color: #fff;
+            border-color: var(--qms-color);
+        }
+
+        .btn-primary:hover {
+            background: #003bb3;
+        }
+
+        .btn-outline {
+            border-color: #dcdcdc;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--qms-color);
+            color: var(--qms-color);
+        }
+
+        .btn-text {
+            color: rgba(0, 0, 0, 0.6);
+            padding: 6px 12px;
+        }
+
+        .btn-text:hover {
+            color: var(--qms-color);
+        }
+
+        /* 认证类型标签栏 */
+        .type-filter-bar {
+            padding: 16px 24px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .type-label {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+            margin-right: 4px;
+        }
+
+        .type-tag {
+            padding: 4px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .type-tag:hover {
+            background: #f5f5f5;
+        }
+
+        .type-tag.active {
+            background: var(--qms-color);
+            color: #fff;
+            border-color: var(--qms-color);
+        }
+
+        .type-tag.outline {
+            border-color: #dcdcdc;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            background: #fafafa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.6);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: rgba(0, 0, 0, 0.8);
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* 任务号样式 */
+        .task-number {
+            color: var(--qms-color);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .task-number:hover {
+            text-decoration: underline;
+        }
+
+        .copy-icon {
+            color: rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-icon:hover {
+            color: var(--qms-color);
+        }
+
+        /* 认证领域徽章 */
+        .system-badges {
+            display: flex;
+            gap: 4px;
+        }
+
+        .system-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .system-badge.Q { background: var(--qms-color); }
+        .system-badge.E { background: var(--ems-color); }
+        .system-badge.S { background: var(--ohsms-color); }
+        .system-badge.IT { background: var(--its-color); }
+        .system-badge.F { background: var(--its-color); }
+
+        /* 认证类型标签 */
+        .cert-type-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+            border: 1px solid transparent;
+        }
+
+        .cert-type-tag.initial {
+            background: #E3F2FD;
+            color: var(--qms-color);
+            border-color: #BBDEFB;
+        }
+
+        .cert-type-tag.supervise1 {
+            background: #E0F7FA;
+            color: #00838F;
+            border-color: #B2EBF2;
+        }
+
+        .cert-type-tag.supervise2 {
+            background: #FFF3E0;
+            color: #EF6C00;
+            border-color: #FFE0B2;
+        }
+
+        .cert-type-tag.re {
+            background: #F3E5F5;
+            color: #7B1FA2;
+            border-color: #E1BEE7;
+        }
+
+        /* 进度条 */
+        .progress-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar-bg {
+            width: 80px;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .progress-bar-fill.high { background: var(--ems-color); }
+        .progress-bar-fill.medium { background: var(--pending-color); }
+        .progress-bar-fill.low { background: var(--reject-color); }
+
+        .progress-text {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.5);
+            min-width: 40px;
+        }
+
+        /* 状态标签 */
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-tag::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-tag.initial-review {
+            background: #E3F2FD;
+            color: var(--qms-color);
+        }
+        .status-tag.initial-review::before { background: var(--qms-color); }
+
+        .status-tag.pending {
+            background: #FFF8E1;
+            color: #FF8F00;
+        }
+        .status-tag.pending::before { background: #FF8F00; }
+
+        .status-tag.second-review {
+            background: #E8F5E9;
+            color: var(--ems-color);
+        }
+        .status-tag.second-review::before { background: var(--ems-color); }
+
+        .status-tag.draft {
+            background: #F5F5F5;
+            color: #616161;
+        }
+        .status-tag.draft::before { background: #9E9E9E; }
+
+        .status-tag.cert-review {
+            background: #EDE7F6;
+            color: var(--its-color);
+        }
+        .status-tag.cert-review::before { background: var(--its-color); }
+
+        .status-tag.returned {
+            background: #FFEBEE;
+            color: var(--reject-color);
+        }
+        .status-tag.returned::before { background: var(--reject-color); }
+
+        .status-tag.passed {
+            background: #E8F5E9;
+            color: var(--pass-color);
+        }
+        .status-tag.passed::before { background: var(--pass-color); }
+
+        /* 操作按钮 */
+        .action-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-link {
+            color: var(--qms-color);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+        .action-link.disabled {
+            color: rgba(0, 0, 0, 0.3);
+            cursor: not-allowed;
+        }
+
+        .action-link.disabled:hover {
+            text-decoration: none;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid #dcdcdc;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--qms-color);
+            color: var(--qms-color);
+        }
+
+        .page-btn.active {
+            background: var(--qms-color);
+            color: #fff;
+            border-color: var(--qms-color);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        /* 复选框 */
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* 导出按钮 */
+        .btn-export {
+            border-color: #dcdcdc;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-export:hover {
+            border-color: var(--qms-color);
+            color: var(--qms-color);
+        }
+
+        /* 展开/收起图标 */
+        .expand-icon {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .expand-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        /* 机构信息 */
+        .org-info {
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+    </style>
+<base target="_blank">
+<base target="_blank">
+</head>
+<body>
+
+<div class="page-container">
+    <!-- 顶部标题栏 -->
+    <div class="top-header">
+        <div class="header-left">
+            <div class="page-title">初次评定管理</div>
+            <div class="page-subtitle">审核材料初次评定与归档</div>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-export" onclick="exportExcel()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                导出Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+        <div class="white-card">
+            <!-- 标签导航 -->
+            <div class="tab-navigation">
+                <div class="tab-item active" onclick="switchTab(this, 'all')">
+                    全部任务
+                </div>
+                <div class="tab-item" onclick="switchTab(this, 'pending')">
+                    待评定<span class="tab-badge">6</span>
+                </div>
+                <div class="tab-item" onclick="switchTab(this, 'returned')">
+                    已退回<span class="tab-badge">2</span>
+                </div>
+                <div class="tab-item" onclick="switchTab(this, 'passed')">
+                    已通过<span class="tab-badge">2</span>
+                </div>
+            </div>
+
+            <!-- 筛选区域 -->
+            <div class="filter-section">
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <span class="filter-label">任务号</span>
+                        <input type="text" class="filter-input" placeholder="请输入任务号" id="filterTaskNo">
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">客户名称</span>
+                        <input type="text" class="filter-input" placeholder="请输入客户名称" id="filterCustomer" style="width: 200px;">
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">认证领域</span>
+                        <select class="filter-select" id="filterDomain">
+                            <option value="">全部</option>
+                            <option value="Q">质量管理体系(Q)</option>
+                            <option value="E">环境管理体系(E)</option>
+                            <option value="S">职业健康安全(S)</option>
+                            <option value="F">食品安全体系(F)</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">认证类型</span>
+                        <select class="filter-select" id="filterType">
+                            <option value="">全部</option>
+                            <option value="initial">初次认证</option>
+                            <option value="supervise1">监督一</option>
+                            <option value="supervise2">监督二</option>
+                            <option value="re">再认证</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <span class="filter-label">任务生成日期</span>
+                        <div class="date-picker-wrapper">
+                            <input type="date" class="date-picker" id="filterDate">
+                        </div>
+                    </div>
+                    <div class="filter-item" style="margin-left: auto;">
+                        <button class="btn btn-primary" onclick="searchData()">查询</button>
+                        <button class="btn btn-outline" onclick="resetFilter()" style="margin-left: 8px;">重置</button>
+                        <button class="btn btn-text" onclick="toggleExpand()">
+                            展开<span class="expand-icon" id="expandIcon">▼</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 认证类型快捷筛选 -->
+            <div class="type-filter-bar">
+                <span class="type-label">认证类型：</span>
+                <span class="type-tag active" onclick="filterByType(this, 'all')">全部类型</span>
+                <span class="type-tag outline" onclick="filterByType(this, 'initial')">初次认证</span>
+                <span class="type-tag outline" onclick="filterByType(this, 'supervise1')">监督一</span>
+                <span class="type-tag outline" onclick="filterByType(this, 'supervise2')">监督二</span>
+                <span class="type-tag outline" onclick="filterByType(this, 're')">再认证</span>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">
+                                <input type="checkbox" class="checkbox" id="selectAll" onclick="selectAllRows(this)">
+                            </th>
+                            <th>任务号</th>
+                            <th style="width: 200px;">客户名称</th>
+                            <th>认证领域</th>
+                            <th>认证类型</th>
+                            <th>任务提交日期</th>
+                            <th>提交人</th>
+                            <th style="width: 180px;">归属机构/部门</th>
+                            <th>状态</th>
+                            <th style="width: 80px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- 数据行将通过JS动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="pagination">
+                <span class="page-info">共 10 条</span>
+                <button class="page-btn" disabled>上一页</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn" onclick="alert('已经是最后一页')">下一页</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 示例数据
+    const tableData = [
+        {
+            taskNo: 'TASK-2026-001',
+            customer: '华锐精密机械制造有限公司',
+            systems: ['Q', 'E', 'S', 'IT'],
+            certType: 'initial',
+            certTypeName: '初次认证',
+            submitDate: '2026-03-15',
+            submitter: '张伟',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'pending',
+            statusName: '待评定'
+        },
+        {
+            taskNo: 'TASK-2026-002',
+            customer: '绿源生态食品科技股份有限公司',
+            systems: ['Q', 'E', 'F'],
+            certType: 'supervise1',
+            certTypeName: '监督一',
+            submitDate: '2026-03-14',
+            submitter: '李芳',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'pending',
+            statusName: '待评定'
+        },
+        {
+            taskNo: 'TASK-2026-003',
+            customer: '恒信芯联电子元器件有限公司',
+            systems: ['Q', 'IT'],
+            certType: 're',
+            certTypeName: '再认证',
+            submitDate: '2026-03-13',
+            submitter: '王强',
+            org: '中国质量认证中心(CQC)<br>电子产品认证部',
+            status: 'passed',
+            statusName: '已通过'
+        },
+        {
+            taskNo: 'TASK-2026-004',
+            customer: '鑫泰筑邦建材实业有限公司',
+            systems: ['Q', 'E', 'S'],
+            certType: 'supervise2',
+            certTypeName: '监督二',
+            submitDate: '2026-03-12',
+            submitter: '刘洋',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'pending',
+            statusName: '待评定'
+        },
+        {
+            taskNo: 'TASK-2026-005',
+            customer: '安捷通运物流仓储有限公司',
+            systems: ['Q', 'E'],
+            certType: 'initial',
+            certTypeName: '初次认证',
+            submitDate: '2026-03-11',
+            submitter: '陈明',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'passed',
+            statusName: '已通过'
+        },
+        {
+            taskNo: 'TASK-2026-006',
+            customer: '盛达新材化工有限公司',
+            systems: ['Q', 'E', 'S', 'IT'],
+            certType: 're',
+            certTypeName: '再认证',
+            submitDate: '2026-03-10',
+            submitter: '赵雪',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'returned',
+            statusName: '已退回'
+        },
+        {
+            taskNo: 'TASK-2026-007',
+            customer: '科瑞智联新能源科技有限公司',
+            systems: ['Q', 'E'],
+            certType: 'supervise1',
+            certTypeName: '监督一',
+            submitDate: '2026-03-09',
+            submitter: '周磊',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'pending',
+            statusName: '待评定'
+        },
+        {
+            taskNo: 'TASK-2026-008',
+            customer: '锦程织造服饰有限公司',
+            systems: ['Q'],
+            certType: 'initial',
+            certTypeName: '初次认证',
+            submitDate: '2026-03-08',
+            submitter: '吴婷',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'returned',
+            statusName: '已退回'
+        },
+        {
+            taskNo: 'TASK-2026-009',
+            customer: '鹏程万里航空服务有限公司',
+            systems: ['Q', 'S'],
+            certType: 'supervise1',
+            certTypeName: '监督一',
+            submitDate: '2026-03-07',
+            submitter: '郑华',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'pending',
+            statusName: '待评定'
+        },
+        {
+            taskNo: 'TASK-2026-010',
+            customer: '宏图智建建筑科技有限公司',
+            systems: ['Q', 'E', 'S'],
+            certType: 'supervise2',
+            certTypeName: '监督二',
+            submitDate: '2026-03-06',
+            submitter: '孙丽',
+            org: '中国检验认证集团北京有限公司<br>检验认证部',
+            status: 'pending',
+            statusName: '待评定'
+        }
+    ];
+
+    // 渲染表格
+    function renderTable(data = tableData) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        data.forEach((row, index) => {
+            // 生成认证领域徽章
+            const systemBadges = row.systems.map(s => 
+                `<span class="system-badge ${s}">${s}</span>`
+            ).join('');
+
+            // 生成认证类型标签样式
+            let certClass = 'initial';
+            if (row.certType === 'supervise1') certClass = 'supervise1';
+            if (row.certType === 'supervise2') certClass = 'supervise2';
+            if (row.certType === 're') certClass = 're';
+
+            // 生成状态标签样式
+            let statusClass = row.status;
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="checkbox" class="checkbox row-checkbox"></td>
+                <td>
+                    <div class="task-number">
+                        ${row.taskNo}
+                        <span class="copy-icon" onclick="copyTaskNo('${row.taskNo}', event)" title="复制">📋</span>
+                    </div>
+                </td>
+                <td>${row.customer}</td>
+                <td>
+                    <div class="system-badges">${systemBadges}</div>
+                </td>
+                <td>
+                    <span class="cert-type-tag ${certClass}">${row.certTypeName}</span>
+                </td>
+                <td>${row.submitDate}</td>
+                <td>${row.submitter}</td>
+                <td>
+                    <div class="org-info">${row.org}</div>
+                </td>
+                <td>
+                    <span class="status-tag ${statusClass}">${row.statusName}</span>
+                </td>
+                <td>
+                    <div class="action-links">
+                        <span class="action-link" onclick="viewDetail('${row.taskNo}')">详情</span>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 切换标签
+    function switchTab(element, tab) {
+        document.querySelectorAll('.tab-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        element.classList.add('active');
+
+        // 根据tab值筛选数据
+        if (tab === 'all') {
+            renderTable(tableData);
+        } else {
+            const filtered = tableData.filter(item => item.status === tab);
+            renderTable(filtered);
+        }
+    }
+
+    // 筛选按钮样式切换
+    function filterByType(element, type) {
+        document.querySelectorAll('.type-filter-bar .type-tag').forEach(tag => {
+            tag.classList.remove('active');
+            tag.classList.add('outline');
+        });
+        element.classList.remove('outline');
+        element.classList.add('active');
+
+        // 筛选数据
+        if (type === 'all') {
+            renderTable(tableData);
+        } else {
+            const filtered = tableData.filter(item => item.certType === type);
+            renderTable(filtered);
+        }
+    }
+
+    // 查询功能
+    function searchData() {
+        const taskNo = document.getElementById('filterTaskNo').value.toLowerCase();
+        const customer = document.getElementById('filterCustomer').value.toLowerCase();
+        const domain = document.getElementById('filterDomain').value;
+        const type = document.getElementById('filterType').value;
+
+        const filtered = tableData.filter(item => {
+            const matchTaskNo = !taskNo || item.taskNo.toLowerCase().includes(taskNo);
+            const matchCustomer = !customer || item.customer.toLowerCase().includes(customer);
+            const matchDomain = !domain || item.systems.includes(domain);
+            const matchType = !type || item.certType === type;
+            return matchTaskNo && matchCustomer && matchDomain && matchType;
+        });
+
+        renderTable(filtered);
+        alert(`查询完成，找到 ${filtered.length} 条记录`);
+    }
+
+    // 重置筛选
+    function resetFilter() {
+        document.getElementById('filterTaskNo').value = '';
+        document.getElementById('filterCustomer').value = '';
+        document.getElementById('filterDomain').value = '';
+        document.getElementById('filterType').value = '';
+        document.getElementById('filterDate').value = '';
+        
+        // 重置认证类型标签
+        document.querySelectorAll('.type-filter-bar .type-tag').forEach((tag, index) => {
+            if (index === 0) {
+                tag.classList.add('active');
+                tag.classList.remove('outline');
+            } else {
+                tag.classList.remove('active');
+                tag.classList.add('outline');
+            }
+        });
+
+        renderTable(tableData);
+    }
+
+    // 展开/收起（示例功能）
+    function toggleExpand() {
+        const icon = document.getElementById('expandIcon');
+        icon.classList.toggle('rotated');
+        // 实际项目中这里可以展开更多筛选条件
+    }
+
+    // 全选功能
+    function selectAllRows(checkbox) {
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        rowCheckboxes.forEach(cb => {
+            cb.checked = checkbox.checked;
+        });
+    }
+
+    // 复制任务号
+    function copyTaskNo(taskNo, event) {
+        event.stopPropagation();
+        navigator.clipboard.writeText(taskNo).then(() => {
+            alert(`已复制: ${taskNo}`);
+        }).catch(() => {
+            // 降级处理
+            const input = document.createElement('input');
+            input.value = taskNo;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            alert(`已复制: ${taskNo}`);
+        });
+    }
+
+    // 查看详情
+    function viewDetail(taskNo) {
+        // 跳转到之前生成的详情页
+        alert(`正在打开任务 ${taskNo} 的初次评定详情页...`);
+        // window.location.href = `detail.html?taskNo=${taskNo}`;
+    }
+
+    // 导出Excel
+    function exportExcel() {
+        alert('正在导出Excel文件...');
+        // 实际项目中这里会调用导出API
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        renderTable();
+    });
+</script>
+
+</body>
+</html>
