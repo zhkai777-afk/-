@@ -1357,7 +1357,7 @@
                             <div class="item-header">
                                 <div class="item-name">重要环境因素清单</div>
                                 <div class="item-systems">
-                                    <span class="sys-badge E">E</span>
+                                    <span class="sys-badge E"></span>
                                 </div>
                             </div>
                             <div class="item-meta">
@@ -1431,18 +1431,19 @@
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E34D59" stroke-width="2">
                                 <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
-                            <span>该材料分类下的问题清单（<span id="problemCount">0</span>项）</span>
+                            <span>该材料分类下的问题清单</span>
                         </div>
                         <div class="section-content" style="padding: 0;">
                             <table class="problem-list-table" id="problemListTable">
                                 <thead>
                                     <tr>
-                                        <th style="width: 70px;">序号</th>
-                                        <th style="width: 110px;">问题类型</th>
+                                        <th style="width: 60px;">序号</th>
+                                        <th style="width: 100px;">问题类型</th>
                                         <th>问题描述</th>
+                                        <th style="width: 130px;">材料分类</th>
                                         <th style="width: 100px;">涉及领域</th>
-                                        <th style="width: 160px;">提交人</th>
-                                        <th style="width: 80px;">操作</th>
+                                        <th style="width: 140px;">提交人</th>
+                                        <th style="width: 70px;">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="problemListBody">
@@ -1588,6 +1589,20 @@
                 <label class="form-label" id="descLabel">问题描述</label>
                 <textarea class="form-textarea" id="problemDesc" placeholder="请输入详细描述（至少10个字）..."></textarea>
             </div>
+
+            <div class="form-group" id="materialCategoryGroup" style="display: none;">
+                <label class="form-label">所属材料分类 <span style="color: #E34D59; font-size: 11px;">*必选</span></label>
+                <select id="materialCategorySelect" style="width: 100%; padding: 8px 12px; border: 1px solid #e7e7e7; border-radius: 4px; font-size: 13px; outline: none; background: #fff; cursor: pointer;">
+                    <option value="">-- 请选择材料分类 --</option>
+                    <option value="认证申请表">认证申请表</option>
+                    <option value="认证申请评审表">认证申请评审表</option>
+                    <option value="审核计划书">审核计划书</option>
+                    <option value="法律地位证明文件复印件">法律地位证明文件复印件（如营业执照）</option>
+                    <option value="产品质量标准清单">产品质量标准清单</option>
+                    <option value="质量/环境管理手册">质量/环境管理手册</option>
+                    <option value="程序文件汇编">程序文件汇编</option>
+                </select>
+            </div>
             
             <div class="form-group">
                 <label class="form-label">涉及领域（可多选）</label>
@@ -1672,6 +1687,16 @@
                 input.checked = false;
             }
         });
+
+        // 材料分类选择器：仅在"全部"视图下显示，需指定所属材料分类
+        const categoryGroup = document.getElementById('materialCategoryGroup');
+        const categorySelect = document.getElementById('materialCategorySelect');
+        if (String(currentMaterialId) === 'all') {
+            categoryGroup.style.display = 'block';
+            categorySelect.value = '';
+        } else {
+            categoryGroup.style.display = 'none';
+        }
         
         overlay.classList.add('show');
     }
@@ -1707,94 +1732,134 @@
             alert('请至少选择一个涉及领域');
             return;
         }
+
+        // 确定材料分类：全部视图下从下拉框获取，单项视图下使用当前材料名
+        var materialCategory = '';
+        if (String(currentMaterialId) === 'all') {
+            materialCategory = document.getElementById('materialCategorySelect').value;
+            if (!materialCategory) {
+                alert('当前为"全部"视图，请先选择所属材料分类');
+                return;
+            }
+        } else {
+            materialCategory = (materialsData[currentMaterialId] || {}).name || '';
+        }
         
         // 生成新ID
-        const maxId = problemListData.length > 0 ? Math.max(...problemListData.map(p => p.id)) : 0;
+        var maxId = problemListData.length > 0 ? Math.max.apply(null, problemListData.map(function(p) { return p.id; })) : 0;
         
         // 根据类型确定显示文本
-        const typeMap = {
+        var typeMap = {
             'fix': { type: 'fix', typeName: '文件修正' },
             'material': { type: 'material', typeName: '补充材料' },
             'review': { type: 'review', typeName: '补充审核' }
         };
         
-        // 添加到问题清单数据
-        const newProblem = {
+        // 添加到问题清单数据（含材料分类字段）
+        var newProblem = {
             id: maxId + 1,
             type: typeMap[currentModalType].type,
             typeName: typeMap[currentModalType].typeName,
             desc: desc,
             domains: selectedDomains,
             submitter: '王建国',
-            role: 'Q体系专家'
+            role: 'Q体系专家',
+            materialCategory: materialCategory
         };
         problemListData.push(newProblem);
         
-        // 更新UI
-        updateProblemListUI();
-        
-        // 关闭弹窗
+        // 先关闭弹窗，再更新UI（避免UI更新异常导致弹窗无法关闭）
         closeModal();
+        
+        // 确保问题清单DOM存在后再更新
+        try {
+            ensureProblemListDOM();
+            updateProblemListUI();
+        } catch(e) {
+            console.error('更新问题清单出错：', e);
+        }
         
         alert('已添加成功');
     }
     
-    // 更新问题清单UI
+    // 更新问题清单UI（按当前材料分类过滤 + 显示材料分类列）
     function updateProblemListUI() {
         const tbody = document.getElementById('problemListBody');
         const emptyHint = document.getElementById('emptyHint');
-        const count = document.getElementById('problemCount');
         
         tbody.innerHTML = '';
-        count.textContent = problemListData.length;
         
-        if (problemListData.length === 0) {
-            emptyHint.style.display = 'block';
-            document.getElementById('problemListTable').style.display = 'none';
-            return;
-        }
-        
-        emptyHint.style.display = 'none';
-        document.getElementById('problemListTable').style.display = 'table';
-        
-        problemListData.forEach((problem, index) => {
-            const row = tbody.insertRow();
-            row.setAttribute('data-problem-id', problem.id);
-            
-            const cell1 = row.insertCell();
-            cell1.textContent = index + 1;
-            
-            const cell2 = row.insertCell();
-            const typeClass = problem.type === 'fix' ? 'fix' : (problem.type === 'material' ? 'material' : 'review');
-            cell2.innerHTML = `<span class="problem-type-tag ${typeClass}">${problem.typeName}</span>`;
-            
-            const cell3 = row.insertCell();
-            cell3.textContent = problem.desc;
-            
-            const cell4 = row.insertCell();
-            const domainBadges = problem.domains.map(d => `<span class="domain-badge ${d}">${d}</span>`).join('');
-            cell4.innerHTML = `<div class="domain-badges">${domainBadges}</div>`;
-            
-            const cell5 = row.insertCell();
-            cell5.innerHTML = `
-                <div class="submitter-info">
-                    <span class="submitter-name">${problem.submitter}</span>
-                    <span class="submitter-role">${problem.role}</span>
-                </div>
-            `;
-            
-            const cell6 = row.insertCell();
-            cell6.innerHTML = `
-                <button class="delete-btn" onclick="deleteProblem(${problem.id})">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
-                    删除
-                </button>
-            `;
+        // 根据当前视图过滤问题：全部视图显示所有问题，单项视图只显示对应分类
+        var currentCategoryName = String(currentMaterialId) === 'all' ? '' : ((materialsData[currentMaterialId] || {}).name || '');
+        const filteredProblems = problemListData.filter(p => {
+            if (currentMaterialId === 'all') return true;
+            return p.materialCategory === currentCategoryName;
         });
         
-        document.querySelector('.problem-section .section-header span').innerHTML = `该材料分类下的问题清单（${problemListData.length}项）`;
+        if (filteredProblems.length === 0) {
+            emptyHint.style.display = 'block';
+            document.getElementById('problemListTable').style.display = 'none';
+        } else {
+            emptyHint.style.display = 'none';
+            document.getElementById('problemListTable').style.display = 'table';
+            
+            filteredProblems.forEach((problem, index) => {
+                const row = tbody.insertRow();
+                row.setAttribute('data-problem-id', problem.id);
+                
+                // 序号
+                const cell1 = row.insertCell();
+                cell1.textContent = index + 1;
+                
+                // 问题类型
+                const cell2 = row.insertCell();
+                const typeClass = problem.type === 'fix' ? 'fix' : (problem.type === 'material' ? 'material' : 'review');
+                cell2.innerHTML = `<span class="problem-type-tag ${typeClass}">${problem.typeName}</span>`;
+                
+                // 问题描述
+                const cell3 = row.insertCell();
+                cell3.textContent = problem.desc;
+                
+                // 材料分类（新增列）
+                const cellCat = row.insertCell();
+                const catName = problem.materialCategory || '未指定';
+                cellCat.innerHTML = `<span style="font-size: 12px; color: rgba(0,0,0,0.7); background: #F2F3FF; padding: 2px 8px; border-radius: 3px; border: 1px solid #D6E4FF;">${catName}</span>`;
+                
+                // 涉及领域
+                const cell4 = row.insertCell();
+                const domainBadges = problem.domains.map(d => `<span class="domain-badge ${d}">${d}</span>`).join('');
+                cell4.innerHTML = `<div class="domain-badges">${domainBadges}</div>`;
+                
+                // 提交人
+                const cell5 = row.insertCell();
+                cell5.innerHTML = `
+                    <div class="submitter-info">
+                        <span class="submitter-name">${problem.submitter}</span>
+                        <span class="submitter-role">${problem.role}</span>
+                    </div>
+                `;
+                
+                // 操作
+                const cell6 = row.insertCell();
+                cell6.innerHTML = `
+                    <button class="delete-btn" onclick="deleteProblem(${problem.id})">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"></path>
+                        </svg>
+                        删除
+                    </button>
+                `;
+            });
+        }
+        
+        // 更新标题：区分全部/单项视图，修复连续点击DOM覆盖造成的崩溃
+        const sectionHeaderSpan = document.querySelector('.problem-section .section-header > span');
+        if (sectionHeaderSpan) {
+            const sectionTitle = String(currentMaterialId) === 'all' 
+                ? `全部问题清单（${filteredProblems.length}项）`
+                : `「${currentCategoryName}」下的问题清单（${filteredProblems.length}项）`;
+            sectionHeaderSpan.textContent = sectionTitle;
+        }
     }
     
     // 删除问题
@@ -1840,7 +1905,164 @@
         if (!data) return;
         
         updateHeader(data);
+        
+        // 确保问题清单DOM结构存在（可能被renderReadonlyMaterial销毁）
+        ensureProblemListDOM();
+        
         updateProblemListUI();
+    }
+    
+    // 确保问题清单的DOM结构存在，如果被销毁则重新创建
+    function ensureProblemListDOM() {
+        if (document.getElementById('problemListBody')) return; // 已存在，无需重建
+        
+        var layout = document.querySelector('.content-split-layout');
+        if (!layout) return;
+        
+        layout.innerHTML = `
+            <div class="problem-section">
+                <div class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E34D59" stroke-width="2">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <span>问题清单</span>
+                </div>
+                <div class="section-content" style="padding: 0;">
+                    <table class="problem-list-table" id="problemListTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">序号</th>
+                                <th style="width: 100px;">问题类型</th>
+                                <th>问题描述</th>
+                                <th style="width: 130px;">材料分类</th>
+                                <th style="width: 100px;">涉及领域</th>
+                                <th style="width: 140px;">提交人</th>
+                                <th style="width: 70px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="problemListBody">
+                        </tbody>
+                    </table>
+                    <div class="empty-hint" id="emptyHint">
+                        暂无问题记录，请通过上方按钮添加
+                    </div>
+                </div>
+            </div>
+
+            <div class="file-list-section">
+                <div class="section-header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0052D9" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>该分类下包含的具体文件列表（3个文件）</span>
+                </div>
+                <div class="section-content" style="padding: 0;">
+                    <table class="file-list-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"></th>
+                                <th>文件名称</th>
+                                <th style="width: 100px;">文件类型</th>
+                                <th style="width: 120px;">带入环节</th>
+                                <th style="width: 140px;">上传日期</th>
+                                <th style="width: 120px;">覆盖体系</th>
+                                <th style="width: 100px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="file-icon-small pdf">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                        </svg>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="file-info-text">
+                                        <span class="name">营业执照_正本.pdf</span>
+                                        <span class="meta">2.3 MB | 客户A有限公司</span>
+                                    </div>
+                                </td>
+                                <td>PDF</td>
+                                <td>客户资料库</td>
+                                <td>2026-03-15 10:05</td>
+                                <td>
+                                    <div class="system-badges">
+                                        <span class="sys-badge-mini Q">Q</span>
+                                        <span class="sys-badge-mini E">E</span>
+                                        <span class="sys-badge-mini S">S</span>
+                                        <span class="sys-badge-mini IT">IT</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="preview-btn" onclick="previewFile('营业执照_正本.pdf')">预览</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="file-icon-small pdf">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                        </svg>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="file-info-text">
+                                        <span class="name">营业执照_副本.pdf</span>
+                                        <span class="meta">1.8 MB | 客户A有限公司</span>
+                                    </div>
+                                </td>
+                                <td>PDF</td>
+                                <td>客户资料库</td>
+                                <td>2026-03-15 10:05</td>
+                                <td>
+                                    <div class="system-badges">
+                                        <span class="sys-badge-mini Q">Q</span>
+                                        <span class="sys-badge-mini E">E</span>
+                                        <span class="sys-badge-mini S">S</span>
+                                        <span class="sys-badge-mini IT">IT</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="preview-btn" onclick="previewFile('营业执照_副本.pdf')">预览</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="file-icon-small form">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"></path>
+                                        </svg>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="file-info-text">
+                                        <span class="name">认证申请表_附表</span>
+                                        <span class="meta">在线表单 | 客户A有限公司</span>
+                                    </div>
+                                </td>
+                                <td>表单</td>
+                                <td>初次评定</td>
+                                <td>2026-03-10 14:22</td>
+                                <td>
+                                    <div class="system-badges">
+                                        <span class="sys-badge-mini Q">Q</span>
+                                        <span class="sys-badge-mini E">E</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="preview-btn" onclick="previewFile('认证申请表_附表')">预览</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
     }
     
     function renderReadonlyMaterial(materialId) {
@@ -1928,8 +2150,87 @@
         document.getElementById('pageTags').innerHTML = systemTagsHtml;
     }
     
+    // 文件预览弹窗
     function previewFile(fileName) {
-        alert(`正在预览文件：${fileName}`);
+        const overlay = document.getElementById('previewFileOverlay');
+        const title = document.getElementById('previewFileTitle');
+        const body = document.getElementById('previewFileBody');
+
+        title.textContent = '预览：' + fileName;
+
+        // 模拟不同文件的预览内容
+        const previewContents = {
+            '营业执照_正本.pdf': `
+                <div style="width: 100%; max-width: 560px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 36px; font-family: SimSun, serif;">
+                    <div style="text-align: center; margin-bottom: 28px;">
+                        <div style="font-size: 26px; font-weight: bold; color: #C41A1A; letter-spacing: 8px;">营业执照</div>
+                        <div style="font-size: 12px; color: #888;">BUSINESS LICENSE</div>
+                        <div style="width: 50px; height: 2px; background: #C41A1A; margin: 10px auto;"></div>
+                    </div>
+                    <div style="font-size: 14px; line-height: 2.4; color: #333;">
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">统一社会信用代码：</span><span>91310000MA1FL8XQ30</span></div>
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">名&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;称：</span><span>上海示例科技有限公司</span></div>
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">类&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;型：</span><span>有限责任公司</span></div>
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">法定代表人：</span><span>张三</span></div>
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">注 册 资 本：</span><span>壹仟万元整</span></div>
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">成 立 日 期：</span><span>2020年03月15日</span></div>
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">住&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;所：</span><span>上海市浦东新区张江高科技园区XX路XX号</span></div>
+                        <div style="display: flex; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">经 营 范 围：</span><span>技术开发、技术咨询、软件开发、企业管理咨询</span></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 24px; color: #bbb; font-size: 12px;">（此为模拟预览文件，仅供展示用途）</div>
+                </div>`,
+            '营业执照_副本.pdf': `
+                <div style="width: 100%; max-width: 560px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 36px; font-family: SimSun, serif;">
+                    <div style="text-align: center; margin-bottom: 28px;">
+                        <div style="font-size: 26px; font-weight: bold; color: #C41A1A; letter-spacing: 8px;">营业执照</div>
+                        <div style="font-size: 12px; color: #888;">BUSINESS LICENSE（副本）</div>
+                        <div style="width: 50px; height: 2px; background: #C41A1A; margin: 10px auto;"></div>
+                    </div>
+                    <div style="font-size: 14px; line-height: 2.4; color: #333;">
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">统一社会信用代码：</span><span>91310000MA1FL8XQ30</span></div>
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">名&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;称：</span><span>上海示例科技有限公司</span></div>
+                        <div style="display: flex; border-bottom: 1px dashed #e0e0e0; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">法定代表人：</span><span>张三</span></div>
+                        <div style="display: flex; padding: 6px 0;"><span style="width: 130px; color: #666; flex-shrink: 0;">副本编号：</span><span>NO.2-2020031501</span></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 24px; color: #bbb; font-size: 12px;">（此为模拟预览文件，仅供展示用途）</div>
+                </div>`,
+            '认证申请表_附表': `
+                <div style="width: 100%; max-width: 600px; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; font-family: Microsoft YaHei, sans-serif;">
+                    <div style="text-align: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #0052D9;">
+                        <h2 style="font-size: 18px; color: #333; margin-bottom: 4px;">认证申请表 - 附表</h2>
+                        <p style="font-size: 12px; color: #999;">表单编号：FORM-APP-001</p>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <tr><td style="border: 1px solid #ddd; padding: 8px 10px; background: #f7f8fa; color: #666; width: 120px;">申请组织</td><td style="border: 1px solid #ddd; padding: 8px 10px;" colspan="3">上海示例科技有限公司</td></tr>
+                        <tr><td style="border: 1px solid #ddd; padding: 8px 10px; background: #f7f8fa; color: #666;">认证类型</td><td style="border: 1px solid #ddd; padding: 8px 10px;">初次认证</td><td style="border: 1px solid #ddd; padding: 8px 10px; background: #f7f8fa; color: #666;">申请体系</td><td style="border: 1px solid #ddd; padding: 8px 10px;">Q/E/S/IT</td></tr>
+                        <tr><td style="border: 1px solid #ddd; padding: 8px 10px; background: #f7f8fa; color: #666;">认证范围</td><td style="border: 1px solid #ddd; padding: 8px 10px;" colspan="3">信息技术服务的设计、开发、运维及相关管理活动</td></tr>
+                        <tr><td style="border: 1px solid #ddd; padding: 8px 10px; background: #f7f8fa; color: #666;">联系人</td><td style="border: 1px solid #ddd; padding: 8px 10px;">王五</td><td style="border: 1px solid #ddd; padding: 8px 10px; background: #f7f8fa; color: #666;">联系电话</td><td style="border: 1px solid #ddd; padding: 8px 10px;">021-12345678</td></tr>
+                    </table>
+                    <div style="text-align: center; margin-top: 16px; color: #bbb; font-size: 12px;">（此为模拟预览文件，仅供展示用途）</div>
+                </div>`
+        };
+
+        if (previewContents[fileName]) {
+            body.innerHTML = previewContents[fileName];
+        } else {
+            body.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom: 12px;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <p style="font-size: 15px; color: #666; margin-bottom: 6px;">${fileName}</p>
+                    <p style="font-size: 13px;">文件预览内容</p>
+                    <p style="font-size: 12px; margin-top: 10px; color: #bbb;">（模拟预览，仅供展示）</p>
+                </div>`;
+        }
+
+        overlay.classList.add('show');
+    }
+
+    // 关闭文件预览弹窗
+    function closePreviewFileModal() {
+        document.getElementById('previewFileOverlay').classList.remove('show');
     }
     
     function filterMaterials(keyword) {
@@ -2036,7 +2337,37 @@
             closeModal();
         }
     });
+
+    // 点击外部关闭文件预览弹窗
+    document.getElementById('previewFileOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closePreviewFileModal();
+        }
+    });
+
+    // ESC键关闭所有弹窗
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+            closePreviewFileModal();
+        }
+    });
 </script>
+
+<div class="modal-overlay" id="previewFileOverlay" style="z-index: 1100;">
+    <div class="modal-container" style="max-width: 720px; width: 90%;">
+        <div class="modal-header">
+            <span class="modal-title" id="previewFileTitle">预览文件</span>
+            <button class="modal-close" onclick="closePreviewFileModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body" id="previewFileBody" style="max-height: 70vh; overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; padding: 20px;">
+            </div>
+    </div>
+</div>
 
 </body>
 </html>
