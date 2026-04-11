@@ -1524,6 +1524,49 @@
             gap: 12px;
         }
 
+        /* 删除确认弹窗 */
+        .confirm-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1002;
+            justify-content: center;
+            align-items: center;
+        }
+        .confirm-modal-overlay.active {
+            display: flex;
+        }
+        .confirm-modal-content {
+            background: #fff;
+            width: 480px;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .confirm-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .confirm-modal-body {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .confirm-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
         /* 问题清单行操作按钮 */
         .issue-row-actions {
             display: flex;
@@ -1554,13 +1597,242 @@
         .operation-cell {
             white-space: nowrap;
         }
-</style>
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
+
+        /* 营业执照预览弹窗样式 */
+        .preview-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1003;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+        .preview-modal-overlay.active {
+            display: flex;
+        }
+        .preview-modal-content {
+            background: #e0e0e0;
+            width: 900px;
+            max-height: 90vh;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .preview-modal-header {
+            padding: 16px 24px;
+            background: #fff;
+            border-bottom: 1px solid #e7e7e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .preview-modal-close {
+            cursor: pointer;
+            color: #999;
+            font-size: 20px;
+        }
+        .preview-modal-close:hover {
+            color: #333;
+        }
+        .preview-modal-body {
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 600px;
+        }
+
+        /* 营业执照仿真样式 - 完整保留第二个文件的所有样式 */
+        .bl-paper {
+            background: #FAF5EB;
+            width: 820px;
+            margin: 0 auto;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 10px;
+            color: #333;
+            display: block;
+        }
+        
+        .bl-border-outer {
+            border: 1px solid #bda06d;
+            height: 100%;
+            padding: 4px;
+        }
+        
+        .bl-border-inner {
+            border: 6px solid #bda06d;
+            height: 100%;
+            padding: 40px 50px;
+            position: relative;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(189,160,109,0.04) 10px, rgba(189,160,109,0.04) 20px);
+        }
+        
+        .bl-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+        
+        .bl-code-area {
+            font-family: "SimHei", sans-serif;
+            font-size: 13px;
+            line-height: 1.8;
+            font-weight: bold;
+        }
+        
+        .bl-title-area {
+            text-align: center;
+            margin-top: -10px;
+        }
+        
+        .bl-title-main {
+            font-size: 42px;
+            font-family: "STZhongsong", "SimSun", serif;
+            font-weight: bold;
+            letter-spacing: 12px;
+            color: #222;
+            margin-bottom: 10px;
+            margin-left: 12px;
+        }
+        
+        .bl-title-sub {
+            font-size: 18px;
+            font-family: "STZhongsong", "SimSun", serif;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+        
+        .bl-qr-area {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .bl-qr-box {
+            width: 64px;
+            height: 64px;
+            border: 1px solid #666;
+            padding: 3px;
+            display: flex;
+            flex-wrap: wrap;
+            background: #fff;
+        }
+        
+        .bl-qr-mock {
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(45deg, #000, #000 2px, #fff 2px, #fff 4px),
+                        repeating-linear-gradient(-45deg, #000, #000 2px, #fff 2px, #fff 4px);
+        }
+        
+        .bl-qr-text {
+            font-size: 10px;
+            line-height: 1.3;
+            width: 90px;
+            color: #333;
+        }
+        
+        .bl-content-grid {
+            display: flex;
+            gap: 30px;
+            font-family: "STZhongsong", "SimSun", serif;
+            font-size: 15px;
+            line-height: 2;
+        }
+        
+        .bl-col-left { flex: 1.2; }
+        .bl-col-right { flex: 0.8; }
+        
+        .bl-item {
+            display: flex;
+            margin-bottom: 16px;
+            align-items: baseline;
+        }
+        
+        .bl-label {
+            width: 110px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            flex-shrink: 0;
+            color: #111;
+        }
+        
+        .bl-label-normal {
+            width: 110px;
+            font-weight: bold;
+            flex-shrink: 0;
+            color: #111;
+        }
+        
+        .bl-value {
+            flex: 1;
+            font-weight: bold;
+            color: #222;
+        }
+        
+        .bl-scope-desc {
+            font-size: 13.5px;
+            line-height: 1.6;
+            font-weight: normal;
+        }
+        
+        .bl-stamp-area {
+            position: absolute;
+            bottom: 30px;
+            right: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-family: "STZhongsong", "SimSun", serif;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .bl-stamp-date {
+            margin-top: 15px;
+            letter-spacing: 1px;
+            display: flex;
+            gap: 10px;
+            margin-right: 20px;
+        }
+        
+        .bl-emblem {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: #c1272d;
+            border-radius: 50%;
+            border: 2px solid #bda06d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        .bl-emblem::after {
+            content: "★";
+            color: #f7d358;
+            font-size: 40px;
+        }
+    </style>
 </head>
 <body>
 
@@ -1939,6 +2211,112 @@
         <div class="confirm-modal-footer">
             <button class="t-button btn-outline" onclick="closeDeleteConfirmModal()">取消</button>
             <button class="t-button btn-danger" onclick="confirmDeleteIssue()">确认删除</button>
+        </div>
+    </div>
+</div>
+
+<!-- 营业执照预览弹窗 - 嵌入第二个HTML文件内容 -->
+<div class="preview-modal-overlay" id="previewModal">
+    <div class="preview-modal-content">
+        <div class="preview-modal-header">
+            <span>📄 文件预览</span>
+            <span class="preview-modal-close" onclick="closePreviewModal()">✕</span>
+        </div>
+        <div class="preview-modal-body">
+            <div class="bl-paper">
+                <div class="bl-border-outer">
+                    <div class="bl-border-inner">
+                        
+                        <div class="bl-emblem"></div>
+                        
+                        <div class="bl-top-row">
+                            <div class="bl-code-area">
+                                <div style="font-size:16px;">统一社会信用代码</div>
+                                <div style="font-size:16px;">91310000MA1FPFRF44</div>
+                                <div style="margin-top:10px; color:#444;">证照编号：01000002201908280013</div>
+                            </div>
+                            
+                            <div class="bl-title-area">
+                                <div class="bl-title-main">营业执照</div>
+                                <div class="bl-title-sub">(副本)</div>
+                            </div>
+                            
+                            <div class="bl-qr-area">
+                                <div class="bl-qr-box">
+                                    <div class="bl-qr-mock"></div>
+                                </div>
+                                <div class="bl-qr-text">
+                                    扫描二维码登录<br>"国家企业信用信息公示系统"了解更多登记、备案、许可、监管信息。
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bl-content-grid">
+                            <div class="bl-col-left">
+                                <div class="bl-item">
+                                    <div class="bl-label">名 称</div>
+                                    <div class="bl-value">极易净水科技(上海)有限公司</div>
+                                </div>
+                                <div class="bl-item">
+                                    <div class="bl-label">类 型</div>
+                                    <div class="bl-value">有限责任公司(台港澳法人独资)</div>
+                                </div>
+                                <div class="bl-item">
+                                    <div class="bl-label-normal">法定代表人</div>
+                                    <div class="bl-value">朱芮</div>
+                                </div>
+                                <div class="bl-item">
+                                    <div class="bl-label">经营范围</div>
+                                    <div class="bl-value bl-scope-desc">
+                                        水处理设备、环保产品及零部件、空气调节设备及其零部件、<br>
+                                        家用电器、燃气器具、电热水器具、太阳能设备、医疗器械的<br>
+                                        研究、批发、进出口、佣金代理（拍卖除外）并提供相关配套<br>
+                                        服务。<br>
+                                        【依法须经批准的项目，经相关部门批准后方可开展经营活动】
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bl-col-right">
+                                <div class="bl-item">
+                                    <div class="bl-label">注册资本</div>
+                                    <div class="bl-value">美元150.0000万</div>
+                                </div>
+                                <div class="bl-item">
+                                    <div class="bl-label">成立日期</div>
+                                    <div class="bl-value">2019年08月28日</div>
+                                </div>
+                                <div class="bl-item">
+                                    <div class="bl-label">营业期限</div>
+                                    <div class="bl-value">2019年08月28日 至 2049年08月27日</div>
+                                </div>
+                                <div class="bl-item" style="margin-top:20px;">
+                                    <div class="bl-label">住 所</div>
+                                    <div class="bl-value" style="font-weight:normal;">上海市黄浦区新码头街55号4幢3楼</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bl-stamp-area">
+                            <svg viewBox="0 0 140 140" style="width:160px; height:160px; position:absolute; top:-100px; right:10px; opacity:0.85; transform:rotate(-15deg);">
+                                <circle cx="70" cy="70" r="66" fill="none" stroke="#d32f2f" stroke-width="4"/>
+                                <circle cx="70" cy="70" r="62" fill="none" stroke="#d32f2f" stroke-width="1"/>
+                                <path id="seal-arc" d="M 20, 70 A 50 50 0 0 1 120 70" fill="none" />
+                                <text font-size="15" fill="#d32f2f" font-weight="bold" font-family="SimHei, sans-serif" letter-spacing="1">
+                                    <textPath href="#seal-arc" startOffset="50%" text-anchor="middle">上海市市场监督管理局</textPath>
+                                </text>
+                                <text x="70" y="80" font-size="36" fill="#d32f2f" text-anchor="middle">★</text>
+                            </svg>
+
+                            <div style="z-index:10; position:relative;">登记机关</div>
+                            <div class="bl-stamp-date" style="z-index:10; position:relative;">
+                                <span>2019</span>年<span>08</span>月<span>28</span>日
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -3292,10 +3670,18 @@
         }
     }
 
-    // 预览文件
+    // 预览文件 - 打开营业执照弹窗
     function previewFile(fileName) {
-        alert(`正在打开文件预览：${fileName}
-（此处集成PDF预览组件）`);
+        const modal = document.getElementById('previewModal');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // 关闭预览弹窗
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
     }
 
     // 辅助函数
