@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>归档材料专家评定</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: #f5f5f5;
+            color: rgba(0, 0, 0, 0.9);
+            overflow-x: hidden;
+        }
+        
+        :root {
+            --qms-color: #0052D9;
+            --ems-color: #00A870;
+            --ohsms-color: #FF7D00;
+            --its-color: #7B4DFE;
+            --common-color: #5E5E5E;
+            --success-color: #00A870;
+            --warning-color: #FF7D00;
+            --error-color: #E34D59;
+            --gold-color: #FAAD14;
+        }
+        
+        .page-container {
+            width: 100%;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 顶部导航 - 自适应宽度 */
+        .top-header {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid #e7e7e7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            color: rgba(0,0,0,0.8);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        
+        .back-btn:hover {
+            background: #e7e7e7;
+            border-color: #d9d9d9;
+        }
+        
+        .page-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.9);
+            padding-left: 16px;
+            border-left: 1px solid #e7e7e7;
+            flex-shrink: 0;
+        }
+        
+        .task-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            padding-left: 16px;
+            border-left: 1px solid #e7e7e7;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        
+        .submit-highlight-btn {
+            background: linear-gradient(135deg, #0052D9 0%, #003bb3 100%);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 82, 217, 0.4), 0 0 20px rgba(0, 82, 217, 0.2);
+            transition: all 0.3s ease;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        .submit-highlight-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #003bb3 0%, #002a8f 100%);
+            box-shadow: 0 6px 20px rgba(0, 82, 217, 0.6), 0 0 30px rgba(0, 82, 217, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(0, 82, 217, 0.4), 0 0 20px rgba(0, 82, 217, 0.2);
+            }
+            50% {
+                box-shadow: 0 4px 16px rgba(0, 82, 217, 0.5), 0 0 30px rgba(0, 82, 217, 0.3);
+            }
+        }
+        
+        .expert-banner {
+            background: linear-gradient(to right, #FFF7E6, #FFF0D6);
+            border-left: 4px solid var(--gold-color);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #D48806;
+            font-weight: 500;
+        }
+        
+        /* 主体布局 - 改为两栏布局（左+中），移除右侧栏 */
+        .main-layout {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 108px);
+            overflow: hidden;
+        }
+        
+        /* 左栏：材料导航 - 固定320px宽度 */
+        .sidebar-left {
+            width: 320px;
+            background: #fff;
+            border-right: 1px solid #e7e7e7;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #e7e7e7;
+            background: #fafafa;
+        }
+        
+        .expert-info-card {
+            background: linear-gradient(135deg, #F2F3FF 0%, #fff 100%);
+            border: 1px solid #D6E4FF;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .expert-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--qms-color);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .expert-details {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .expert-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: rgba(0,0,0,0.9);
+        }
+        
+        .expert-title {
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
+        
+        .expert-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--qms-color);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        .filter-section {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e7e7e7;
+        }
+        
+        .filter-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .filter-label {
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filter-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tag {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #e7e7e7;
+            background: #fff;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .filter-tag:hover {
+            background: #F2F3FF;
+            border-color: #0052D9;
+            color: #0052D9;
+        }
+        
+        .filter-tag.active {
+            background: #0052D9;
+            border-color: #0052D9;
+            color: #fff;
+        }
+        
+        .filter-tag.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f5f5f5;
+            position: relative;
+        }
+        
+        .lock-notice {
+            font-size: 11px;
+            color: var(--qms-color);
+            background: #F2F3FF;
+            padding: 6px;
+            border-radius: 4px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .material-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        
+        .material-group {
+            margin-bottom: 4px;
+        }
+        
+        .group-title {
+            padding: 12px 16px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            background: #f0f0f0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+        
+        .group-title .arrow {
+            transition: transform 0.3s;
+            color: rgba(0, 0, 0, 0.4);
+            font-size: 12px;
+        }
+        
+        .group-title.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .group-items {
+            overflow: hidden;
+        }
+        
+        .group-items.collapsed {
+            display: none;
+        }
+        
+        .material-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f5f5f5;
+            position: relative;
+        }
+        
+        .material-item:hover {
+            background: #fafafa;
+        }
+        
+        .material-item.active {
+            background: #F2F3FF;
+            border-left-color: #0052D9;
+        }
+        
+        .material-item.readonly {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #fafafa;
+        }
+        
+        .material-item.readonly:hover {
+            background: #f5f5f5;
+        }
+        
+        .material-item.readonly::after {
+            content: "只读";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            color: #999;
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .item-name {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.9);
+            line-height: 1.4;
+            flex: 1;
+            word-break: break-all;
+        }
+        
+        .item-systems {
+            display: flex;
+            gap: 3px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .sys-badge {
+            font-size: 10px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.2;
+            transition: all 0.3s;
+        }
+        
+        .sys-badge.Q { background: var(--qms-color); }
+        .sys-badge.E { background: var(--ems-color); opacity: 0.4; }
+        .sys-badge.S { background: var(--ohsms-color); opacity: 0.4; }
+        .sys-badge.IT { background: var(--its-color); opacity: 0.4; }
+        
+        .sys-badge.highlight {
+            opacity: 1;
+            box-shadow: 0 0 0 2px rgba(0,82,217,0.2);
+            transform: scale(1.1);
+        }
+        
+        .item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: rgba(0, 0, 0, 0.4);
+            margin-top: 2px;
+        }
+        
+        .item-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.pending { background: #FF7D00; }
+        .status-dot.approved { background: #00A870; }
+        .status-dot.rejected { background: #E34D59; }
+        .status-dot.supplement { background: #FF7D00; }
+        .status-dot.na { background: #999; }
+        
+        /* 中栏：专家审核 - 自适应填充剩余宽度 */
+        .content-main {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+        
+        .content-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e7e7e7;
+            background: linear-gradient(to right, #fff, #fafafa);
+        }
+        
+        .material-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .title-text {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1; /* 核心调整：让标题容器撑满剩余空间，配合内部的 margin-left: auto 实现右对齐 */
+        }
+        
+        .title-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+        
+        .title-action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .title-action-btn.primary {
+            background: #0052D9;
+            color: #fff;
+            border-color: #0052D9;
+        }
+        
+        .title-action-btn.primary:hover {
+            background: #003bb3;
+        }
+        
+        .title-action-btn.warning {
+            background: #FF7D00;
+            color: #fff;
+            border-color: #FF7D00;
+        }
+        
+        .title-action-btn.warning:hover {
+            background: #d46b08;
+        }
+        
+        .title-action-btn.info {
+            background: #E6F7FF;
+            color: #0052D9;
+            border-color: #91D5FF;
+        }
+        
+        .title-action-btn.info:hover {
+            background: #BAE7FF;
+        }
+        
+        .system-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .system-tag {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .system-tag.Q { background: var(--qms-color); }
+        .system-tag.E { background: var(--ems-color); opacity: 0.4; }
+        .system-tag.S { background: var(--ohsms-color); opacity: 0.4; }
+        .system-tag.IT { background: var(--its-color); opacity: 0.4; }
+        
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .content-split-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            height: 100%;
+        }
+        
+        .problem-section {
+            background: #fff;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            overflow: hidden;
+            flex: 0 0 auto;
+        }
+        
+        .section-block {
+            margin-bottom: 24px;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 16px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e7e7e7;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-content {
+            padding: 20px;
+        }
+        
+        .problem-list-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .problem-list-table th,
+        .problem-list-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        
+        .problem-list-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: rgba(0,0,0,0.7);
+            white-space: nowrap;
+        }
+        
+        .problem-list-table tr:hover td {
+            background: #fafafa;
+        }
+        
+        .problem-type-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .problem-type-tag.fix {
+            background: #FFF2F0;
+            color: #E34D59;
+            border: 1px solid #FFCCC7;
+        }
+        
+        .problem-type-tag.material {
+            background: #FFF7E6;
+            color: #FF7D00;
+            border: 1px solid #FFD591;
+        }
+        
+        .problem-type-tag.review {
+            background: #E6FFFB;
+            color: #00A870;
+            border: 1px solid #B5F5EC;
+        }
+        
+        .domain-badges {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+        }
+        
+        .domain-badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .domain-badge.Q { background: var(--qms-color); }
+        .domain-badge.E { background: var(--ems-color); }
+        .domain-badge.S { background: var(--ohsms-color); }
+        .domain-badge.IT { background: var(--its-color); }
+        
+        .submitter-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .submitter-name {
+            font-weight: 500;
+            color: rgba(0,0,0,0.9);
+        }
+        
+        .submitter-role {
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        /* 删除按钮样式 - 保持在一行 */
+        .delete-btn {
+            padding: 6px 12px;
+            border: 1px solid #FFCCC7;
+            background: #FFF2F0;
+            color: #E34D59;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        
+        .delete-btn:hover {
+            background: #E34D59;
+            color: #fff;
+            border-color: #E34D59;
+        }
+        
+        .file-list-section {
+            background: #fff;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .file-list-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .file-list-table th,
+        .file-list-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        
+        .file-list-table th {
+            background: #fafafa;
+            font-weight: 600;
+            color: rgba(0,0,0,0.7);
+            white-space: nowrap;
+        }
+        
+        .file-list-table tr:hover td {
+            background: #fafafa;
+        }
+        
+        .file-list-table .file-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-icon-small {
+            width: 32px;
+            height: 32px;
+            background: #F2F3FF;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0052D9;
+            flex-shrink: 0;
+        }
+        
+        .file-icon-small.pdf {
+            background: #FFF1F0;
+            color: #E34D59;
+        }
+        
+        .file-icon-small.form {
+            background: #E6FFFB;
+            color: #00A870;
+        }
+        
+        .file-info-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .file-info-text .name {
+            font-weight: 500;
+            color: rgba(0,0,0,0.9);
+        }
+        
+        .file-info-text .meta {
+            font-size: 12px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        .system-badges {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .sys-badge-mini {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .sys-badge-mini.Q { background: var(--qms-color); }
+        .sys-badge-mini.E { background: var(--ems-color); }
+        .sys-badge-mini.S { background: var(--ohsms-color); }
+        .sys-badge-mini.IT { background: var(--its-color); }
+        
+        .preview-btn {
+            padding: 4px 12px;
+            border: 1px solid #D6E4FF;
+            background: #F2F3FF;
+            color: #0052D9;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preview-btn:hover {
+            background: #0052D9;
+            color: #fff;
+        }
+        
+        /* 弹窗样式 - Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-container {
+            background: #fff;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 560px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 48px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e7e7e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.9);
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(0,0,0,0.5);
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #f5f5f5;
+            color: rgba(0,0,0,0.8);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.8);
+            margin-bottom: 8px;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e7e7e7;
+            border-radius: 6px;
+            font-size: 13px;
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: #0052D9;
+            box-shadow: 0 0 0 3px rgba(0,82,217,0.1);
+        }
+        
+        .domain-selector {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .domain-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: 1px solid #e7e7e7;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        
+        .domain-checkbox:hover {
+            border-color: #0052D9;
+            background: #F2F3FF;
+        }
+        
+        .domain-checkbox.selected {
+            border-color: #0052D9;
+            background: #F2F3FF;
+            color: #0052D9;
+            font-weight: 500;
+        }
+        
+        .domain-checkbox input {
+            display: none;
+        }
+        
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e7e7e7;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .btn-default {
+            background: #fff;
+            border-color: #e7e7e7;
+            color: rgba(0,0,0,0.8);
+        }
+        
+        .btn-default:hover {
+            border-color: #0052D9;
+            color: #0052D9;
+        }
+        
+        .btn-primary {
+            background: #0052D9;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: #003bb3;
+        }
+        
+        /* 按钮样式 */
+        .t-button {
+            border-radius: 4px;
+            font-size: 14px;
+            padding: 8px 16px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            background: #fff;
+            color: rgba(0,0,0,0.9);
+        }
+        
+        .t-button--outline {
+            border-color: #e7e7e7;
+        }
+        
+        .t-button--outline:hover {
+            border-color: #0052D9;
+            color: #0052D9;
+        }
+        
+        /* 标签样式 */
+        .t-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .t-tag--warning {
+            background: #FFF0D6;
+            color: #FF7D00;
+            border: 1px solid #FFE8B3;
+        }
+        
+        .t-tag--success {
+            background: #D6F5E8;
+            color: #00A870;
+            border: 1px solid #B5F5EC;
+        }
+        
+        .t-tag--error {
+            background: #FFE8E8;
+            color: #E34D59;
+            border: 1px solid #FFD6D6;
+        }
+        
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #DCDCDC;
+            border-radius: 4px;
+        }
+        
+        .filter-stats {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+            margin-top: 4px;
+            font-weight: normal;
+        }
+        
+        .empty-hint {
+            text-align: center;
+            color: rgba(0,0,0,0.4);
+            font-size: 13px;
+            padding: 24px 0;
+            font-style: italic;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 992px) {
+            .main-layout {
+                flex-direction: column;
+                height: auto;
+                overflow: visible;
+            }
+            
+            .sidebar-left {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e7e7e7;
+                max-height: 400px;
+            }
+            
+            .content-main {
+                min-height: 600px;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="page-container">
+    <header class="top-header">
+        <div class="header-left">
+            <button class="back-btn" onclick="history.back()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                返回
+            </button>
+            
+            <span class="page-name">归档材料专家评定</span>
+            
+            <div class="task-info">
+                <span>任务号：TASK-2026-001</span>
+                <span style="color: rgba(0,0,0,0.4);">|</span>
+                <span>客户A - 四体系整合审核</span>
+                <span style="color: rgba(0,0,0,0.4);">|</span>
+                <span id="currentMaterialName">当前：全部材料汇总</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="t-button t-button--outline">返回列表</button>
+            <button class="submit-highlight-btn" id="submitExpertBtn" onclick="submitToManager()">
+                提交结果至管理员
+            </button>
+        </div>
+    </header>
+
+    <div class="expert-banner">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <span>您正在以 <strong>Q体系专家</strong> 身份进行审核。您仅可审核带有Q标签的材料，其他体系材料为只读模式。</span>
+    </div>
+
+    <div class="main-layout">
+        <aside class="sidebar-left">
+            <div class="sidebar-header">
+                <div class="expert-info-card">
+                    <div class="expert-avatar">王</div>
+                    <div class="expert-details">
+                        <div class="expert-name">王建国</div>
+                        <div class="expert-title">高级工程师 / 国家注册审核员</div>
+                        <span class="expert-tag">Q体系专家</span>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <div class="filter-label">
+                        <span>🔒</span>
+                        <span>认证领域（已锁定）</span>
+                    </div>
+                    <div class="filter-tags">
+                        <span class="filter-tag system-Q active" data-value="Q">质量管理体系(Q)</span>
+                        <span class="filter-tag system-E disabled" data-value="E">环境管理(E)</span>
+                        <span class="filter-tag system-S disabled" data-value="S">职业健康安全(S)</span>
+                        <span class="filter-tag system-IT disabled" data-value="IT">信息安全(IT)</span>
+                    </div>
+                    <div class="lock-notice">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span>仅显示含Q体系的材料</span>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                    <div style="font-weight: 600; margin-bottom: 4px; font-size: 13px;">快速筛选</div>
+                    <div style="font-size: 12px; color: rgba(0,0,0,0.4); margin-bottom: 8px;">
+                        需审核：<strong style="color: #0052D9;">7项</strong> | 显示：<span id="filteredCount">7</span>项
+                    </div>
+                    
+                    <div style="margin-bottom: 12px; position: relative;">
+                        <input type="text" id="materialSearch" placeholder="搜索材料名称..." 
+                               style="width: 100%; padding: 8px 12px; padding-left: 32px; border: 1px solid #e7e7e7; border-radius: 4px; font-size: 13px; outline: none;"
+                               oninput="filterMaterials(this.value)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="2" 
+                             style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="material-nav" id="materialNav">
+                <div class="material-group" style="margin-bottom: 0;">
+                    <div class="group-title" onclick="toggleGroup(this)">
+                        <span style="color: #0052D9;">⚡ 需审核的材料</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="group-items">
+                        
+                        <div class="material-item active" data-id="all" onclick="switchMaterial('all')" style="background: linear-gradient(to right, #F2F3FF, #fff); border-left-color: #0052D9;">
+                            <div class="item-header">
+                                <div class="item-name" style="font-weight: 600; color: #0052D9;">全部</div>
+                            </div>
+                        </div>
+
+                        <div class="sub-group">
+                            <div class="group-title" onclick="toggleGroup(this)" style="padding: 10px 16px 10px 24px; background: #f9f9f9; border-bottom: 1px solid #f5f5f5;">
+                                <span style="font-size: 13px; color: rgba(0,0,0,0.8);">📁 通用材料</span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <div class="group-items">
+                                <div class="material-item" data-id="3" data-systems="Q,E,S" data-my-status="supplement" onclick="switchMaterial(3)" style="padding-left: 36px;">
+                                    <div class="item-header">
+                                        <div class="item-name">认证申请表</div>
+                                        <div class="item-systems">
+                                            <span class="sys-badge Q highlight">Q</span>
+                                            <span class="sys-badge E">E</span>
+                                            <span class="sys-badge S">S</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span>通用材料</span>
+                                        <div class="item-status">
+                                            <span class="status-dot supplement"></span>
+                                            <span>需补充</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="material-item" data-id="9" data-systems="Q,E,S,IT" data-my-status="pending" onclick="switchMaterial(9)" style="padding-left: 36px;">
+                                    <div class="item-header">
+                                        <div class="item-name">法律地位证明文件复印件（如营业执照）</div>
+                                        <div class="item-systems">
+                                            <span class="sys-badge Q highlight">Q</span>
+                                            <span class="sys-badge E">E</span>
+                                            <span class="sys-badge S">S</span>
+                                            <span class="sys-badge IT">IT</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span>跨体系材料</span>
+                                        <div class="item-status">
+                                            <span class="status-dot pending"></span>
+                                            <span>待审核</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="material-item" data-id="101" data-systems="Q" data-my-status="pending" onclick="switchMaterial(101)" style="padding-left: 36px;">
+                                    <div class="item-header">
+                                        <div class="item-name">认证申请评审表</div>
+                                        <div class="item-systems">
+                                            <span class="sys-badge Q highlight">Q</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span>通用材料</span>
+                                        <div class="item-status">
+                                            <span class="status-dot pending"></span>
+                                            <span>待审核</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="material-item" data-id="102" data-systems="Q,E,S" data-my-status="pending" onclick="switchMaterial(102)" style="padding-left: 36px;">
+                                    <div class="item-header">
+                                        <div class="item-name">审核计划书</div>
+                                        <div class="item-systems">
+                                            <span class="sys-badge Q highlight">Q</span>
+                                            <span class="sys-badge E">E</span>
+                                            <span class="sys-badge S">S</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span>通用材料</span>
+                                        <div class="item-status">
+                                            <span class="status-dot pending"></span>
+                                            <span>待审核</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sub-group">
+                            <div class="group-title" onclick="toggleGroup(this)" style="padding: 10px 16px 10px 24px; background: #f9f9f9; border-bottom: 1px solid #f5f5f5;">
+                                <span style="font-size: 13px; color: rgba(0,0,0,0.8);">📁 一阶段审核材料</span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <div class="group-items">
+                                <div class="material-item" data-id="17" data-systems="Q" data-my-status="approved" onclick="switchMaterial(17)" style="padding-left: 36px;">
+                                    <div class="item-header">
+                                        <div class="item-name">产品质量标准清单</div>
+                                        <div class="item-systems">
+                                            <span class="sys-badge Q highlight">Q</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span>QMS专用</span>
+                                        <div class="item-status">
+                                            <span class="status-dot approved"></span>
+                                            <span>已通过</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sub-group">
+                            <div class="group-title" onclick="toggleGroup(this)" style="padding: 10px 16px 10px 24px; background: #f9f9f9; border-bottom: 1px solid #f5f5f5;">
+                                <span style="font-size: 13px; color: rgba(0,0,0,0.8);">📁 二阶段审核材料</span>
+                                <span class="arrow">▼</span>
+                            </div>
+                            <div class="group-items">
+                                <div class="material-item" data-id="25" data-systems="Q,E" data-my-status="pending" onclick="switchMaterial(25)" style="padding-left: 36px;">
+                                    <div class="item-header">
+                                        <div class="item-name">质量/环境管理手册</div>
+                                        <div class="item-systems">
+                                            <span class="sys-badge Q highlight">Q</span>
+                                            <span class="sys-badge E">E</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span>Q/E整合材料</span>
+                                        <div class="item-status">
+                                            <span class="status-dot pending"></span>
+                                            <span>待审核</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="material-item" data-id="28" data-systems="Q" data-my-status="rejected" onclick="switchMaterial(28)" style="padding-left: 36px;">
+                                    <div class="item-header">
+                                        <div class="item-name">程序文件汇编</div>
+                                        <div class="item-systems">
+                                            <span class="sys-badge Q highlight">Q</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-meta">
+                                        <span>QMS专用</span>
+                                        <div class="item-status">
+                                            <span class="status-dot rejected"></span>
+                                            <span>已驳回</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="material-group">
+                    <div class="group-title collapsed" onclick="toggleGroup(this)">
+                        <span style="color: #999;">🔒 其他体系材料（只读）（3项）</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="group-items collapsed">
+                        <div class="material-item readonly" data-id="19" data-systems="E" onclick="switchMaterial(19, true)">
+                            <div class="item-header">
+                                <div class="item-name">重要环境因素清单</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge E">E</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>EMS专用</span>
+                                <div class="item-status">
+                                    <span class="status-dot na"></span>
+                                    <span>非您领域</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="material-item readonly" data-id="26" data-systems="IT" onclick="switchMaterial(26, true)">
+                            <div class="item-header">
+                                <div class="item-name">适用性声明(SoA)</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge IT">IT</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>ITS专用</span>
+                                <div class="item-status">
+                                    <span class="status-dot na"></span>
+                                    <span>非您领域</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="material-item readonly" data-id="27" data-systems="S" onclick="switchMaterial(27, true)">
+                            <div class="item-header">
+                                <div class="item-name">危险源辨识清单</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge S">S</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>OHSMS专用</span>
+                                <div class="item-status">
+                                    <span class="status-dot na"></span>
+                                    <span>非您领域</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-main">
+            <div class="content-header">
+                <div class="material-title">
+                    <div class="title-text" id="pageTitle">
+                        全部材料汇总
+                        <span class="t-tag t-tag--warning">待审核</span>
+                    </div>
+                    
+
+                </div>
+                
+                <div class="system-tags" id="pageTags">
+                    <span class="system-tag Q" style="box-shadow: 0 0 0 2px rgba(0,82,217,0.3);">质量管理体系(Q)</span>
+                    <span class="system-tag E">环境管理体系(E)</span>
+                    <span class="system-tag S">职业健康安全(S)</span>
+                    <span class="system-tag IT">信息安全体系(IT)</span>
+                </div>
+            </div>
+            
+            <div class="content-body" id="contentBody">
+                <div class="content-split-layout">
+                    <div class="problem-section">
+                        <div class="section-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E34D59" stroke-width="2">
+                                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            <span>该材料分类下的问题清单（<span id="problemCount">0</span>项）</span>
+                        </div>
+                        <div class="section-content" style="padding: 0;">
+                            <table class="problem-list-table" id="problemListTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 70px;">序号</th>
+                                        <th style="width: 110px;">问题类型</th>
+                                        <th>问题描述</th>
+                                        <th style="width: 100px;">涉及领域</th>
+                                        <th style="width: 160px;">提交人</th>
+                                        <th style="width: 80px;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="problemListBody">
+                                    </tbody>
+                            </table>
+                            <div class="empty-hint" id="emptyHint">
+                                暂无问题记录，请通过上方按钮添加
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="file-list-section">
+                        <div class="section-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0052D9" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            <span>该分类下包含的具体文件列表（3个文件）</span>
+                        </div>
+                        <div class="section-content" style="padding: 0;">
+                            <table class="file-list-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;"></th>
+                                        <th>文件名称</th>
+                                        <th style="width: 100px;">文件类型</th>
+                                        <th style="width: 120px;">带入环节</th>
+                                        <th style="width: 140px;">上传日期</th>
+                                        <th style="width: 120px;">覆盖体系</th>
+                                        <th style="width: 100px;">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="file-icon-small pdf">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                </svg>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="file-info-text">
+                                                <span class="name">营业执照_正本.pdf</span>
+                                                <span class="meta">2.3 MB | 客户A有限公司</span>
+                                            </div>
+                                        </td>
+                                        <td>PDF</td>
+                                        <td>客户资料库</td>
+                                        <td>2026-03-15 10:05</td>
+                                        <td>
+                                            <div class="system-badges">
+                                                <span class="sys-badge-mini Q">Q</span>
+                                                <span class="sys-badge-mini E">E</span>
+                                                <span class="sys-badge-mini S">S</span>
+                                                <span class="sys-badge-mini IT">IT</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="preview-btn" onclick="previewFile('营业执照_正本.pdf')">预览</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="file-icon-small pdf">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                </svg>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="file-info-text">
+                                                <span class="name">营业执照_副本.pdf</span>
+                                                <span class="meta">1.8 MB | 客户A有限公司</span>
+                                            </div>
+                                        </td>
+                                        <td>PDF</td>
+                                        <td>客户资料库</td>
+                                        <td>2026-03-15 10:05</td>
+                                        <td>
+                                            <div class="system-badges">
+                                                <span class="sys-badge-mini Q">Q</span>
+                                                <span class="sys-badge-mini E">E</span>
+                                                <span class="sys-badge-mini S">S</span>
+                                                <span class="sys-badge-mini IT">IT</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="preview-btn" onclick="previewFile('营业执照_副本.pdf')">预览</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="file-icon-small form">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"></path>
+                                                </svg>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="file-info-text">
+                                                <span class="name">认证申请表_附表</span>
+                                                <span class="meta">在线表单 | 客户A有限公司</span>
+                                            </div>
+                                        </td>
+                                        <td>表单</td>
+                                        <td>初次评定</td>
+                                        <td>2026-03-10 14:22</td>
+                                        <td>
+                                            <div class="system-badges">
+                                                <span class="sys-badge-mini Q">Q</span>
+                                                <span class="sys-badge-mini E">E</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="preview-btn" onclick="previewFile('认证申请表_附表')">预览</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle">登记问题</span>
+            <button class="modal-close" onclick="closeModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label" id="descLabel">问题描述</label>
+                <textarea class="form-textarea" id="problemDesc" placeholder="请输入详细描述（至少10个字）..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">涉及领域（可多选）</label>
+                <div class="domain-selector" id="domainSelector">
+                    <label class="domain-checkbox selected" onclick="toggleDomain(this, 'Q')">
+                        <input type="checkbox" value="Q" checked>
+                        <span>质量管理体系(Q)</span>
+                    </label>
+                    <label class="domain-checkbox" onclick="toggleDomain(this, 'E')">
+                        <input type="checkbox" value="E">
+                        <span>环境管理体系(E)</span>
+                    </label>
+                    <label class="domain-checkbox" onclick="toggleDomain(this, 'S')">
+                        <input type="checkbox" value="S">
+                        <span>职业健康安全(S)</span>
+                    </label>
+                    <label class="domain-checkbox" onclick="toggleDomain(this, 'IT')">
+                        <input type="checkbox" value="IT">
+                        <span>信息安全体系(IT)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-default" onclick="closeModal()">取消</button>
+            <button class="btn btn-primary" onclick="submitProblem()">确认</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 问题清单数据存储 - 默认空数据
+    let problemListData = [];
+    
+    // 当前弹窗类型
+    let currentModalType = 'fix';
+    
+    let currentMaterialId = 'all';
+    let currentExpertSystem = 'Q';
+    let selectedStatus = 'all'; // 状态筛选已移除，默认全览
+    let searchKeyword = '';
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        switchMaterial('all'); // 默认选中"全部"
+        updateProblemListUI();
+    });
+    
+    // 打开弹窗
+    function openModal(type) {
+        currentModalType = type;
+        const overlay = document.getElementById('modalOverlay');
+        const title = document.getElementById('modalTitle');
+        const descLabel = document.getElementById('descLabel');
+        
+        const titles = {
+            'fix': '登记问题',
+            'material': '补充材料',
+            'review': '补充审核'
+        };
+        
+        const labels = {
+            'fix': '问题描述',
+            'material': '补充材料原因',
+            'review': '补充审核原因'
+        };
+        
+        title.textContent = titles[type];
+        descLabel.textContent = labels[type];
+        
+        // 重置表单
+        document.getElementById('problemDesc').value = '';
+        
+        // 重置领域选择（默认选中Q）
+        document.querySelectorAll('.domain-checkbox').forEach(cb => {
+            const input = cb.querySelector('input');
+            if (input.value === 'Q') {
+                cb.classList.add('selected');
+                input.checked = true;
+            } else {
+                cb.classList.remove('selected');
+                input.checked = false;
+            }
+        });
+        
+        overlay.classList.add('show');
+    }
+    
+    // 关闭弹窗
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('show');
+    }
+    
+    // 切换领域选择
+    function toggleDomain(element, value) {
+        const input = element.querySelector('input');
+        input.checked = !input.checked;
+        element.classList.toggle('selected', input.checked);
+    }
+    
+    // 提交问题
+    function submitProblem() {
+        const desc = document.getElementById('problemDesc').value.trim();
+        
+        if (!desc || desc.length < 10) {
+            alert('描述至少需要10个字');
+            return;
+        }
+        
+        // 获取选中的领域
+        const selectedDomains = [];
+        document.querySelectorAll('.domain-checkbox.selected input:checked').forEach(input => {
+            selectedDomains.push(input.value);
+        });
+        
+        if (selectedDomains.length === 0) {
+            alert('请至少选择一个涉及领域');
+            return;
+        }
+        
+        // 生成新ID
+        const maxId = problemListData.length > 0 ? Math.max(...problemListData.map(p => p.id)) : 0;
+        
+        // 根据类型确定显示文本
+        const typeMap = {
+            'fix': { type: 'fix', typeName: '文件修正' },
+            'material': { type: 'material', typeName: '补充材料' },
+            'review': { type: 'review', typeName: '补充审核' }
+        };
+        
+        // 添加到问题清单数据
+        const newProblem = {
+            id: maxId + 1,
+            type: typeMap[currentModalType].type,
+            typeName: typeMap[currentModalType].typeName,
+            desc: desc,
+            domains: selectedDomains,
+            submitter: '王建国',
+            role: 'Q体系专家'
+        };
+        problemListData.push(newProblem);
+        
+        // 更新UI
+        updateProblemListUI();
+        
+        // 关闭弹窗
+        closeModal();
+        
+        alert('已添加成功');
+    }
+    
+    // 更新问题清单UI
+    function updateProblemListUI() {
+        const tbody = document.getElementById('problemListBody');
+        const emptyHint = document.getElementById('emptyHint');
+        const count = document.getElementById('problemCount');
+        
+        tbody.innerHTML = '';
+        count.textContent = problemListData.length;
+        
+        if (problemListData.length === 0) {
+            emptyHint.style.display = 'block';
+            document.getElementById('problemListTable').style.display = 'none';
+            return;
+        }
+        
+        emptyHint.style.display = 'none';
+        document.getElementById('problemListTable').style.display = 'table';
+        
+        problemListData.forEach((problem, index) => {
+            const row = tbody.insertRow();
+            row.setAttribute('data-problem-id', problem.id);
+            
+            const cell1 = row.insertCell();
+            cell1.textContent = index + 1;
+            
+            const cell2 = row.insertCell();
+            const typeClass = problem.type === 'fix' ? 'fix' : (problem.type === 'material' ? 'material' : 'review');
+            cell2.innerHTML = `<span class="problem-type-tag ${typeClass}">${problem.typeName}</span>`;
+            
+            const cell3 = row.insertCell();
+            cell3.textContent = problem.desc;
+            
+            const cell4 = row.insertCell();
+            const domainBadges = problem.domains.map(d => `<span class="domain-badge ${d}">${d}</span>`).join('');
+            cell4.innerHTML = `<div class="domain-badges">${domainBadges}</div>`;
+            
+            const cell5 = row.insertCell();
+            cell5.innerHTML = `
+                <div class="submitter-info">
+                    <span class="submitter-name">${problem.submitter}</span>
+                    <span class="submitter-role">${problem.role}</span>
+                </div>
+            `;
+            
+            const cell6 = row.insertCell();
+            cell6.innerHTML = `
+                <button class="delete-btn" onclick="deleteProblem(${problem.id})">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                    删除
+                </button>
+            `;
+        });
+        
+        document.querySelector('.problem-section .section-header span').innerHTML = `该材料分类下的问题清单（${problemListData.length}项）`;
+    }
+    
+    // 删除问题
+    function deleteProblem(problemId) {
+        if (!confirm('确定要删除这条问题记录吗？')) {
+            return;
+        }
+        
+        const index = problemListData.findIndex(p => p.id === problemId);
+        if (index > -1) {
+            problemListData.splice(index, 1);
+            updateProblemListUI();
+        }
+    }
+    
+    // 其他函数保持原有功能
+    function toggleGroup(element) {
+        element.classList.toggle('collapsed');
+        const items = element.nextElementSibling;
+        items.classList.toggle('collapsed');
+    }
+    
+    function switchMaterial(materialId, isReadonly = false) {
+        currentMaterialId = materialId;
+        
+        document.querySelectorAll('.material-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        const activeItem = document.querySelector(`.material-item[data-id="${materialId}"]`);
+        if (activeItem) activeItem.classList.add('active');
+        
+        if (isReadonly) {
+            renderReadonlyMaterial(materialId);
+        } else {
+            renderEditableMaterial(materialId);
+        }
+        
+        document.getElementById('currentMaterialName').textContent = `当前：${materialsData[materialId]?.name || readonlyMaterials[materialId]?.name}`;
+    }
+    
+    function renderEditableMaterial(materialId) {
+        const data = materialsData[materialId];
+        if (!data) return;
+        
+        updateHeader(data);
+        updateProblemListUI();
+    }
+    
+    function renderReadonlyMaterial(materialId) {
+        const data = readonlyMaterials[materialId];
+        if (!data) return;
+        
+        const statusMap = {
+            'approved': '<span class="t-tag t-tag--success">已通过</span>',
+            'rejected': '<span class="t-tag t-tag--error">已驳回</span>',
+            'supplement': '<span class="t-tag t-tag--warning">需补充</span>',
+            'pending': '<span class="t-tag t-tag--warning">待审核</span>'
+        };
+        
+        document.getElementById('pageTitle').innerHTML = `
+            ${data.name}
+            ${statusMap['pending']}
+        `;
+        
+        const names = {'Q': '质量管理体系', 'E': '环境管理体系', 'S': '职业健康安全', 'IT': '信息安全体系'};
+        const systemTagsHtml = data.systems.map(sys => {
+            const isMySystem = sys === currentExpertSystem;
+            const className = sys === 'IT' ? 'IT' : sys;
+            const opacity = isMySystem ? '' : 'opacity: 0.4;';
+            const highlight = isMySystem ? 'box-shadow: 0 0 0 2px rgba(0,82,217,0.3);' : '';
+            return `<span class="system-tag ${className}" style="${opacity} ${highlight}">${names[sys]}(${sys})</span>`;
+        }).join('');
+        document.getElementById('pageTags').innerHTML = systemTagsHtml;
+        
+        document.querySelector('.content-split-layout').innerHTML = `
+            <div class="section-block">
+                <div class="section-content" style="text-align: center; padding: 48px;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5" style="margin-bottom: 16px;">
+                        <path d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-4-4 4 4 0 0 0-4 4v3h8z"/>
+                    </svg>
+                    <h3 style="color: #666; margin-bottom: 8px;">此材料不在您的审核范围内</h3>
+                    <p style="color: #999; font-size: 14px;">请联系对应体系专家进行审核</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    function updateHeader(data) {
+        const statusMap = {
+            'approved': '<span class="t-tag t-tag--success">已通过</span>',
+            'rejected': '<span class="t-tag t-tag--error">已驳回</span>',
+            'supplement': '<span class="t-tag t-tag--warning">需补充</span>',
+            'pending': '<span class="t-tag t-tag--warning">待审核</span>'
+        };
+        
+        const titleHtml = `
+            ${data.name}
+            ${statusMap[data.status]}
+            <div class="title-actions">
+                <button class="title-action-btn primary" onclick="openModal('fix')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    登记问题
+                </button>
+                <button class="title-action-btn warning" onclick="openModal('material')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"></path>
+                    </svg>
+                    补充材料
+                </button>
+                <button class="title-action-btn info" onclick="openModal('review')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                    补充审核
+                </button>
+            </div>
+        `;
+        document.getElementById('pageTitle').innerHTML = titleHtml;
+        
+        const names = {'Q': '质量管理体系', 'E': '环境管理体系', 'S': '职业健康安全', 'IT': '信息安全体系'};
+        const systemTagsHtml = data.systems.map(sys => {
+            const isMySystem = sys === currentExpertSystem;
+            const className = sys === 'IT' ? 'IT' : sys;
+            const opacity = isMySystem ? '' : 'opacity: 0.4;';
+            const highlight = isMySystem ? 'box-shadow: 0 0 0 2px rgba(0,82,217,0.3);' : '';
+            return `<span class="system-tag ${className}" style="${opacity} ${highlight}">${names[sys]}(${sys})</span>`;
+        }).join('');
+        document.getElementById('pageTags').innerHTML = systemTagsHtml;
+    }
+    
+    function previewFile(fileName) {
+        alert(`正在预览文件：${fileName}`);
+    }
+    
+    function filterMaterials(keyword) {
+        searchKeyword = keyword;
+        filterMaterialsList();
+    }
+    
+    function filterMaterialsList() {
+        const items = document.querySelectorAll('.material-item');
+        let visibleCount = 0;
+        
+        items.forEach(item => {
+            const myStatus = item.getAttribute('data-my-status') || 'pending';
+            const materialName = item.querySelector('.item-name').textContent.toLowerCase();
+            
+            let statusMatch = selectedStatus === 'all' || myStatus === selectedStatus;
+            let searchMatch = !searchKeyword || materialName.includes(searchKeyword.toLowerCase());
+            
+            const isReadonly = item.classList.contains('readonly');
+            if (isReadonly && selectedStatus === 'pending') {
+                statusMatch = false;
+            }
+            
+            if (statusMatch && searchMatch) {
+                item.style.display = '';
+                if (!isReadonly) visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('filteredCount').textContent = visibleCount;
+    }
+    
+    function submitToManager() {
+        const total = problemListData.length;
+        
+        let confirmMsg = '确定要提交审核结果吗？\n\n';
+        if (total > 0) {
+            confirmMsg += `当前问题清单共 ${total} 项\n\n`;
+        }
+        confirmMsg += '提交后不可修改，请谨慎操作。';
+        
+        if (!confirm(confirmMsg)) {
+            return;
+        }
+        
+        alert('审核结果已提交！\n\n提交成功，等待管理员复核。');
+    }
+    
+    // 材料数据更新
+    const materialsData = {
+        'all': {
+            name: "全部材料汇总",
+            systems: ["Q", "E", "S", "IT"],
+            status: "pending",
+        },
+        9: {
+            name: "法律地位证明文件复印件",
+            systems: ["Q", "E", "S", "IT"],
+            status: "pending",
+        },
+        3: {
+            name: "认证申请表",
+            systems: ["Q", "E", "S"],
+            status: "supplement",
+        },
+        101: {
+            name: "认证申请评审表",
+            systems: ["Q"],
+            status: "pending",
+        },
+        102: {
+            name: "审核计划书",
+            systems: ["Q", "E", "S"],
+            status: "pending",
+        },
+        17: {
+            name: "产品质量标准清单",
+            systems: ["Q"],
+            status: "approved",
+        },
+        25: {
+            name: "质量/环境管理手册",
+            systems: ["Q", "E"],
+            status: "pending",
+        },
+        28: {
+            name: "程序文件汇编",
+            systems: ["Q"],
+            status: "rejected",
+        }
+    };
+    
+    const readonlyMaterials = {
+        19: { name: "重要环境因素清单", systems: ["E"] },
+        26: { name: "适用性声明(SoA)", systems: ["IT"] },
+        27: { name: "危险源辨识清单", systems: ["S"] }
+    };
+    
+    // 点击外部关闭弹窗
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+</script>
+
+</body>
+</html>
