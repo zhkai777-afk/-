@@ -1,0 +1,2492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>材料管理（多体系） - 审核材料归档系</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: #f5f5f5;
+            color: rgba(0, 0, 0, 0.9);
+            overflow-x: auto;
+            /* 1. 修改：自适应窗口宽度，设置合理的最小宽度防止布局塌陷 */
+            min-width: 1200px; 
+        }
+        
+        :root {
+            --qms-color: #0052D9;
+            --ems-color: #00A870;
+            --ohsms-color: #FF7D00;
+            --its-color: #7B4DFE;
+            --common-color: #5E5E5E;
+        }
+        
+        .page-container {
+            /* 1. 修改：由固定 1848px 改为 100% 宽度，实现自适应 */
+            width: 100%; 
+            margin: 0 auto;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 顶部导航 */
+        .top-header {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid #e7e7e7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0052D9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .task-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            padding-left: 16px;
+            border-left: 1px solid #e7e7e7;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 12px;
+        }
+        
+        /* 主体布局 */
+        .main-layout {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 64px);
+            overflow: hidden;
+        }
+        
+        /* 左栏：材料导航 - 320px宽度 */
+        .sidebar-left {
+            width: 320px;
+            background: #fff;
+            border-right: 1px solid #e7e7e7;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid #e7e7e7;
+            background: #fafafa;
+        }
+        
+        .filter-section {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e7e7e7;
+        }
+        
+        .filter-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .filter-label {
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filter-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tag {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #e7e7e7;
+            background: #fff;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .filter-tag:hover {
+            background: #F2F3FF;
+            border-color: #0052D9;
+            color: #0052D9;
+        }
+        
+        .filter-tag.active {
+            background: #0052D9;
+            border-color: #0052D9;
+            color: #fff;
+        }
+        
+        .filter-tag.system-Q.active { background: var(--qms-color); border-color: var(--qms-color); }
+        .filter-tag.system-E.active { background: var(--ems-color); border-color: var(--ems-color); }
+        .filter-tag.system-S.active { background: var(--ohsms-color); border-color: var(--ohsms-color); }
+        .filter-tag.system-IT.active { background: var(--its-color); border-color: var(--its-color); }
+        
+        .material-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        
+        .material-group {
+            margin-bottom: 4px;
+        }
+        
+        .group-title {
+            padding: 12px 16px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            background: #f0f0f0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+        }
+        
+        .group-title .arrow {
+            transition: transform 0.3s;
+            color: rgba(0, 0, 0, 0.4);
+            font-size: 12px;
+        }
+        
+        .group-title.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .group-items {
+            overflow: hidden;
+        }
+        
+        .group-items.collapsed {
+            display: none;
+        }
+        
+        .material-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            border-bottom: 1px solid #f5f5f5;
+            position: relative;
+        }
+        
+        .material-item:hover {
+            background: #fafafa;
+        }
+        
+        .material-item.active {
+            background: #F2F3FF;
+            border-left-color: #0052D9;
+        }
+        
+        .material-item.hidden {
+            display: none;
+        }
+        
+        .material-item.all-materials {
+            background: linear-gradient(to right, #F2F3FF, #fff);
+            border-left-color: #0052D9;
+            font-weight: 600;
+        }
+        
+        .material-item.all-materials.active {
+            background: #0052D9;
+            color: #fff;
+        }
+        
+        .material-item.all-materials.active .item-name,
+        .material-item.all-materials.active .item-meta {
+            color: #fff;
+        }
+        
+        .material-item.single-active {
+            background: #E6FFFB;
+            border-left-color: #00A870;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .item-name {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.9);
+            line-height: 1.4;
+            flex: 1;
+            word-break: break-all;
+        }
+        
+        .item-systems {
+            display: flex;
+            gap: 3px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .sys-badge {
+            font-size: 10px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.2;
+            transition: all 0.3s;
+        }
+        
+        .sys-badge.Q { background: var(--qms-color); }
+        .sys-badge.E { background: var(--ems-color); }
+        .sys-badge.S { background: var(--ohsms-color); }
+        .sys-badge.IT { background: var(--its-color); }
+        .sys-badge.F { background: #E34D59; }
+        .sys-badge.common { 
+            background: #fff; 
+            color: var(--common-color);
+            border: 1px solid #d0d0d0;
+        }
+        
+        .sys-badge.dimmed {
+            opacity: 0.3;
+            filter: grayscale(100%);
+            transform: scale(0.9);
+        }
+        
+        .item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: rgba(0, 0, 0, 0.4);
+            margin-top: 2px;
+        }
+        
+        .item-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .status-dot.completed { background: #00A870; }
+        .status-dot.pending { background: #E7E7E7; }
+        .status-dot.warning { background: #FF7D00; }
+        .status-dot.error { background: #E34D59; }
+        
+        .applicable-tag {
+            font-size: 11px;
+            color: #FF7D00;
+            background: #FFF0D6;
+            padding: 1px 6px;
+            border-radius: 3px;
+            margin-left: 4px;
+        }
+        
+        /* 中栏：材料编辑 */
+        .content-main {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+        
+        .content-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e7e7e7;
+            background: linear-gradient(to right, #fff, #fafafa);
+        }
+        
+        .material-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .title-text {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .system-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .system-tag {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .system-tag.Q { background: var(--qms-color); }
+        .system-tag.E { background: var(--ems-color); }
+        .system-tag.S { background: var(--ohsms-color); }
+        .system-tag.IT { background: var(--its-color); }
+        
+        .material-desc {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.6);
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+        
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        
+        .section-block {
+            margin-bottom: 24px;
+            border: 1px solid #e7e7e7;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 16px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e7e7e7;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-content {
+            padding: 20px;
+        }
+        
+        .file-card {
+            background: #fff;
+            border: 1px solid #e7e7e7;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: all 0.2s;
+        }
+        
+        .file-card:hover {
+            border-color: #0052D9;
+            box-shadow: 0 2px 8px rgba(0, 82, 217, 0.1);
+        }
+        
+        .file-card.hidden-file {
+            display: none;
+        }
+        
+        .file-icon {
+            width: 48px;
+            height: 48px;
+            background: #F2F3FF;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0052D9;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .file-icon.form {
+            background: #E6FFFB;
+            color: #00A870;
+        }
+        
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .file-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-source {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.4);
+            margin-bottom: 12px;
+        }
+        
+        .file-source-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: #F2F3FF;
+            color: #0052D9;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        
+        .system-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-top: 1px dashed #e7e7e7;
+            margin-top: 8px;
+        }
+        
+        .selector-label {
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.6);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .selected-systems-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        /* V5.0：修改为适合单字母显示的样式 */
+        .system-tag-mini {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 22px;
+        }
+        
+        .system-tag-mini.Q { background: var(--qms-color); }
+        .system-tag-mini.E { background: var(--ems-color); }
+        .system-tag-mini.S { background: var(--ohsms-color); }
+        .system-tag-mini.IT { background: var(--its-color); }
+        
+        .system-tag-mini.dimmed {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+        
+        .file-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        /* 右栏：分体系统计 */
+        .sidebar-right {
+            width: 380px;
+            background: #fff;
+            border-left: 1px solid #e7e7e7;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .panel-section {
+            border-bottom: 1px solid #e7e7e7;
+            padding: 20px;
+        }
+        
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .system-progress-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .system-progress-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+        
+        .system-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .progress-bar-bg {
+            height: 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        .fill-Q { background: var(--qms-color); }
+        .fill-E { background: var(--ems-color); }
+        .fill-S { background: var(--ohsms-color); }
+        .fill-IT { background: var(--its-color); }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .summary-card {
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+            background: #fafafa;
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+        
+        .summary-card.warning {
+            background: #FFF0D6;
+            border-color: #FFE8B3;
+        }
+        
+        .summary-card.error {
+            background: #FFE8E8;
+            border-color: #FFD6D6;
+        }
+        
+        .summary-value {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            color: rgba(0,0,0,0.6);
+        }
+        
+        /* 按钮样式 */
+        .t-button {
+            border-radius: 4px;
+            font-size: 14px;
+            padding: 8px 16px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            background: #fff;
+            color: rgba(0,0,0,0.9);
+        }
+        
+        .t-button--primary {
+            background: #0052D9;
+            color: #fff;
+        }
+        
+        .t-button--primary:hover {
+            background: #003bb3;
+        }
+        
+        .t-button--outline {
+            border-color: #e7e7e7;
+        }
+        
+        .t-button--outline:hover {
+            border-color: #0052D9;
+            color: #0052D9;
+        }
+        
+        .t-button--success {
+            background: #00A870;
+            color: #fff;
+        }
+        
+        .t-button--success:hover:not(:disabled) {
+            background: #008f5f;
+        }
+        
+        .t-button--success:disabled {
+            background: #b3b3b3;
+            cursor: not-allowed;
+        }
+        
+        .t-button--text {
+            background: transparent;
+            border-color: transparent;
+            color: rgba(0,0,0,0.6);
+            font-size: 13px;
+            padding: 4px 8px;
+        }
+        
+        .t-button--text:hover {
+            color: #0052D9;
+            background: #f5f5f5;
+        }
+        
+        /* 标签样式 */
+        .t-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .t-tag--primary {
+            background: #F2F3FF;
+            color: #0052D9;
+            border: 1px solid #D6E4FF;
+        }
+        
+        .t-tag--warning {
+            background: #FFF0D6;
+            color: #FF7D00;
+            border: 1px solid #FFE8B3;
+        }
+        
+        .t-tag--success {
+            background: #D6F5E8;
+            color: #00A870;
+            border: 1px solid #B5F5EC;
+        }
+        
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #DCDCDC;
+            border-radius: 4px;
+        }
+        
+        .filter-stats {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+            margin-top: 4px;
+            font-weight: normal;
+        }
+        
+        .all-files-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e7e7e7;
+        }
+        
+        .stats-pills {
+            display: flex;
+            gap: 12px;
+            margin-left: auto;
+        }
+        
+        .stat-pill {
+            background: #f5f5f5;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: rgba(0,0,0,0.6);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        /* 上传文件列表临时展示区域（可选） */
+        .upload-preview {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .upload-preview.active {
+            display: block;
+        }
+
+        .upload-file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: #fff;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .upload-file-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ============================================
+           预览弹窗样式 - 增强版
+           支持PDF、图片、表单等多种文件类型预览
+           ============================================ */
+        .preview-modal {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* 半透明遮罩层 */
+            z-index: 1000; /* 确保在最上层 */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px); /* 毛玻璃效果 */
+            animation: fadeIn 0.3s ease; /* 淡入动画 */
+        }
+
+        /* 弹窗显示状态 */
+        .preview-modal.show {
+            display: flex;
+        }
+
+        /* 弹窗内容容器 - 居中自适应 */
+        .preview-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1000px; /* 最大宽度限制 */
+            max-height: 90vh; /* 最大高度限制，防止超出视口 */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); /* 阴影效果 */
+            animation: slideUp 0.3s ease; /* 上滑动画 */
+            position: relative;
+        }
+
+        /* 弹窗头部 - 包含标题和关闭按钮 */
+        .preview-header {
+            padding: 16px 24px;
+            background: #fafafa;
+            border-bottom: 1px solid #e7e7e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0; /* 防止头部被压缩 */
+        }
+
+        .preview-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 文件类型标识图标 */
+        .preview-type-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* 关闭按钮 */
+        .preview-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(0,0,0,0.5);
+            transition: all 0.2s;
+        }
+
+        .preview-close:hover {
+            background: #f0f0f0;
+            color: rgba(0,0,0,0.8);
+        }
+
+        /* 弹窗主体内容区域 - 可滚动 */
+        .preview-body {
+            flex: 1;
+            overflow: auto;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f5f5f5;
+            min-height: 400px;
+            position: relative;
+        }
+
+        /* 图片预览样式 */
+        .preview-image {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        /* PDF预览容器 */
+        .preview-pdf-container {
+            width: 100%;
+            height: 100%;
+            min-height: 600px;
+            background: #fff;
+        }
+
+        /* PDF嵌入样式 */
+        .preview-pdf {
+            width: 100%;
+            height: 100%;
+            min-height: 600px;
+            border: none;
+        }
+
+        /* 表单预览容器 */
+        .preview-form-container {
+            width: 100%;
+            max-width: 800px;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            margin: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* 表单标题 */
+        .preview-form-title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #0052D9;
+            color: rgba(0,0,0,0.9);
+        }
+
+        /* 表单字段组 */
+        .preview-form-group {
+            margin-bottom: 24px;
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 16px;
+        }
+
+        .preview-form-label {
+            width: 140px;
+            font-weight: 500;
+            color: rgba(0,0,0,0.6);
+            flex-shrink: 0;
+            padding-top: 4px;
+        }
+
+        .preview-form-value {
+            flex: 1;
+            color: rgba(0,0,0,0.9);
+            font-weight: 500;
+            padding: 4px 12px;
+            background: #fafafa;
+            border-radius: 4px;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 加载状态 */
+        .preview-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .preview-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #0052D9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* 空状态提示 */
+        .preview-empty {
+            text-align: center;
+            padding: 60px 40px;
+            color: rgba(0,0,0,0.4);
+        }
+
+        .preview-empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        /* 动画定义 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 弹窗底部信息栏（可选） */
+        .preview-footer {
+            padding: 12px 24px;
+            background: #fafafa;
+            border-top: 1px solid #e7e7e7;
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 响应式适配：小屏幕设备 */
+        @media (max-width: 768px) {
+            .preview-content {
+                width: 95%;
+                max-height: 95vh;
+                border-radius: 8px;
+            }
+            
+            .preview-form-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .preview-form-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .preview-form-label {
+                width: auto;
+            }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+<div class="page-container">
+    <header class="top-header">
+        <div class="header-left">
+            <button class="t-button t-button--text" style="padding: 6px 12px; margin-right: 8px; color: rgba(0,0,0,0.6);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                返回
+            </button>
+            <span style="font-size: 18px; font-weight: 600; color: rgba(0,0,0,0.9);">归档材料提交</span>
+            <div class="task-info">
+                <span>任务号：TASK-2026-001</span>
+                <span style="color: rgba(0,0,0,0.4);">|</span>
+                <span>客户A - Q/E/S/IT 四体系整合审核</span>
+                <span style="color: rgba(0,0,0,0.4);">|</span>
+                <span id="currentMaterialName">当前材料：法律地位证明文件复印件（如营业执照）</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="t-button t-button--outline">返回列表</button>
+            <button class="t-button t-button--outline">保存草稿</button>
+            <button class="t-button t-button--success" id="submitBtn" disabled>材料报送</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar-left">
+            <div class="sidebar-header">
+                <div class="filter-section">
+                    <div class="filter-label">
+                        <span>🏷️</span>
+                        <span>认证领域（多选）</span>
+                        <span class="filter-stats" id="systemFilterStats">已选：全部</span>
+                    </div>
+                    <div class="filter-tags" id="systemFilters">
+                        <span class="filter-tag system-Q" data-value="Q" onclick="toggleSystemFilter('Q')">质量管理体系(Q)</span>
+                        <span class="filter-tag system-E" data-value="E" onclick="toggleSystemFilter('E')">环境管理体系(E)</span>
+                        <span class="filter-tag system-S" data-value="S" onclick="toggleSystemFilter('S')">职业健康安全(S)</span>
+                        <span class="filter-tag system-IT" data-value="IT" onclick="toggleSystemFilter('IT')">信息安全体系(IT)</span>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <div class="filter-label">
+                        <span>📋</span>
+                        <span>认证类型（多选）</span>
+                        <span class="filter-stats" id="auditFilterStats">已选：全部</span>
+                    </div>
+                    <div class="filter-tags" id="auditTypeFilters">
+                        <span class="filter-tag" data-value="Initial" onclick="toggleAuditTypeFilter('Initial')">初次认证</span>
+                        <span class="filter-tag" data-value="Surveillance1" onclick="toggleAuditTypeFilter('Surveillance1')">监督一</span>
+                        <span class="filter-tag" data-value="Surveillance2" onclick="toggleAuditTypeFilter('Surveillance2')">监督二</span>
+                        <span class="filter-tag" data-value="Recertification" onclick="toggleAuditTypeFilter('Recertification')">再认证</span>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 12px;">
+                    <div style="font-weight: 600; margin-bottom: 4px; font-size: 13px;">快速筛选</div>
+                    <div style="font-size: 12px; color: rgba(0,0,0,0.4); margin-bottom: 8px;">
+                        共 <span id="totalCount">44</span> 项材料 | 显示 <span id="filteredCount">44</span> 项
+                    </div>
+                    
+                    <div style="margin-bottom: 12px; position: relative;">
+                        <input type="text" id="materialSearch" placeholder="搜索材料名称..." 
+                               style="width: 100%; padding: 8px 12px; padding-left: 32px; border: 1px solid #e7e7e7; border-radius: 4px; font-size: 13px; outline: none;"
+                               oninput="filterMaterials(this.value)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="2" 
+                             style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="M21 21l-4.35-4.35"></path>
+                        </svg>
+                    </div>
+                    
+                    <div class="filter-tags">
+                        <span class="filter-tag active" onclick="filterByStatus('all', this)">全部</span>
+                        <span class="filter-tag" onclick="filterByStatus('missing', this)">仅看缺失</span>
+                        <span class="filter-tag" onclick="filterByStatus('applicable', this)">适用时</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="material-nav" id="materialNav">
+                <div class="material-group">
+                    <div class="group-title" onclick="toggleGroup(this)">
+                        <span>📁 全部材料汇总</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="group-items">
+                        <div class="material-item all-materials active" data-id="all" data-systems="Q,E,S,IT,F" onclick="showAllMaterials(this)">
+                            <div class="item-header">
+                                <div class="item-name" style="font-weight: 600;">全部材料</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge Q">Q</span>
+                                    <span class="sys-badge E">E</span>
+                                    <span class="sys-badge S">S</span>
+                                    <span class="sys-badge IT">IT</span>
+                                    <span class="sys-badge F">F</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>查看所有体系文件</span>
+                                <div class="item-status">
+                                    <span class="status-dot completed"></span>
+                                    <span>23个文件</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="material-group">
+                    <div class="group-title" onclick="toggleGroup(this)">
+                        <span>📋 通用材料（29项）</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="group-items">
+                        <div class="material-item" data-id="3" data-systems="Q,E,S,F" data-audit-types="Initial,Surveillance1,Surveillance2,Recertification" onclick="switchMaterial('application', this)">
+                            <div class="item-header">
+                                <div class="item-name">认证申请表</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge Q">Q</span>
+                                    <span class="sys-badge E">E</span>
+                                    <span class="sys-badge S">S</span>
+                                    <span class="sys-badge F">F</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>通用 | 初次/监督/再认证</span>
+                                <div class="item-status">
+                                    <span class="status-dot pending"></span>
+                                    <span>未上传</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="material-item" data-id="9" data-systems="Q,E,S,F" data-audit-types="Initial,Surveillance1,Surveillance2,Recertification" onclick="switchMaterial('legal', this)">
+                            <div class="item-header">
+                                <div class="item-name">法律地位证明文件复印件（如营业执照）</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge Q">Q</span>
+                                    <span class="sys-badge E">E</span>
+                                    <span class="sys-badge S">S</span>
+                                    <span class="sys-badge F">F</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>多文件材料</span>
+                                <div class="item-status">
+                                    <span class="status-dot warning"></span>
+                                    <span>3个文件</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="material-item" data-id="17" data-systems="Q" data-audit-types="Initial,Surveillance1,Surveillance2,Recertification" onclick="switchMaterial('default', this)">
+                            <div class="item-header">
+                                <div class="item-name">组织适用的产品或服务质量标准清单</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge Q">Q</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>QMS专用</span>
+                                <div class="item-status">
+                                    <span class="status-dot pending"></span>
+                                    <span>未上传</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="material-item" data-id="19" data-systems="E" data-audit-types="Initial,Surveillance1,Surveillance2,Recertification" onclick="switchMaterial('default', this)">
+                            <div class="item-header">
+                                <div class="item-name">重要环境因素清单</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge E">E</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>EMS专用</span>
+                                <div class="item-status">
+                                    <span class="status-dot pending"></span>
+                                    <span>未上传</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="material-item" data-id="26" data-systems="IT" data-audit-types="Initial,Surveillance1,Surveillance2,Recertification" onclick="switchMaterial('default', this)">
+                            <div class="item-header">
+                                <div class="item-name">适用性声明</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge IT">IT</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>ITS专用</span>
+                                <div class="item-status">
+                                    <span class="status-dot pending"></span>
+                                    <span>未上传</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="material-group">
+                    <div class="group-title collapsed" onclick="toggleGroup(this)">
+                        <span>📑 第一阶段审核（7项）</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="group-items collapsed">
+                        <div class="material-item" data-id="F1-2" data-systems="Q,E,S,F" data-audit-types="Initial" onclick="switchMaterial('default', this)">
+                            <div class="item-header">
+                                <div class="item-name">审核任务书（第一阶段）</div>
+                                <div class="item-systems">
+                                    <span class="sys-badge Q">Q</span>
+                                    <span class="sys-badge E">E</span>
+                                    <span class="sys-badge S">S</span>
+                                    <span class="sys-badge F">F</span>
+                                </div>
+                            </div>
+                            <div class="item-meta">
+                                <span>第一阶段 | 初次认证</span>
+                                <div class="item-status">
+                                    <span class="status-dot pending"></span>
+                                    <span>未上传</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-main">
+            <div class="content-header">
+                <div class="material-title">
+                    <div class="title-text" id="pageTitle">
+                        全部材料汇总
+                        <span class="t-tag t-tag--primary">跨体系视图</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="t-button t-button--outline" style="font-size: 13px;" onclick="triggerLocalUpload()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            本地上传
+                        </button>
+                        <input type="file" id="fileUpload" style="display: none;" multiple onchange="handleLocalUpload(event)">
+                        
+                        <button class="t-button t-button--outline" style="font-size: 13px;" onclick="openLibraryModal()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            从资料库选择
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="system-tags" id="pageTags" style="margin-bottom: 12px;">
+                    <span class="system-tag Q">质量管理体系</span>
+                    <span class="system-tag E">环境管理体系</span>
+                    <span class="system-tag S">职业健康安全</span>
+                    <span class="system-tag IT">信息安全体系</span>
+                </div>
+                
+                <div class="material-desc" id="pageDesc">
+                    当前展示所有认证领域的材料文件。您可以通过左侧筛选器按体系或认证类型进行过滤，系统会实时联动显示符合条件的文件。
+                </div>
+
+                <div id="uploadPreview" class="upload-preview">
+                    <div style="font-size: 13px; color: rgba(0,0,0,0.6); margin-bottom: 8px; font-weight: 500;">
+                        已选择以下文件准备上传：
+                    </div>
+                    <div id="uploadFileList"></div>
+                    
+                    <div style="margin-top: 12px; font-size: 13px; display: flex; align-items: center; gap: 12px;">
+                        <span style="font-weight: 500; color: rgba(0,0,0,0.6);">选择覆盖体系：</span>
+                        <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;"><input type="checkbox" value="Q" class="upload-sys-check" checked> QMS(质量)</label>
+                        <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;"><input type="checkbox" value="E" class="upload-sys-check" checked> EMS(环境)</label>
+                        <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;"><input type="checkbox" value="S" class="upload-sys-check" checked> OHSMS(安全)</label>
+                        <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;"><input type="checkbox" value="IT" class="upload-sys-check" checked> ITS(信息)</label>
+                    </div>
+
+                    <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
+                        <button class="t-button t-button--outline" style="font-size: 13px;" onclick="clearUploadPreview()">取消</button>
+                        <button class="t-button t-button--primary" style="font-size: 13px;" onclick="confirmUpload()">确认上传</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-body" id="contentBody">
+                <div id="all-files-view">
+                    <div class="all-files-title">
+                        <h3 style="font-size: 16px; font-weight: 600;" id="listTitle">全部文件列表</h3>
+                        <div class="stats-pills" id="listStats">
+                            <span class="stat-pill">PDF文件：8个</span>
+                            <span class="stat-pill">在线表单：3个</span>
+                            <span class="stat-pill">缺失：12个</span>
+                        </div>
+                    </div>
+
+                    <div class="section-block" data-material-id="9" data-section-name="法律地位证明文件">
+                        <div class="section-header">
+                            <span>📄</span>
+                            <span>法律地位证明文件（3个文件）</span>
+                            <span style="margin-left: auto; font-size: 12px; color: rgba(0,0,0,0.4); font-weight: normal;">通用材料</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="file-card" data-file-systems="Q,E,S,IT" data-file-id="file-9-1" data-file-type="pdf" data-file-name="营业执照_正本.pdf">
+                                <div class="file-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name">
+                                        营业执照_正本.pdf
+                                        <span class="t-tag t-tag--primary" style="margin-left: 8px;">附件</span>
+                                    </div>
+                                    <div class="file-source">
+                                        <span class="file-source-tag">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                            </svg>
+                                            客户资料库自动带入
+                                        </span>
+                                        <span>大小：2.3 MB | 上传时间：2026-03-15 10:05</span>
+                                    </div>
+                                    <div class="system-selector">
+                                        <span class="selector-label">覆盖体系：</span>
+                                        <div class="selected-systems-tags">
+                                            <span class="system-tag-mini" style="background: #0052D9; padding: 2px 12px;">当前任务下全部体系</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="t-button t-button--text" onclick="openPreviewModal('营业执照_正本.pdf', 'pdf')">预览</button>
+                                    <button class="t-button t-button--text" style="color: #E34D59;" onclick="this.closest('.file-card').remove()">删除</button>
+                                </div>
+                            </div>
+
+                            <div class="file-card" data-file-systems="E,S" data-file-id="file-9-2" data-file-type="pdf" data-file-name="事业法人证书.pdf">
+                                <div class="file-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name">
+                                        事业法人证书.pdf
+                                        <span class="t-tag t-tag--primary" style="margin-left: 8px;">附件</span>
+                                    </div>
+                                    <div class="file-source">
+                                        <span class="file-source-tag" style="background: #E6FFFB; color: #00A870;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M9 11l3 3L22 4"></path>
+                                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                                            </svg>
+                                            审核任务书附件
+                                        </span>
+                                        <span>大小：1.1 MB | 上传时间：2026-03-10 14:30</span>
+                                    </div>
+                                    <div class="system-selector">
+                                        <span class="selector-label">覆盖体系：</span>
+                                        <div class="selected-systems-tags">
+                                            <span class="system-tag-mini E">E</span>
+                                            <span class="system-tag-mini S">S</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="t-button t-button--text" onclick="openPreviewModal('事业法人证书.pdf', 'pdf')">预览</button>
+                                    <button class="t-button t-button--text" style="color: #E34D59;" onclick="this.closest('.file-card').remove()">删除</button>
+                                </div>
+                            </div>
+
+                            <div class="file-card" data-file-systems="Q,E,S,IT" data-file-id="file-9-3" data-file-type="form" data-file-name="组织基本信息登记表">
+                                <div class="file-icon form">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name">
+                                        组织基本信息登记表
+                                        <span class="t-tag t-tag--success" style="margin-left: 8px;">在线表单</span>
+                                    </div>
+                                    <div class="file-source">
+                                        <span class="file-source-tag" style="background: #FFF0D6; color: #FF7D00;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                                            </svg>
+                                            认证申请同步
+                                        </span>
+                                        <span>表单状态：已填写 | 同步时间：2026-03-15 09:00</span>
+                                    </div>
+                                    <div class="system-selector">
+                                        <span class="selector-label">覆盖体系：</span>
+                                        <div class="selected-systems-tags">
+                                            <span class="system-tag-mini" style="background: #0052D9; padding: 2px 12px;">当前任务下全部体系</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="t-button t-button--text" onclick="openPreviewModal('组织基本信息登记表', 'form')">查看表单</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-block" data-material-id="3" data-section-name="认证申请表">
+                        <div class="section-header">
+                            <span>📝</span>
+                            <span>认证申请表（1个文件）</span>
+                            <span style="margin-left: auto; font-size: 12px; color: rgba(0,0,0,0.4); font-weight: normal;">通用材料</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="file-card" data-file-systems="Q,E,S,F" data-file-id="file-3-1" data-file-type="form" data-file-name="认证申请表（在线填报）">
+                                <div class="file-icon form">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name">认证申请表（在线填报）</div>
+                                    <div class="file-source">
+                                        <span class="file-source-tag" style="background: #F2F3FF; color: #0052D9;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                                            </svg>
+                                            认证申请同步
+                                        </span>
+                                        <span>表单状态：已填写 | 同步时间：2026-03-15 09:00 | 填写人：张三</span>
+                                    </div>
+                                    <div class="system-selector">
+                                        <span class="selector-label">覆盖体系：</span>
+                                        <div class="selected-systems-tags">
+                                            <span class="system-tag-mini Q">Q</span>
+                                            <span class="system-tag-mini E">E</span>
+                                            <span class="system-tag-mini S">S</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="t-button t-button--text" onclick="openPreviewModal('认证申请表（在线填报）', 'form')">查看完整表单</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-block" data-material-id="17" data-section-name="产品质量标准清单">
+                        <div class="section-header">
+                            <span>📊</span>
+                            <span>组织适用的产品或服务质量标准清单（0个文件）</span>
+                            <span style="margin-left: auto; font-size: 12px; color: rgba(0,0,0,0.4); font-weight: normal;">QMS专用</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <div>该材料暂无上传文件</div>
+                                <div style="font-size: 12px; margin-top: 8px; opacity: 0.6;">点击右上角"本地上传"添加文件</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="sidebar-right">
+            <div class="panel-section">
+                <div class="panel-title">
+                    <span>分体系完整性检查</span>
+                </div>
+                <div class="system-progress-list">
+                    <div class="system-progress-item">
+                        <div class="progress-header">
+                            <div class="system-name">
+                                <span class="sys-dot" style="background: var(--qms-color);"></span>
+                                <span>质量管理体系</span>
+                            </div>
+                            <span style="color: var(--qms-color); font-weight: 600;">80%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill fill-Q" style="width: 80%"></div>
+                        </div>
+                        <div style="font-size: 11px; color: rgba(0,0,0,0.4); margin-top: 4px; display: flex; justify-content: space-between;">
+                            <span>28/35 项已完成</span>
+                            <span style="color: #E34D59;">缺 7 项</span>
+                        </div>
+                    </div>
+                    <div class="system-progress-item">
+                        <div class="progress-header">
+                            <div class="system-name">
+                                <span class="sys-dot" style="background: var(--ems-color);"></span>
+                                <span>环境管理体系</span>
+                            </div>
+                            <span style="color: var(--ems-color); font-weight: 600;">75%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill fill-E" style="width: 75%"></div>
+                        </div>
+                        <div style="font-size: 11px; color: rgba(0,0,0,0.4); margin-top: 4px; display: flex; justify-content: space-between;">
+                            <span>24/32 项已完成</span>
+                            <span style="color: #E34D59;">缺 8 项</span>
+                        </div>
+                    </div>
+                    <div class="system-progress-item">
+                        <div class="progress-header">
+                            <div class="system-name">
+                                <span class="sys-dot" style="background: var(--ohsms-color);"></span>
+                                <span>职业健康安全</span>
+                            </div>
+                            <span style="color: var(--ohsms-color); font-weight: 600;">73%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill fill-S" style="width: 73%"></div>
+                        </div>
+                        <div style="font-size: 11px; color: rgba(0,0,0,0.4); margin-top: 4px; display: flex; justify-content: space-between;">
+                            <span>22/30 项已完成</span>
+                            <span style="color: #E34D59;">缺 8 项</span>
+                        </div>
+                    </div>
+                    <div class="system-progress-item">
+                        <div class="progress-header">
+                            <div class="system-name">
+                                <span class="sys-dot" style="background: var(--its-color);"></span>
+                                <span>信息安全体系</span>
+                            </div>
+                            <span style="color: var(--its-color); font-weight: 600;">63%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill fill-IT" style="width: 63%"></div>
+                        </div>
+                        <div style="font-size: 11px; color: rgba(0,0,0,0.4); margin-top: 4px; display: flex; justify-content: space-between;">
+                            <span>5/8 项已完成</span>
+                            <span style="color: #E34D59;">缺 3 项</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <div class="summary-value" style="color: #0052D9;">44</div>
+                        <div class="summary-label">材料总数</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-value" style="color: #00A870;">23</div>
+                        <div class="summary-label">已完成</div>
+                    </div>
+                    <div class="summary-card error">
+                        <div class="summary-value" style="color: #E34D59;">18</div>
+                        <div class="summary-label">缺失项</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel-section" style="flex: 1;">
+                <div class="panel-title">
+                    <span>当前视图状态</span>
+                </div>
+                <div style="font-size: 13px; color: rgba(0, 0, 0, 0.6); line-height: 1.8;" id="viewStatusPanel">
+                    <p style="margin-bottom: 12px;"><strong id="viewModeText">当前视图：全部材料汇总</strong></p>
+                    <p id="viewFilterText">认证领域：全部 | 认证类型：全部</p>
+                    <p id="viewFileCount">显示文件：4个</p>
+                    <p style="margin-top: 12px; color: rgba(0,0,0,0.4);">
+                        提示：点击"全部材料"查看跨体系汇总，点击左侧具体材料查看单项详情。
+                    </p>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<div id="submitModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: #fff; width: 400px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <div style="padding: 16px 24px; border-bottom: 1px solid #e7e7e7; font-size: 16px; font-weight: 600; display: flex; justify-content: space-between;">
+            <span>材料报送确认</span>
+            <span style="cursor: pointer; color: rgba(0,0,0,0.4);" onclick="document.getElementById('submitModal').style.display='none'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </span>
+        </div>
+        <div style="padding: 32px 24px; font-size: 14px; line-height: 1.6; color: rgba(0,0,0,0.9);">
+            确认提交后，将提交至初次审核。
+        </div>
+        <div style="padding: 16px 24px; border-top: 1px solid #e7e7e7; text-align: right; background: #fafafa;">
+            <button class="t-button t-button--outline" onclick="document.getElementById('submitModal').style.display='none'">取消</button>
+            <button class="t-button t-button--primary" onclick="alert('报送成功！'); document.getElementById('submitModal').style.display='none'">确认提交</button>
+        </div>
+    </div>
+</div>
+
+<div class="preview-modal" id="previewModal">
+    <div class="preview-content">
+        <div class="preview-header">
+            <h3 class="preview-title">
+                <span id="previewTypeIcon" class="preview-type-icon" style="background: #0052D9;">📄</span>
+                <span id="previewTitle">预览文件</span>
+            </h3>
+            <button class="preview-close" onclick="closePreviewModal()" title="关闭预览">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="preview-body" id="previewBody">
+            </div>
+        
+        <div class="preview-footer" id="previewFooter">
+            <span id="previewFileInfo">文件大小：2.3 MB | 上传时间：2026-03-15 10:05</span>
+            <span style="color: #0052D9; cursor: pointer;" onclick="downloadCurrentFile()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                下载文件
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="preview-modal" id="libraryModal">
+    <div class="preview-content" style="width: 90%; max-width: 1200px; height: 85vh;">
+        <div class="preview-header">
+            <h3 class="preview-title">
+                <span class="preview-type-icon" style="background: #0052D9;">📁</span>
+                从资料库选择
+            </h3>
+            <button class="preview-close" onclick="closeLibraryModal()" title="关闭">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="preview-body" style="padding: 0; min-height: unset; height: 100%;">
+            <iframe src="https://zhkai777-afk.github.io/-/资料库.html" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * 打开资料库弹窗
+     */
+    function openLibraryModal() {
+        document.getElementById('libraryModal').classList.add('show');
+    }
+
+    /**
+     * 关闭资料库弹窗
+     */
+    function closeLibraryModal() {
+        document.getElementById('libraryModal').classList.remove('show');
+    }
+
+    // 全局变量存储当前预览的文件信息
+    let currentPreviewFile = {
+        name: '',
+        type: '',
+        size: '',
+        uploadTime: ''
+    };
+
+    // 模拟文件数据库（实际项目中应从后端获取）
+    const fileDatabase = {
+        '营业执照_正本.pdf': {
+            type: 'pdf',
+            size: '2.3 MB',
+            uploadTime: '2026-03-15 10:05',
+            // 使用在线PDF示例（实际项目中使用真实文件URL）
+            url: 'https://www.africau.edu/images/default/sample.pdf'
+        },
+        '事业法人证书.pdf': {
+            type: 'pdf',
+            size: '1.1 MB',
+            uploadTime: '2026-03-10 14:30',
+            url: 'https://www.africau.edu/images/default/sample.pdf'
+        },
+        '组织基本信息登记表': {
+            type: 'form',
+            size: '-',
+            uploadTime: '2026-03-15 09:00',
+            formData: {
+                '组织名称': '某某科技有限公司',
+                '统一社会信用代码': '91110105MA00XXXXXX',
+                '注册地址': '北京市朝阳区XXX路XXX号',
+                '法定代表人': '张三',
+                '联系电话': '13800138000',
+                '员工总数': '150人',
+                '体系覆盖人数': '120人',
+                '认证领域': '质量管理体系(QMS) + 环境管理体系(EMS)',
+                '申请日期': '2026-03-01'
+            }
+        },
+        '认证申请表（在线填报）': {
+            type: 'form',
+            size: '-',
+            uploadTime: '2026-03-15 09:00',
+            formData: {
+                '申请组织': '某某科技有限公司',
+                '认证标准': 'ISO 9001:2015 / ISO 14001:2015',
+                '审核类型': '初次认证',
+                '覆盖范围': '计算机软件开发、信息系统集成服务',
+                '多场所情况': '无',
+                '希望审核时间': '2026-04-15 至 2026-04-17',
+                '联系人': '李四',
+                '联系电话': '010-12345678'
+            }
+        }
+    };
+
+    /**
+     * 打开预览弹窗
+     * @param {string} fileName - 文件名称
+     * @param {string} fileType - 文件类型（pdf/form/image）
+     */
+    function openPreviewModal(fileName, fileType) {
+        const modal = document.getElementById('previewModal');
+        const title = document.getElementById('previewTitle');
+        const body = document.getElementById('previewBody');
+        const typeIcon = document.getElementById('previewTypeIcon');
+        const footer = document.getElementById('previewFooter');
+        
+        // 更新当前预览文件信息
+        currentPreviewFile.name = fileName;
+        currentPreviewFile.type = fileType;
+        
+        // 获取文件信息（从模拟数据库）
+        const fileInfo = fileDatabase[fileName] || {
+            size: '未知',
+            uploadTime: '-'
+        };
+        currentPreviewFile.size = fileInfo.size;
+        currentPreviewFile.uploadTime = fileInfo.uploadTime;
+        
+        // 更新标题
+        title.innerHTML = `
+            <span class="preview-type-icon" style="background: ${getFileTypeColor(fileType)}">${getFileTypeIcon(fileType)}</span>
+            ${fileName}
+        `;
+        
+        // 清空并准备加载内容
+        body.innerHTML = '<div class="preview-loading"><div class="preview-loading-spinner"></div><div>正在加载预览...</div></div>';
+        
+        // 显示弹窗
+        modal.classList.add('show');
+        
+        // 更新底部信息
+        document.getElementById('previewFileInfo').textContent = 
+            `文件大小：${fileInfo.size} | 上传时间：${fileInfo.uploadTime}`;
+        
+        // 根据文件类型加载不同预览内容（模拟异步加载）
+        setTimeout(() => {
+            switch(fileType) {
+                case 'pdf':
+                    body.innerHTML = renderPDFPreview(fileInfo.url);
+                    break;
+                case 'form':
+                    body.innerHTML = renderFormPreview(fileInfo.formData, fileName);
+                    break;
+                case 'image':
+                    body.innerHTML = renderImagePreview(fileInfo.url || 'https://via.placeholder.com/800x600/0052D9/FFFFFF?text=Image+Preview');
+                    break;
+                default:
+                    body.innerHTML = renderDefaultPreview(fileName);
+            }
+        }, 500); // 模拟500ms加载延迟
+    }
+
+    /**
+     * 关闭预览弹窗
+     */
+    function closePreviewModal() {
+        const modal = document.getElementById('previewModal');
+        modal.classList.remove('show');
+        
+        // 清空内容，释放内存
+        setTimeout(() => {
+            document.getElementById('previewBody').innerHTML = '';
+        }, 300);
+    }
+
+    /**
+     * 渲染PDF预览
+     * @param {string} pdfUrl - PDF文件URL
+     * @returns {string} HTML字符串
+     */
+    function renderPDFPreview(pdfUrl) {
+        return `
+            <div class="preview-pdf-container">
+                <iframe src="${pdfUrl}" class="preview-pdf" title="PDF预览"></iframe>
+            </div>
+        `;
+    }
+
+    /**
+     * 渲染表单预览
+     * @param {Object} formData - 表单数据对象
+     * @param {string} formName - 表单名称
+     * @returns {string} HTML字符串
+     */
+    function renderFormPreview(formData, formName) {
+        if (!formData) {
+            return '<div class="preview-empty"><div class="preview-empty-icon">📝</div><div>暂无表单数据</div></div>';
+        }
+        
+        // 构建表单字段HTML
+        let fieldsHtml = '';
+        for (const [key, value] of Object.entries(formData)) {
+            fieldsHtml += `
+                <div class="preview-form-group">
+                    <div class="preview-form-label">${key}</div>
+                    <div class="preview-form-value">${value}</div>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="preview-form-container">
+                <div class="preview-form-title">${formName}</div>
+                ${fieldsHtml}
+            </div>
+        `;
+    }
+
+    /**
+     * 渲染图片预览
+     * @param {string} imageUrl - 图片URL
+     * @returns {string} HTML字符串
+     */
+    function renderImagePreview(imageUrl) {
+        return `<img src="${imageUrl}" alt="预览图片" class="preview-image" onclick="event.stopPropagation()">`;
+    }
+
+    /**
+     * 渲染默认预览（不支持类型）
+     * @param {string} fileName - 文件名称
+     * @returns {string} HTML字符串
+     */
+    function renderDefaultPreview(fileName) {
+        return `
+            <div class="preview-empty">
+                <div class="preview-empty-icon">📄</div>
+                <div>该文件类型暂不支持在线预览</div>
+                <div style="font-size: 13px; margin-top: 8px; opacity: 0.6;">${fileName}</div>
+                <button class="t-button t-button--primary" style="margin-top: 16px;" onclick="downloadCurrentFile()">
+                    下载查看
+                </button>
+            </div>
+        `;
+    }
+
+    /**
+     * 获取文件类型颜色
+     * @param {string} type - 文件类型
+     * @returns {string} 颜色代码
+     */
+    function getFileTypeColor(type) {
+        const colors = {
+            'pdf': '#E34D59',      // 红色
+            'form': '#00A870',     // 绿色
+            'image': '#0052D9',    // 蓝色
+            'default': '#5E5E5E'   // 灰色
+        };
+        return colors[type] || colors['default'];
+    }
+
+    /**
+     * 获取文件类型图标
+     * @param {string} type - 文件类型
+     * @returns {string} 图标字符
+     */
+    function getFileTypeIcon(type) {
+        const icons = {
+            'pdf': 'PDF',
+            'form': '📝',
+            'image': '🖼️',
+            'default': '📄'
+        };
+        return icons[type] || icons['default'];
+    }
+
+    /**
+     * 下载当前预览的文件（模拟）
+     */
+    function downloadCurrentFile() {
+        if (currentPreviewFile.name) {
+            // 实际项目中这里应该触发真实的文件下载
+            alert(`开始下载：${currentPreviewFile.name}\n\n（演示模式：实际项目中此处将触发文件下载）`);
+        }
+    }
+
+    // 点击遮罩层关闭预览弹窗
+    document.getElementById('previewModal').addEventListener('click', function(e) {
+        // 如果点击的是遮罩层本身（而非内容区域），则关闭弹窗
+        if (e.target === this) {
+            closePreviewModal();
+        }
+    });
+
+    // 点击遮罩层关闭资料库弹窗
+    document.getElementById('libraryModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeLibraryModal();
+        }
+    });
+
+    // ESC键关闭所有弹窗
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePreviewModal();
+            closeLibraryModal();
+        }
+    });
+
+    let selectedSystems = new Set();
+    let selectedAuditTypes = new Set();
+    let currentStatusFilter = 'all';
+    let searchKeyword = '';
+    let currentViewMode = 'all'; 
+    let currentMaterialId = null; 
+
+    // 本地上传功能
+    function triggerLocalUpload() {
+        document.getElementById('fileUpload').click();
+    }
+
+    function handleLocalUpload(event) {
+        const files = event.target.files;
+        if (files.length === 0) return;
+        
+        const previewDiv = document.getElementById('uploadPreview');
+        const fileListDiv = document.getElementById('uploadFileList');
+        
+        fileListDiv.innerHTML = '';
+        
+        Array.from(files).forEach(file => {
+            const fileSize = (file.size / 1024 / 1024).toFixed(2);
+            const fileItem = document.createElement('div');
+            fileItem.className = 'upload-file-item';
+            fileItem.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0052D9" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
+                <span style="color: rgba(0,0,0,0.4); font-size: 12px;">${fileSize}MB</span>
+            `;
+            fileListDiv.appendChild(fileItem);
+        });
+        
+        previewDiv.classList.add('active');
+    }
+
+    function clearUploadPreview() {
+        document.getElementById('uploadPreview').classList.remove('active');
+        document.getElementById('fileUpload').value = '';
+    }
+
+    // 确认上传方法，注入选择体系覆盖功能
+    function confirmUpload() {
+        const fileInput = document.getElementById('fileUpload');
+        if (fileInput.files.length === 0) return;
+        
+        // 获取勾选的覆盖范围
+        const selectedSysNodes = document.querySelectorAll('.upload-sys-check:checked');
+        if (selectedSysNodes.length === 0) {
+            alert('请至少选择一个覆盖体系');
+            return;
+        }
+        
+        const selectedSys = Array.from(selectedSysNodes).map(n => n.value);
+        const sysString = selectedSys.join(',');
+        
+        let tagsHtml = '';
+        selectedSys.forEach(sys => {
+            tagsHtml += `<span class="system-tag-mini ${sys}">${sys}</span>`;
+        });
+
+        // 确定文件归属目标区块
+        let targetSection;
+        if (currentViewMode === 'single') {
+            targetSection = document.querySelector('.section-block[data-material-id="' + currentMaterialId + '"] .section-content');
+        } else {
+            targetSection = document.querySelector('.section-block:not([style*="display: none"]) .section-content');
+        }
+
+        if (!targetSection) {
+            alert('未找到可上传的材料分类区域，请先选择左侧分类');
+            return;
+        }
+
+        // 生成新文件列表卡片并插入DOM
+        Array.from(fileInput.files).forEach(file => {
+            const fileSize = (file.size / 1024 / 1024).toFixed(2);
+            const newFileHtml = `
+            <div class="file-card" data-file-systems="${sysString}" data-file-id="new-file-${Date.now()}" data-file-type="${file.name.endsWith('.pdf') ? 'pdf' : 'image'}" data-file-name="${file.name}">
+                <div class="file-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                </div>
+                <div class="file-info">
+                    <div class="file-name">
+                        ${file.name}
+                        <span class="t-tag t-tag--primary" style="margin-left: 8px;">新上传</span>
+                    </div>
+                    <div class="file-source">
+                        <span class="file-source-tag">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            本地上传
+                        </span>
+                        <span>大小：${fileSize} MB | 上传时间：刚刚</span>
+                    </div>
+                    <div class="system-selector">
+                        <span class="selector-label">覆盖体系：</span>
+                        <div class="selected-systems-tags">
+                            ${tagsHtml}
+                        </div>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    <button class="t-button t-button--text" onclick="openPreviewModal('${file.name}', '${file.name.endsWith('.pdf') ? 'pdf' : 'image'}')">预览</button>
+                    <button class="t-button t-button--text" style="color: #E34D59;" onclick="this.closest('.file-card').remove()">删除</button>
+                </div>
+            </div>`;
+
+            // 如果原本是空状态区域，则先移除空状态提示
+            const emptyState = targetSection.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            targetSection.insertAdjacentHTML('beforeend', newFileHtml);
+        });
+
+        // 触发数据模拟函数
+        simulateCompletion();
+        
+        clearUploadPreview();
+    }
+
+    // 数据模拟函数，将侧边栏进度打满并唤起提交按钮
+    function simulateCompletion() {
+        // 解除提交按钮的 disabled 并绑定弹窗事件
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = false;
+        submitBtn.onclick = function() {
+            document.getElementById('submitModal').style.display = 'flex';
+        };
+
+        // 将所有进度条填满到 100%
+        document.querySelector('.fill-Q').style.width = '100%';
+        document.querySelector('.fill-E').style.width = '100%';
+        document.querySelector('.fill-S').style.width = '100%';
+        document.querySelector('.fill-IT').style.width = '100%';
+
+        // 更新进度百分比文字
+        const progressHeaders = document.querySelectorAll('.progress-header > span:nth-child(2)');
+        progressHeaders.forEach(span => span.textContent = '100%');
+
+        // 更新具体的完成项文字
+        const statusTexts = document.querySelectorAll('.system-progress-item > div:last-child');
+        statusTexts[0].innerHTML = '<span>35/35 项已完成</span><span style="color: #00A870;">缺 0 项</span>';
+        statusTexts[1].innerHTML = '<span>32/32 项已完成</span><span style="color: #00A870;">缺 0 项</span>';
+        statusTexts[2].innerHTML = '<span>30/30 项已完成</span><span style="color: #00A870;">缺 0 项</span>';
+        statusTexts[3].innerHTML = '<span>8/8 项已完成</span><span style="color: #00A870;">缺 0 项</span>';
+
+        // 更新底部统计卡片状态
+        const summaryValues = document.querySelectorAll('.summary-value');
+        summaryValues[1].textContent = '44';
+        summaryValues[2].textContent = '0';
+        
+        // 移除警告卡片样式，改为安全成功色
+        const errorCard = document.querySelector('.summary-card.error');
+        if(errorCard) {
+            errorCard.classList.remove('error');
+            errorCard.style.background = '#D6F5E8';
+            errorCard.style.borderColor = '#B5F5EC';
+            summaryValues[2].style.color = '#00A870';
+        }
+    }
+
+    function toggleGroup(element) {
+        element.classList.toggle('collapsed');
+        const items = element.nextElementSibling;
+        items.classList.toggle('collapsed');
+    }
+    
+    function showAllMaterials(element) {
+        document.querySelectorAll('.material-item').forEach(item => {
+            item.classList.remove('active');
+            item.classList.remove('single-active');
+        });
+        element.classList.add('active');
+        
+        currentViewMode = 'all';
+        currentMaterialId = null;
+        
+        document.getElementById('pageTitle').innerHTML = `全部材料汇总 <span class="t-tag t-tag--primary">跨体系视图</span>`;
+        document.getElementById('pageTags').style.display = 'flex';
+        document.getElementById('pageTags').innerHTML = `
+            <span class="system-tag Q">质量管理体系</span>
+            <span class="system-tag E">环境管理体系</span>
+            <span class="system-tag S">职业健康安全</span>
+            <span class="system-tag IT">信息安全体系</span>
+        `;
+        document.getElementById('pageDesc').textContent = '当前展示所有认证领域的材料文件。您可以通过左侧筛选器按体系或认证类型进行过滤，系统会实时联动显示符合条件的文件。';
+        document.getElementById('currentMaterialName').textContent = '当前材料：全部材料';
+        
+        document.getElementById('listTitle').textContent = '全部文件列表';
+        document.getElementById('listStats').innerHTML = `
+            <span class="stat-pill">PDF文件：8个</span>
+            <span class="stat-pill">在线表单：3个</span>
+            <span class="stat-pill">缺失：12个</span>
+        `;
+        
+        document.querySelectorAll('.section-block').forEach(block => {
+            block.style.display = '';
+        });
+        
+        applyFileFilter();
+        updateViewStatus();
+    }
+    
+    function switchMaterial(type, element) {
+        document.querySelectorAll('.material-item').forEach(item => {
+            item.classList.remove('active');
+            item.classList.remove('single-active');
+        });
+        document.querySelector('.material-item.all-materials').classList.remove('active');
+        element.classList.add('single-active');
+        
+        currentViewMode = 'single';
+        
+        let title = '';
+        let systems = [];
+        const materialId = element.getAttribute('data-id');
+        currentMaterialId = materialId;
+        
+        if (element) {
+            const nameElement = element.querySelector('.item-name');
+            const clone = nameElement.cloneNode(true);
+            clone.querySelectorAll('span').forEach(span => span.remove());
+            title = clone.textContent.trim();
+            
+            const systemBadges = element.querySelectorAll('.sys-badge');
+            systemBadges.forEach(badge => {
+                const sys = badge.textContent.trim();
+                if (!systems.includes(sys)) systems.push(sys);
+            });
+        }
+        
+        const systemNames = {'Q': '质量管理体系', 'E': '环境管理体系', 'S': '职业健康安全', 'F': '食品安全体系', 'IT': '信息安全体系'};
+        
+        if (type === 'legal') {
+            document.getElementById('pageTitle').innerHTML = title + ' <span class="t-tag t-tag--warning">多文件材料</span>';
+        } else {
+            document.getElementById('pageTitle').textContent = title;
+        }
+        
+        let tagsHtml = '';
+        systems.forEach(sys => {
+            const sysClass = sys === 'IT' ? 'IT' : sys;
+            if (systemNames[sys]) {
+                tagsHtml += `<span class="system-tag ${sysClass}">${systemNames[sys]}</span>`;
+            }
+        });
+        document.getElementById('pageTags').innerHTML = tagsHtml;
+        document.getElementById('pageDesc').textContent = `适用于 ${systems.join('/')} 体系。当前仅展示该材料下的文件列表。`;
+        document.getElementById('currentMaterialName').textContent = `当前材料：${title}`;
+        
+        document.getElementById('listTitle').textContent = title;
+        
+        document.querySelectorAll('.section-block').forEach(block => {
+            const blockMaterialId = block.getAttribute('data-material-id');
+            if (blockMaterialId === materialId) {
+                block.style.display = '';
+                const fileCount = block.querySelectorAll('.file-card').length;
+                document.getElementById('listStats').innerHTML = `
+                    <span class="stat-pill">材料ID：${materialId}</span>
+                    <span class="stat-pill">文件数：${fileCount}</span>
+                    <span class="stat-pill">适用体系：${systems.join('+')}</span>
+                `;
+            } else {
+                block.style.display = 'none';
+            }
+        });
+        
+        updateViewStatus();
+    }
+    
+    function toggleSystemFilter(system) {
+        const tag = document.querySelector(`.filter-tag[data-value="${system}"]`);
+        if (selectedSystems.has(system)) {
+            selectedSystems.delete(system);
+            tag.classList.remove('active');
+        } else {
+            selectedSystems.add(system);
+            tag.classList.add('active');
+        }
+        updateFilterStats();
+        
+        if (currentViewMode === 'single') {
+            const allMaterialsBtn = document.querySelector('.material-item.all-materials');
+            showAllMaterials(allMaterialsBtn);
+        } else {
+            applyFileFilter();
+        }
+        applyLeftPanelFilter();
+    }
+    
+    function toggleAuditTypeFilter(type) {
+        const tag = document.querySelector(`#auditTypeFilters .filter-tag[data-value="${type}"]`);
+        if (selectedAuditTypes.has(type)) {
+            selectedAuditTypes.delete(type);
+            tag.classList.remove('active');
+        } else {
+            selectedAuditTypes.add(type);
+            tag.classList.add('active');
+        }
+        updateFilterStats();
+        
+        if (currentViewMode === 'single') {
+            const allMaterialsBtn = document.querySelector('.material-item.all-materials');
+            showAllMaterials(allMaterialsBtn);
+        } else {
+            applyLeftPanelFilter();
+        }
+    }
+    
+    function updateFilterStats() {
+        const sysStats = document.getElementById('systemFilterStats');
+        const auditStats = document.getElementById('auditFilterStats');
+        
+        if (selectedSystems.size === 0) {
+            sysStats.textContent = '已选：全部';
+        } else {
+            sysStats.textContent = `已选：${Array.from(selectedSystems).join('+')}`;
+        }
+        
+        if (selectedAuditTypes.size === 0) {
+            auditStats.textContent = '已选：全部';
+        } else {
+            const names = Array.from(selectedAuditTypes).map(t => {
+                const map = {'Initial':'初次','Surveillance1':'监督一','Surveillance2':'监督二','Recertification':'再认证'};
+                return map[t];
+            });
+            auditStats.textContent = `已选：${names.join('+')}`;
+        }
+    }
+    
+    function applyFileFilter() {
+        if (currentViewMode !== 'all') return; 
+        
+        const fileCards = document.querySelectorAll('.file-card');
+        let visibleCount = 0;
+        
+        fileCards.forEach(card => {
+            const fileSystems = card.getAttribute('data-file-systems').split(',');
+            const systemMatch = selectedSystems.size === 0 || fileSystems.some(s => selectedSystems.has(s));
+            
+            if (systemMatch) {
+                card.classList.remove('hidden-file');
+                visibleCount++;
+                const tags = card.querySelectorAll('.system-tag-mini');
+                tags.forEach(tag => {
+                    const sys = tag.classList.contains('Q') ? 'Q' :
+                               tag.classList.contains('E') ? 'E' :
+                               tag.classList.contains('S') ? 'S' :
+                               tag.classList.contains('IT') ? 'IT' : '';
+                    if (selectedSystems.size === 0 || selectedSystems.has(sys)) {
+                        tag.classList.remove('dimmed');
+                    } else {
+                        tag.classList.add('dimmed');
+                    }
+                });
+            } else {
+                card.classList.add('hidden-file');
+            }
+        });
+        
+        document.querySelectorAll('.section-block').forEach(block => {
+            const visibleFiles = block.querySelectorAll('.file-card:not(.hidden-file)');
+            const hasVisibleFiles = visibleFiles.length > 0;
+            const hasEmptyState = block.querySelector('.empty-state') !== null;
+            
+            if (hasVisibleFiles || hasEmptyState) {
+                block.style.display = '';
+            } else {
+                block.style.display = 'none';
+            }
+        });
+        
+        const visibleSections = document.querySelectorAll('.section-block:not([style*="display: none"])').length;
+        document.getElementById('listStats').innerHTML = `
+            <span class="stat-pill">可见分组：${visibleSections}</span>
+            <span class="stat-pill">可见文件：${visibleCount}</span>
+            <span class="stat-pill">已筛选：${selectedSystems.size > 0 ? Array.from(selectedSystems).join('+') : '全部'}</span>
+        `;
+        
+        updateViewStatus();
+    }
+    
+    function applyLeftPanelFilter() {
+        const items = document.querySelectorAll('.material-item:not(.all-materials)');
+        items.forEach(item => {
+            const systems = item.getAttribute('data-systems').split(',');
+            const auditTypes = item.getAttribute('data-audit-types').split(',');
+            
+            const systemMatch = selectedSystems.size === 0 || systems.some(s => selectedSystems.has(s));
+            const auditMatch = selectedAuditTypes.size === 0 || auditTypes.some(t => selectedAuditTypes.has(t));
+            
+            if (systemMatch && auditMatch) {
+                item.classList.remove('hidden');
+                item.style.display = '';
+                const badges = item.querySelectorAll('.sys-badge');
+                badges.forEach(badge => {
+                    const badgeSystem = badge.textContent.trim();
+                    if (selectedSystems.size === 0 || selectedSystems.has(badgeSystem)) {
+                        badge.classList.remove('dimmed');
+                    } else {
+                        badge.classList.add('dimmed');
+                    }
+                });
+            } else {
+                item.classList.add('hidden');
+                item.style.display = 'none';
+            }
+        });
+        
+        document.querySelectorAll('.material-group').forEach(group => {
+            const visibleItems = group.querySelectorAll('.material-item:not(.hidden)');
+            group.style.display = visibleItems.length > 0 ? '' : 'none';
+        });
+        
+        document.getElementById('filteredCount').textContent = document.querySelectorAll('.material-item:not(.hidden):not(.all-materials)').length;
+    }
+    
+    function filterByStatus(type, element) {
+        document.querySelectorAll('.filter-tag').forEach(tag => {
+            if (tag.parentElement.id !== 'systemFilters' && tag.parentElement.id !== 'auditTypeFilters') {
+                tag.classList.remove('active');
+            }
+        });
+        element.classList.add('active');
+        currentStatusFilter = type;
+        applyLeftPanelFilter();
+    }
+    
+    function filterMaterials(keyword) {
+        searchKeyword = keyword;
+        applyLeftPanelFilter();
+    }
+    
+    function updateViewStatus() {
+        const viewModeText = document.getElementById('viewModeText');
+        const viewFilterText = document.getElementById('viewFilterText');
+        const viewFileCount = document.getElementById('viewFileCount');
+        
+        if (currentViewMode === 'all') {
+            viewModeText.textContent = '当前视图：全部材料汇总';
+            const visibleFiles = document.querySelectorAll('.file-card:not(.hidden-file)').length;
+            viewFileCount.textContent = `显示文件：${visibleFiles}个`;
+        } else {
+            viewModeText.textContent = '当前视图：单项材料详情';
+            const currentSection = document.querySelector(`.section-block[data-material-id="${currentMaterialId}"]`);
+            const fileCount = currentSection ? currentSection.querySelectorAll('.file-card').length : 0;
+            viewFileCount.textContent = `显示文件：${fileCount}个（仅当前材料）`;
+        }
+        
+        const sysText = selectedSystems.size > 0 ? Array.from(selectedSystems).join('+') : '全部';
+        const auditText = selectedAuditTypes.size > 0 ? 
+            Array.from(selectedAuditTypes).map(t => {
+                const map = {'Initial':'初次','Surveillance1':'监督一','Surveillance2':'监督二','Recertification':'再认证'};
+                return map[t];
+            }).join('+') : '全部';
+        
+        viewFilterText.textContent = `认证领域：${sysText} | 认证类型：${auditText}`;
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        showAllMaterials(document.querySelector('.material-item.all-materials'));
+    });
+</script>
+
+</body>
+</html>
