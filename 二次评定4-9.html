@@ -2249,6 +2249,11 @@ let currentSystemFilter = 'all';
                     <td>${materialName}</td>
                     <td>${systemsHtml}</td>
                     <td>${issue.submitter}</td>
+                    <td>
+                        <button class="t-button btn-danger btn-small" onclick="deleteIssueFromAllView(${issue.id})">
+                            删除
+                        </button>
+                    </td>
                 </tr>
             `;
         }).join('');
@@ -2288,15 +2293,16 @@ let currentSystemFilter = 'all';
                 <table class="material-data-table">
                     <thead>
                         <tr>
-                            <th style="width: 12%;">问题类型</th>
-                            <th style="width: 35%;">问题描述</th>
-                            <th style="width: 18%;">所属材料分类</th>
-                            <th style="width: 15%;">涉及领域</th>
-                            <th style="width: 20%;">提交人</th>
+                            <th style="width: 10%;">问题类型</th>
+                            <th style="width: 32%;">问题描述</th>
+                            <th style="width: 16%;">所属材料分类</th>
+                            <th style="width: 12%;">涉及领域</th>
+                            <th style="width: 15%;">提交人</th>
+                            <th style="width: 15%;">操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${rowsHtml.length > 0 ? rowsHtml : '<tr><td colspan="5" style="text-align: center; color: #999; padding: 40px;">暂无问题记录</td></tr>'}
+                        ${rowsHtml.length > 0 ? rowsHtml : '<tr><td colspan="6" style="text-align: center; color: #999; padding: 40px;">暂无问题记录</td></tr>'}
                     </tbody>
                 </table>
             </div>
@@ -2617,6 +2623,28 @@ let currentSystemFilter = 'all';
             }
 
             renderMaterialDetail(materialId);
+        }
+    }
+
+    // 从全部视图删除问题
+    function deleteIssueFromAllView(issueId) {
+        if (!confirm('确定删除此问题记录吗？')) return;
+
+        const globalIndex = issuesData['all'].findIndex(item => item.id === issueId);
+        if (globalIndex > -1) {
+            const issue = issuesData['all'][globalIndex];
+            issuesData['all'].splice(globalIndex, 1);
+
+            // 同时从材料特定的问题清单中删除
+            if (issue.materialId && issuesData[issue.materialId]) {
+                const materialIndex = issuesData[issue.materialId].findIndex(item => item.id === issueId);
+                if (materialIndex > -1) {
+                    issuesData[issue.materialId].splice(materialIndex, 1);
+                }
+            }
+
+            // 重新渲染全部材料视图
+            renderAllMaterialsView();
         }
     }
 // 选择通过（可重新修改，仅改变按钮状态，不显示已通过提示）
