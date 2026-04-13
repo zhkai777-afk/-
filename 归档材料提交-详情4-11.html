@@ -2011,19 +2011,18 @@
     </div>
 </div>
 
-<!-- ========== 资料库选择弹窗 ========== -->
+<!-- ========== 资料库选择弹窗（已按要求修改：移除标题和顶部背景栏，仅保留关闭按钮） ========== -->
 <div class="preview-modal" id="libraryModal">
-    <div class="preview-content" style="width: 1200px; height: 800px; max-width: 1200px; max-height: 800px; padding: 0;">
-        <div class="preview-header" style="flex-shrink: 0;">
-            <h3 class="preview-title">从资料库选择</h3>
-            <button class="preview-close" onclick="closeLibraryModal()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-        <div style="flex: 1; overflow: hidden; height: calc(100% - 57px);">
+    <div class="preview-content" style="width: 1200px; height: 800px; max-width: 1200px; max-height: 800px; padding: 0; position: relative;">
+        <!-- 关闭按钮：绝对定位在右上角 -->
+        <button class="preview-close" onclick="closeLibraryModal()" style="position: absolute; top: 12px; right: 12px; z-index: 100; background: rgba(255,255,255,0.9); border-radius: 4px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <!-- iframe容器：高度调整为100%，填满整个弹窗 -->
+        <div style="flex: 1; overflow: hidden; height: 100%;">
             <iframe id="libraryIframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </div>
