@@ -869,7 +869,7 @@
         /* Modal Styles */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: #fff; width: 800px; border-radius: 8px; display: flex; flex-direction: column; max-height: 80vh; }
+        .modal-content { background: #fff; width: 1200px; border-radius: 8px; display: flex; flex-direction: column; height: 800px; max-height: 800px; }
         .modal-header { padding: 16px 24px; border-bottom: 1px solid #e7e7e7; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 600; }
         .modal-close { cursor: pointer; color: #999; }
         .modal-close:hover { color: #333; }
@@ -1560,6 +1560,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1839,7 +1840,7 @@
             <table class="expert-table">
                 <thead>
                     <tr>
-                        <th class="radio-cell">选择</th>
+                        <th class="radio-cell" style="white-space: nowrap;"><input type="checkbox" id="selectAllExperts" onclick="toggleSelectAllExperts()" style="cursor: pointer;"> 全选</th>
                         <th>专家姓名</th>
                         <th>所属机构/公司</th>
                         <th>覆盖领域</th>
@@ -3295,23 +3296,22 @@
     function openExpertModal() {
         document.getElementById('expertSelectionModal').classList.add('active');
 
-        const coveredSystems = new Set();
-        assignedExperts.forEach(expert => {
-            expert.domains.forEach(d => coveredSystems.add(d));
-        });
-        const uncoveredSystems = allSystems.filter(s => !coveredSystems.has(s));
-
-        if (uncoveredSystems.length > 0) {
-            document.getElementById('modalFilterDomain').value = uncoveredSystems[0];
-        } else {
-            document.getElementById('modalFilterDomain').value = '';
-        }
+        // 默认展示全部领域
+        document.getElementById('modalFilterDomain').value = '';
 
         renderModalExperts();
     }
 
     function closeExpertModal() {
         document.getElementById('expertSelectionModal').classList.remove('active');
+    }
+
+    function toggleSelectAllExperts() {
+        const selectAllCheckbox = document.getElementById('selectAllExperts');
+        const checkboxes = document.querySelectorAll('input[name="selectedExpert"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
     }
 
     function renderModalExperts() {
