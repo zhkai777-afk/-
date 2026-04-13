@@ -982,6 +982,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1004,7 +1005,7 @@
         </div>
         <div class="header-right">
             <button class="t-button t-button--outline" onclick="saveDraft()">保存草稿</button>
-            <button class="t-button t-button--danger" onclick="headerResubmit()">重新提交审核</button>
+            <button class="t-button t-button--danger" id="headerResubmitBtn" disabled onclick="headerResubmit()">重新提交审核</button>
         </div>
     </header>
 
@@ -2286,16 +2287,19 @@
         // 更新底部提交提示
         const submitHint = document.getElementById('submitHint');
         const resubmitBtn = document.getElementById('resubmitBtn');
+        const headerResubmitBtn = document.getElementById('headerResubmitBtn');
 
         if (submitHint) {
             if (currentPending === 0 && totalReturned > 0) {
                 submitHint.textContent = '所有问题已处理完成，可重新提交';
                 submitHint.classList.add('ready');
                 if (resubmitBtn) resubmitBtn.disabled = false;
+                if (headerResubmitBtn) headerResubmitBtn.disabled = false;
             } else {
                 submitHint.textContent = `待完成 ${currentPending} 个问题的处理后可重新提交`;
                 submitHint.classList.remove('ready');
                 if (resubmitBtn) resubmitBtn.disabled = true;
+                if (headerResubmitBtn) headerResubmitBtn.disabled = true;
             }
         }
     }
@@ -2470,6 +2474,10 @@
     
     // 顶部重新提交
     function headerResubmit() {
+        const btn = document.getElementById('headerResubmitBtn');
+        if (btn && btn.disabled) {
+            return; // 按钮禁用时不可点击
+        }
         if (confirm('确定要重新提交审核吗？请确认所有问题已处理完毕。')) {
             resubmitAudit();
         }
