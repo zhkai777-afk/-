@@ -444,6 +444,15 @@
             gap: 4px;
         }
         
+        .file-count {
+            color: #0052D9;
+            font-weight: 600;
+            background: #F2F3FF;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        
         .status-dot {
             width: 6px;
             height: 6px;
@@ -1097,6 +1106,7 @@
         }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1217,10 +1227,7 @@
                                     </div>
                                     <div class="item-meta">
                                         <span>通用材料</span>
-                                        <div class="item-status">
-                                            <span class="status-dot supplement"></span>
-                                            <span>需补充</span>
-                                        </div>
+                                        <span class="file-count">2个文件</span>
                                     </div>
                                 </div>
 
@@ -1236,10 +1243,7 @@
                                     </div>
                                     <div class="item-meta">
                                         <span>跨体系材料</span>
-                                        <div class="item-status">
-                                            <span class="status-dot pending"></span>
-                                            <span>待审核</span>
-                                        </div>
+                                        <span class="file-count">3个文件</span>
                                     </div>
                                 </div>
 
@@ -1252,10 +1256,7 @@
                                     </div>
                                     <div class="item-meta">
                                         <span>通用材料</span>
-                                        <div class="item-status">
-                                            <span class="status-dot pending"></span>
-                                            <span>待审核</span>
-                                        </div>
+                                        <span class="file-count">1个文件</span>
                                     </div>
                                 </div>
 
@@ -1270,10 +1271,7 @@
                                     </div>
                                     <div class="item-meta">
                                         <span>通用材料</span>
-                                        <div class="item-status">
-                                            <span class="status-dot pending"></span>
-                                            <span>待审核</span>
-                                        </div>
+                                        <span class="file-count">2个文件</span>
                                     </div>
                                 </div>
                             </div>
@@ -1294,10 +1292,7 @@
                                     </div>
                                     <div class="item-meta">
                                         <span>QMS专用</span>
-                                        <div class="item-status">
-                                            <span class="status-dot approved"></span>
-                                            <span>已通过</span>
-                                        </div>
+                                        <span class="file-count">4个文件</span>
                                     </div>
                                 </div>
                             </div>
@@ -1319,10 +1314,7 @@
                                     </div>
                                     <div class="item-meta">
                                         <span>Q/E整合材料</span>
-                                        <div class="item-status">
-                                            <span class="status-dot pending"></span>
-                                            <span>待审核</span>
-                                        </div>
+                                        <span class="file-count">2个文件</span>
                                     </div>
                                 </div>
 
@@ -1335,10 +1327,7 @@
                                     </div>
                                     <div class="item-meta">
                                         <span>QMS专用</span>
-                                        <div class="item-status">
-                                            <span class="status-dot rejected"></span>
-                                            <span>已驳回</span>
-                                        </div>
+                                        <span class="file-count">5个文件</span>
                                     </div>
                                 </div>
                             </div>
@@ -1362,10 +1351,7 @@
                             </div>
                             <div class="item-meta">
                                 <span>EMS专用</span>
-                                <div class="item-status">
-                                    <span class="status-dot na"></span>
-                                    <span>非您领域</span>
-                                </div>
+                                <span class="file-count">2个文件</span>
                             </div>
                         </div>
 
@@ -1378,10 +1364,7 @@
                             </div>
                             <div class="item-meta">
                                 <span>ITS专用</span>
-                                <div class="item-status">
-                                    <span class="status-dot na"></span>
-                                    <span>非您领域</span>
-                                </div>
+                                <span class="file-count">1个文件</span>
                             </div>
                         </div>
 
@@ -1394,10 +1377,7 @@
                             </div>
                             <div class="item-meta">
                                 <span>OHSMS专用</span>
-                                <div class="item-status">
-                                    <span class="status-dot na"></span>
-                                    <span>非您领域</span>
-                                </div>
+                                <span class="file-count">3个文件</span>
                             </div>
                         </div>
                     </div>
@@ -1461,7 +1441,7 @@
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
                             </svg>
-                            <span>该分类下包含的具体文件列表（3个文件）</span>
+                            <span id="fileListHeader">该分类下包含的具体文件列表（3个文件）</span>
                         </div>
                         <div class="section-content" style="padding: 0;">
                             <table class="file-list-table">
@@ -1476,7 +1456,7 @@
                                         <th style="width: 100px;">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="fileListBody">
                                     <tr>
                                         <td>
                                             <div class="file-icon-small pdf">
@@ -1644,6 +1624,284 @@
     let currentExpertSystem = 'Q';
     let selectedStatus = 'all'; // 状态筛选已移除，默认全览
     let searchKeyword = '';
+    
+    // 文件数据模拟 - 每个分类对应的文件列表
+    const filesData = {
+        'all': [
+            {
+                name: '营业执照_正本.pdf',
+                meta: '2.3 MB | 客户A有限公司',
+                type: 'PDF',
+                source: '客户资料库',
+                date: '2026-03-15 10:05',
+                systems: ['Q', 'E', 'S', 'IT'],
+                icon: 'pdf'
+            },
+            {
+                name: '营业执照_副本.pdf',
+                meta: '1.8 MB | 客户A有限公司',
+                type: 'PDF',
+                source: '客户资料库',
+                date: '2026-03-15 10:05',
+                systems: ['Q', 'E', 'S', 'IT'],
+                icon: 'pdf'
+            },
+            {
+                name: '认证申请表_附表',
+                meta: '在线表单 | 客户A有限公司',
+                type: '表单',
+                source: '初次评定',
+                date: '2026-03-10 14:22',
+                systems: ['Q', 'E'],
+                icon: 'form'
+            }
+        ],
+        3: [
+            {
+                name: '认证申请表_主表.pdf',
+                meta: '1.2 MB | 客户A有限公司',
+                type: 'PDF',
+                source: '初次评定',
+                date: '2026-03-10 14:20',
+                systems: ['Q', 'E', 'S'],
+                icon: 'pdf'
+            },
+            {
+                name: '认证申请表_附表',
+                meta: '在线表单 | 客户A有限公司',
+                type: '表单',
+                source: '初次评定',
+                date: '2026-03-10 14:22',
+                systems: ['Q', 'E'],
+                icon: 'form'
+            }
+        ],
+        9: [
+            {
+                name: '营业执照_正本.pdf',
+                meta: '2.3 MB | 客户A有限公司',
+                type: 'PDF',
+                source: '客户资料库',
+                date: '2026-03-15 10:05',
+                systems: ['Q', 'E', 'S', 'IT'],
+                icon: 'pdf'
+            },
+            {
+                name: '营业执照_副本.pdf',
+                meta: '1.8 MB | 客户A有限公司',
+                type: 'PDF',
+                source: '客户资料库',
+                date: '2026-03-15 10:05',
+                systems: ['Q', 'E', 'S', 'IT'],
+                icon: 'pdf'
+            },
+            {
+                name: '组织机构代码证.pdf',
+                meta: '0.8 MB | 客户A有限公司',
+                type: 'PDF',
+                source: '客户资料库',
+                date: '2026-03-15 10:06',
+                systems: ['Q', 'E', 'S', 'IT'],
+                icon: 'pdf'
+            }
+        ],
+        101: [
+            {
+                name: '认证申请评审表_2026.pdf',
+                meta: '0.5 MB | 审核部',
+                type: 'PDF',
+                source: '初次评定',
+                date: '2026-03-12 09:15',
+                systems: ['Q'],
+                icon: 'pdf'
+            }
+        ],
+        102: [
+            {
+                name: '审核计划书_初稿.pdf',
+                meta: '1.5 MB | 审核部',
+                type: 'PDF',
+                source: '审核策划',
+                date: '2026-03-18 16:30',
+                systems: ['Q', 'E', 'S'],
+                icon: 'pdf'
+            },
+            {
+                name: '审核计划书_修订版.pdf',
+                meta: '1.6 MB | 审核部',
+                type: 'PDF',
+                source: '审核策划',
+                date: '2026-03-20 10:15',
+                systems: ['Q', 'E', 'S'],
+                icon: 'pdf'
+            }
+        ],
+        17: [
+            {
+                name: '产品质量标准清单_国标.pdf',
+                meta: '2.1 MB | 技术部',
+                type: 'PDF',
+                source: '一阶段审核',
+                date: '2026-03-22 11:20',
+                systems: ['Q'],
+                icon: 'pdf'
+            },
+            {
+                name: '产品质量标准清单_行标.pdf',
+                meta: '1.8 MB | 技术部',
+                type: 'PDF',
+                source: '一阶段审核',
+                date: '2026-03-22 11:25',
+                systems: ['Q'],
+                icon: 'pdf'
+            },
+            {
+                name: '产品检验规范.docx',
+                meta: '0.9 MB | 质量部',
+                type: 'Word',
+                source: '一阶段审核',
+                date: '2026-03-23 09:10',
+                systems: ['Q'],
+                icon: 'form'
+            },
+            {
+                name: '检测方法确认记录.pdf',
+                meta: '1.2 MB | 实验室',
+                type: 'PDF',
+                source: '一阶段审核',
+                date: '2026-03-23 14:00',
+                systems: ['Q'],
+                icon: 'pdf'
+            }
+        ],
+        25: [
+            {
+                name: '质量管理手册_V3.0.pdf',
+                meta: '5.2 MB | 质量部',
+                type: 'PDF',
+                source: '二阶段审核',
+                date: '2026-03-25 08:30',
+                systems: ['Q'],
+                icon: 'pdf'
+            },
+            {
+                name: '环境管理手册_V2.1.pdf',
+                meta: '4.8 MB | 环保部',
+                type: 'PDF',
+                source: '二阶段审核',
+                date: '2026-03-25 09:00',
+                systems: ['E'],
+                icon: 'pdf'
+            }
+        ],
+        28: [
+            {
+                name: '文件控制程序.pdf',
+                meta: '0.8 MB | 质量部',
+                type: 'PDF',
+                source: '二阶段审核',
+                date: '2026-03-26 10:00',
+                systems: ['Q'],
+                icon: 'pdf'
+            },
+            {
+                name: '记录控制程序.pdf',
+                meta: '0.6 MB | 质量部',
+                type: 'PDF',
+                source: '二阶段审核',
+                date: '2026-03-26 10:05',
+                systems: ['Q'],
+                icon: 'pdf'
+            },
+            {
+                name: '内部审核程序.pdf',
+                meta: '0.9 MB | 质量部',
+                type: 'PDF',
+                source: '二阶段审核',
+                date: '2026-03-26 10:10',
+                systems: ['Q'],
+                icon: 'pdf'
+            },
+            {
+                name: '不合格品控制程序.pdf',
+                meta: '1.1 MB | 质量部',
+                type: 'PDF',
+                source: '二阶段审核',
+                date: '2026-03-26 10:15',
+                systems: ['Q'],
+                icon: 'pdf'
+            },
+            {
+                name: '纠正措施控制程序.pdf',
+                meta: '0.7 MB | 质量部',
+                type: 'PDF',
+                source: '二阶段审核',
+                date: '2026-03-26 10:20',
+                systems: ['Q'],
+                icon: 'pdf'
+            }
+        ],
+        19: [
+            {
+                name: '环境因素识别表.pdf',
+                meta: '1.2 MB | 环保部',
+                type: 'PDF',
+                source: 'EMS审核',
+                date: '2026-03-20 11:00',
+                systems: ['E'],
+                icon: 'pdf'
+            },
+            {
+                name: '重要环境因素清单.pdf',
+                meta: '0.8 MB | 环保部',
+                type: 'PDF',
+                source: 'EMS审核',
+                date: '2026-03-20 11:05',
+                systems: ['E'],
+                icon: 'pdf'
+            }
+        ],
+        26: [
+            {
+                name: '适用性声明_SoA_V1.0.pdf',
+                meta: '2.5 MB | IT部',
+                type: 'PDF',
+                source: 'ITS审核',
+                date: '2026-03-21 15:30',
+                systems: ['IT'],
+                icon: 'pdf'
+            }
+        ],
+        27: [
+            {
+                name: '危险源辨识清单.pdf',
+                meta: '1.8 MB | 安全部',
+                type: 'PDF',
+                source: 'OHSMS审核',
+                date: '2026-03-22 09:00',
+                systems: ['S'],
+                icon: 'pdf'
+            },
+            {
+                name: '风险评价表.pdf',
+                meta: '1.5 MB | 安全部',
+                type: 'PDF',
+                source: 'OHSMS审核',
+                date: '2026-03-22 09:05',
+                systems: ['S'],
+                icon: 'pdf'
+            },
+            {
+                name: '重大危险源清单.pdf',
+                meta: '0.9 MB | 安全部',
+                type: 'PDF',
+                source: 'OHSMS审核',
+                date: '2026-03-22 09:10',
+                systems: ['S'],
+                icon: 'pdf'
+            }
+        ]
+    };
     
     // 初始化
     document.addEventListener('DOMContentLoaded', function() {
@@ -1909,7 +2167,68 @@
         // 确保问题清单DOM结构存在（可能被renderReadonlyMaterial销毁）
         ensureProblemListDOM();
         
+        // 更新文件列表
+        updateFileList(materialId);
+        
         updateProblemListUI();
+    }
+    
+    // 更新文件列表
+    function updateFileList(materialId) {
+        const files = filesData[materialId] || [];
+        const tbody = document.getElementById('fileListBody');
+        const header = document.getElementById('fileListHeader');
+        
+        // 更新标题
+        header.textContent = `该分类下包含的具体文件列表（${files.length}个文件）`;
+        
+        // 清空并重新填充表格
+        tbody.innerHTML = '';
+        
+        if (files.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-hint">暂无文件</td></tr>';
+            return;
+        }
+        
+        files.forEach(file => {
+            const tr = document.createElement('tr');
+            
+            // 文件图标
+            const iconClass = file.icon === 'pdf' ? 'file-icon-small pdf' : 'file-icon-small form';
+            const iconSvg = file.icon === 'pdf' 
+                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"></path></svg>';
+            
+            // 体系标签
+            const systemBadges = file.systems.map(sys => `<span class="sys-badge-mini ${sys}">${sys}</span>`).join('');
+            
+            tr.innerHTML = `
+                <td>
+                    <div class="${iconClass}">
+                        ${iconSvg}
+                    </div>
+                </td>
+                <td>
+                    <div class="file-info-text">
+                        <span class="name">${file.name}</span>
+                        <span class="meta">${file.meta}</span>
+                    </div>
+                </td>
+                <td>${file.type}</td>
+                <td>${file.source}</td>
+                <td>${file.date}</td>
+                <td>
+                    <div class="system-badges">
+                        ${systemBadges}
+                    </div>
+                </td>
+                <td>
+                    <button class="preview-btn" onclick="previewFile('${file.name}')">预览</button>
+                </td>
+            `;
+            
+            tbody.appendChild(tr);
+        });
     }
     
     // 确保问题清单的DOM结构存在，如果被销毁则重新创建
@@ -1955,7 +2274,7 @@
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                     </svg>
-                    <span>该分类下包含的具体文件列表（3个文件）</span>
+                    <span id="fileListHeader">该分类下包含的具体文件列表（0个文件）</span>
                 </div>
                 <div class="section-content" style="padding: 0;">
                     <table class="file-list-table">
@@ -1970,94 +2289,7 @@
                                 <th style="width: 100px;">操作</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div class="file-icon-small pdf">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                        </svg>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="file-info-text">
-                                        <span class="name">营业执照_正本.pdf</span>
-                                        <span class="meta">2.3 MB | 客户A有限公司</span>
-                                    </div>
-                                </td>
-                                <td>PDF</td>
-                                <td>客户资料库</td>
-                                <td>2026-03-15 10:05</td>
-                                <td>
-                                    <div class="system-badges">
-                                        <span class="sys-badge-mini Q">Q</span>
-                                        <span class="sys-badge-mini E">E</span>
-                                        <span class="sys-badge-mini S">S</span>
-                                        <span class="sys-badge-mini IT">IT</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <button class="preview-btn" onclick="previewFile('营业执照_正本.pdf')">预览</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="file-icon-small pdf">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                            <polyline points="14 2 14 8 20 8"></polyline>
-                                        </svg>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="file-info-text">
-                                        <span class="name">营业执照_副本.pdf</span>
-                                        <span class="meta">1.8 MB | 客户A有限公司</span>
-                                    </div>
-                                </td>
-                                <td>PDF</td>
-                                <td>客户资料库</td>
-                                <td>2026-03-15 10:05</td>
-                                <td>
-                                    <div class="system-badges">
-                                        <span class="sys-badge-mini Q">Q</span>
-                                        <span class="sys-badge-mini E">E</span>
-                                        <span class="sys-badge-mini S">S</span>
-                                        <span class="sys-badge-mini IT">IT</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <button class="preview-btn" onclick="previewFile('营业执照_副本.pdf')">预览</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="file-icon-small form">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"></path>
-                                        </svg>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="file-info-text">
-                                        <span class="name">认证申请表_附表</span>
-                                        <span class="meta">在线表单 | 客户A有限公司</span>
-                                    </div>
-                                </td>
-                                <td>表单</td>
-                                <td>初次评定</td>
-                                <td>2026-03-10 14:22</td>
-                                <td>
-                                    <div class="system-badges">
-                                        <span class="sys-badge-mini Q">Q</span>
-                                        <span class="sys-badge-mini E">E</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <button class="preview-btn" onclick="previewFile('认证申请表_附表')">预览</button>
-                                </td>
-                            </tr>
+                        <tbody id="fileListBody">
                         </tbody>
                     </table>
                 </div>
