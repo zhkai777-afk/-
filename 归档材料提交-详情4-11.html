@@ -4,23 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>材料管理（多体系） - 审核材料归档系</title>
-    
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
             background-color: #f5f5f5;
             color: rgba(0, 0, 0, 0.9);
             overflow-x: auto;
-            /* 1. 修改：自适应窗口宽度，设置合理的最小宽度防止布局塌陷 */
             min-width: 1200px; 
         }
-        
+
         :root {
             --qms-color: #0052D9;
             --ems-color: #00A870;
@@ -28,9 +27,8 @@
             --its-color: #7B4DFE;
             --common-color: #5E5E5E;
         }
-        
+
         .page-container {
-            /* 1. 修改：由固定 1848px 改为 100% 宽度，实现自适应 */
             width: 100%; 
             margin: 0 auto;
             background-color: #f5f5f5;
@@ -38,7 +36,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         /* 顶部导航 */
         .top-header {
             height: 64px;
@@ -52,13 +50,13 @@
             top: 0;
             z-index: 100;
         }
-        
+
         .header-left {
             display: flex;
             align-items: center;
             gap: 16px;
         }
-        
+
         .logo {
             font-size: 20px;
             font-weight: 600;
@@ -67,7 +65,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .task-info {
             display: flex;
             align-items: center;
@@ -76,12 +74,13 @@
             padding-left: 16px;
             border-left: 1px solid #e7e7e7;
         }
-        
+
         .header-right {
             display: flex;
             gap: 12px;
+            align-items: center;
         }
-        
+
         /* 主体布局 */
         .main-layout {
             flex: 1;
@@ -89,7 +88,7 @@
             height: calc(100vh - 64px);
             overflow: hidden;
         }
-        
+
         /* 左栏：材料导航 - 320px宽度 */
         .sidebar-left {
             width: 320px;
@@ -98,24 +97,24 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .sidebar-header {
             padding: 16px;
             border-bottom: 1px solid #e7e7e7;
             background: #fafafa;
         }
-        
+
         .filter-section {
             margin-bottom: 16px;
             padding-bottom: 16px;
             border-bottom: 1px solid #e7e7e7;
         }
-        
+
         .filter-section:last-of-type {
             border-bottom: none;
             margin-bottom: 0;
         }
-        
+
         .filter-label {
             font-size: 12px;
             color: rgba(0,0,0,0.5);
@@ -125,13 +124,13 @@
             align-items: center;
             gap: 6px;
         }
-        
+
         .filter-tags {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
         }
-        
+
         .filter-tag {
             font-size: 12px;
             padding: 4px 10px;
@@ -142,34 +141,34 @@
             transition: all 0.2s;
             user-select: none;
         }
-        
+
         .filter-tag:hover {
             background: #F2F3FF;
             border-color: #0052D9;
             color: #0052D9;
         }
-        
+
         .filter-tag.active {
             background: #0052D9;
             border-color: #0052D9;
             color: #fff;
         }
-        
+
         .filter-tag.system-Q.active { background: var(--qms-color); border-color: var(--qms-color); }
         .filter-tag.system-E.active { background: var(--ems-color); border-color: var(--ems-color); }
         .filter-tag.system-S.active { background: var(--ohsms-color); border-color: var(--ohsms-color); }
         .filter-tag.system-IT.active { background: var(--its-color); border-color: var(--its-color); }
-        
+
         .material-nav {
             flex: 1;
             overflow-y: auto;
             padding: 8px 0;
         }
-        
+
         .material-group {
             margin-bottom: 4px;
         }
-        
+
         .group-title {
             padding: 12px 16px;
             font-weight: 600;
@@ -183,25 +182,25 @@
             border-bottom: 1px solid #e0e0e0;
             font-size: 14px;
         }
-        
+
         .group-title .arrow {
             transition: transform 0.3s;
             color: rgba(0, 0, 0, 0.4);
             font-size: 12px;
         }
-        
+
         .group-title.collapsed .arrow {
             transform: rotate(-90deg);
         }
-        
+
         .group-items {
             overflow: hidden;
         }
-        
+
         .group-items.collapsed {
             display: none;
         }
-        
+
         .material-item {
             padding: 12px 16px;
             cursor: pointer;
@@ -213,48 +212,48 @@
             border-bottom: 1px solid #f5f5f5;
             position: relative;
         }
-        
+
         .material-item:hover {
             background: #fafafa;
         }
-        
+
         .material-item.active {
             background: #F2F3FF;
             border-left-color: #0052D9;
         }
-        
+
         .material-item.hidden {
             display: none;
         }
-        
+
         .material-item.all-materials {
             background: linear-gradient(to right, #F2F3FF, #fff);
             border-left-color: #0052D9;
             font-weight: 600;
         }
-        
+
         .material-item.all-materials.active {
             background: #0052D9;
             color: #fff;
         }
-        
+
         .material-item.all-materials.active .item-name,
         .material-item.all-materials.active .item-meta {
             color: #fff;
         }
-        
+
         .material-item.single-active {
             background: #E6FFFB;
             border-left-color: #00A870;
         }
-        
+
         .item-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 8px;
         }
-        
+
         .item-name {
             font-size: 13px;
             color: rgba(0, 0, 0, 0.9);
@@ -262,14 +261,14 @@
             flex: 1;
             word-break: break-all;
         }
-        
+
         .item-systems {
             display: flex;
             gap: 3px;
             flex-shrink: 0;
             margin-top: 2px;
         }
-        
+
         .sys-badge {
             font-size: 10px;
             padding: 1px 5px;
@@ -279,7 +278,7 @@
             line-height: 1.2;
             transition: all 0.3s;
         }
-        
+
         .sys-badge.Q { background: var(--qms-color); }
         .sys-badge.E { background: var(--ems-color); }
         .sys-badge.S { background: var(--ohsms-color); }
@@ -290,13 +289,13 @@
             color: var(--common-color);
             border: 1px solid #d0d0d0;
         }
-        
+
         .sys-badge.dimmed {
             opacity: 0.3;
             filter: grayscale(100%);
             transform: scale(0.9);
         }
-        
+
         .item-meta {
             display: flex;
             justify-content: space-between;
@@ -305,24 +304,24 @@
             color: rgba(0, 0, 0, 0.4);
             margin-top: 2px;
         }
-        
+
         .item-status {
             display: flex;
             align-items: center;
             gap: 4px;
         }
-        
+
         .status-dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
         }
-        
+
         .status-dot.completed { background: #00A870; }
         .status-dot.pending { background: #E7E7E7; }
         .status-dot.warning { background: #FF7D00; }
         .status-dot.error { background: #E34D59; }
-        
+
         .applicable-tag {
             font-size: 11px;
             color: #FF7D00;
@@ -331,7 +330,7 @@
             border-radius: 3px;
             margin-left: 4px;
         }
-        
+
         /* 中栏：材料编辑 */
         .content-main {
             flex: 1;
@@ -341,20 +340,20 @@
             overflow: hidden;
             min-width: 0;
         }
-        
+
         .content-header {
             padding: 20px 24px;
             border-bottom: 1px solid #e7e7e7;
             background: linear-gradient(to right, #fff, #fafafa);
         }
-        
+
         .material-title {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 12px;
         }
-        
+
         .title-text {
             font-size: 18px;
             font-weight: 600;
@@ -362,13 +361,13 @@
             align-items: center;
             gap: 12px;
         }
-        
+
         .system-tags {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
         }
-        
+
         .system-tag {
             padding: 4px 12px;
             border-radius: 4px;
@@ -376,32 +375,32 @@
             font-weight: 500;
             color: #fff;
         }
-        
+
         .system-tag.Q { background: var(--qms-color); }
         .system-tag.E { background: var(--ems-color); }
         .system-tag.S { background: var(--ohsms-color); }
         .system-tag.IT { background: var(--its-color); }
-        
+
         .material-desc {
             font-size: 13px;
             color: rgba(0, 0, 0, 0.6);
             line-height: 1.6;
             margin-top: 12px;
         }
-        
+
         .content-body {
             flex: 1;
             overflow-y: auto;
             padding: 24px;
         }
-        
+
         .section-block {
             margin-bottom: 24px;
             border: 1px solid #e7e7e7;
             border-radius: 8px;
             overflow: hidden;
         }
-        
+
         .section-header {
             padding: 16px 20px;
             background: #fafafa;
@@ -412,11 +411,11 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .section-content {
             padding: 20px;
         }
-        
+
         .file-card {
             background: #fff;
             border: 1px solid #e7e7e7;
@@ -428,16 +427,16 @@
             gap: 16px;
             transition: all 0.2s;
         }
-        
+
         .file-card:hover {
             border-color: #0052D9;
             box-shadow: 0 2px 8px rgba(0, 82, 217, 0.1);
         }
-        
+
         .file-card.hidden-file {
             display: none;
         }
-        
+
         .file-icon {
             width: 48px;
             height: 48px;
@@ -450,17 +449,17 @@
             font-size: 24px;
             flex-shrink: 0;
         }
-        
+
         .file-icon.form {
             background: #E6FFFB;
             color: #00A870;
         }
-        
+
         .file-info {
             flex: 1;
             min-width: 0;
         }
-        
+
         .file-name {
             font-size: 14px;
             font-weight: 500;
@@ -469,13 +468,13 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .file-source {
             font-size: 12px;
             color: rgba(0, 0, 0, 0.4);
             margin-bottom: 12px;
         }
-        
+
         .file-source-tag {
             display: inline-flex;
             align-items: center;
@@ -487,7 +486,7 @@
             font-size: 12px;
             margin-right: 8px;
         }
-        
+
         .system-selector {
             display: flex;
             align-items: center;
@@ -496,20 +495,20 @@
             border-top: 1px dashed #e7e7e7;
             margin-top: 8px;
         }
-        
+
         .selector-label {
             font-size: 13px;
             color: rgba(0, 0, 0, 0.6);
             font-weight: 500;
             white-space: nowrap;
         }
-        
+
         .selected-systems-tags {
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
         }
-        
+
         /* V5.0：修改为适合单字母显示的样式 */
         .system-tag-mini {
             padding: 2px 8px;
@@ -523,23 +522,23 @@
             min-width: 24px;
             height: 22px;
         }
-        
+
         .system-tag-mini.Q { background: var(--qms-color); }
         .system-tag-mini.E { background: var(--ems-color); }
         .system-tag-mini.S { background: var(--ohsms-color); }
         .system-tag-mini.IT { background: var(--its-color); }
-        
+
         .system-tag-mini.dimmed {
             opacity: 0.3;
             filter: grayscale(100%);
         }
-        
+
         .file-actions {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-        
+
         /* 右栏：分体系统计 */
         .sidebar-right {
             width: 380px;
@@ -549,12 +548,12 @@
             flex-direction: column;
             overflow: hidden;
         }
-        
+
         .panel-section {
             border-bottom: 1px solid #e7e7e7;
             padding: 20px;
         }
-        
+
         .panel-title {
             font-size: 14px;
             font-weight: 600;
@@ -563,58 +562,58 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .system-progress-list {
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
-        
+
         .system-progress-item {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-        
+
         .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
         }
-        
+
         .system-name {
             display: flex;
             align-items: center;
             gap: 8px;
             font-weight: 500;
         }
-        
+
         .progress-bar-bg {
             height: 8px;
             background: #f5f5f5;
             border-radius: 4px;
             overflow: hidden;
         }
-        
+
         .progress-bar-fill {
             height: 100%;
             border-radius: 4px;
             transition: width 0.5s;
         }
-        
+
         .fill-Q { background: var(--qms-color); }
         .fill-E { background: var(--ems-color); }
         .fill-S { background: var(--ohsms-color); }
         .fill-IT { background: var(--its-color); }
-        
+
         .summary-cards {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-top: 16px;
         }
-        
+
         .summary-card {
             padding: 16px;
             border-radius: 6px;
@@ -623,28 +622,28 @@
             border: 1px solid #f0f0f0;
             transition: all 0.3s;
         }
-        
+
         .summary-card.warning {
             background: #FFF0D6;
             border-color: #FFE8B3;
         }
-        
+
         .summary-card.error {
             background: #FFE8E8;
             border-color: #FFD6D6;
         }
-        
+
         .summary-value {
             font-size: 24px;
             font-weight: 600;
             margin-bottom: 4px;
         }
-        
+
         .summary-label {
             font-size: 12px;
             color: rgba(0,0,0,0.6);
         }
-        
+
         /* 按钮样式 */
         .t-button {
             border-radius: 4px;
@@ -659,39 +658,39 @@
             background: #fff;
             color: rgba(0,0,0,0.9);
         }
-        
+
         .t-button--primary {
             background: #0052D9;
             color: #fff;
         }
-        
+
         .t-button--primary:hover {
             background: #003bb3;
         }
-        
+
         .t-button--outline {
             border-color: #e7e7e7;
         }
-        
+
         .t-button--outline:hover {
             border-color: #0052D9;
             color: #0052D9;
         }
-        
+
         .t-button--success {
             background: #00A870;
             color: #fff;
         }
-        
+
         .t-button--success:hover:not(:disabled) {
             background: #008f5f;
         }
-        
+
         .t-button--success:disabled {
             background: #b3b3b3;
             cursor: not-allowed;
         }
-        
+
         .t-button--text {
             background: transparent;
             border-color: transparent;
@@ -699,12 +698,24 @@
             font-size: 13px;
             padding: 4px 8px;
         }
-        
+
         .t-button--text:hover {
             color: #0052D9;
             background: #f5f5f5;
         }
-        
+
+        .t-button--help {
+            background: #F2F3FF;
+            color: #0052D9;
+            border-color: #D6E4FF;
+        }
+
+        .t-button--help:hover {
+            background: #0052D9;
+            color: #fff;
+            border-color: #0052D9;
+        }
+
         /* 标签样式 */
         .t-tag {
             display: inline-flex;
@@ -714,47 +725,47 @@
             font-size: 12px;
             line-height: 1.4;
         }
-        
+
         .t-tag--primary {
             background: #F2F3FF;
             color: #0052D9;
             border: 1px solid #D6E4FF;
         }
-        
+
         .t-tag--warning {
             background: #FFF0D6;
             color: #FF7D00;
             border: 1px solid #FFE8B3;
         }
-        
+
         .t-tag--success {
             background: #D6F5E8;
             color: #00A870;
             border: 1px solid #B5F5EC;
         }
-        
+
         /* 滚动条 */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background: #f5f5f5;
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background: #DCDCDC;
             border-radius: 4px;
         }
-        
+
         .filter-stats {
             font-size: 11px;
             color: rgba(0,0,0,0.4);
             margin-top: 4px;
             font-weight: normal;
         }
-        
+
         .all-files-title {
             display: flex;
             align-items: center;
@@ -763,13 +774,13 @@
             padding-bottom: 16px;
             border-bottom: 1px solid #e7e7e7;
         }
-        
+
         .stats-pills {
             display: flex;
             gap: 12px;
             margin-left: auto;
         }
-        
+
         .stat-pill {
             background: #f5f5f5;
             padding: 4px 12px;
@@ -777,13 +788,13 @@
             font-size: 12px;
             color: rgba(0,0,0,0.6);
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             color: rgba(0,0,0,0.4);
         }
-        
+
         .empty-state-icon {
             font-size: 48px;
             margin-bottom: 16px;
@@ -895,7 +906,255 @@
             max-height: 80vh;
             border-radius: 4px;
         }
+
+        /* ============================================
+         * 新手引导样式 - Tour Guide Styles
+         * ============================================ */
+
+        /* 引导遮罩层 */
+        .tour-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 9999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tour-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* 高亮区域 - 通过box-shadow实现镂空效果 */
+        .tour-spotlight {
+            position: absolute;
+            border-radius: 8px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+            z-index: 10000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            border: 2px solid #0052D9;
+            animation: spotlight-pulse 2s infinite;
+        }
+
+        @keyframes spotlight-pulse {
+            0%, 100% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(0, 82, 217, 0.3); }
+            50% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45), 0 0 0 8px rgba(0, 82, 217, 0.1); }
+        }
+
+        /* 引导提示卡片 */
+        .tour-tooltip {
+            position: absolute;
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            width: 360px;
+            z-index: 10001;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .tour-tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 小三角箭头 */
+        .tour-tooltip::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        /* 箭头在左侧（提示在右） */
+        .tour-tooltip.arrow-left::before {
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 12px 12px 12px 0;
+            border-color: transparent #fff transparent transparent;
+        }
+
+        /* 箭头在右侧（提示在左） */
+        .tour-tooltip.arrow-right::before {
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 12px 0 12px 12px;
+            border-color: transparent transparent transparent #fff;
+        }
+
+        /* 箭头在上方（提示在下） */
+        .tour-tooltip.arrow-top::before {
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 0 12px 12px 12px;
+            border-color: transparent transparent #fff transparent;
+        }
+
+        /* 箭头在下方（提示在上） */
+        .tour-tooltip.arrow-bottom::before {
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 12px 12px 0 12px;
+            border-color: #fff transparent transparent transparent;
+        }
+
+        /* 步骤标题 */
+        .tour-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tour-step-badge {
+            background: #0052D9;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* 步骤内容 */
+        .tour-content {
+            font-size: 14px;
+            line-height: 1.7;
+            color: rgba(0, 0, 0, 0.7);
+            margin-bottom: 20px;
+        }
+
+        /* 步骤控制区 */
+        .tour-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tour-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tour-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tour-btn-primary {
+            background: #0052D9;
+            color: #fff;
+            border-color: #0052D9;
+        }
+
+        .tour-btn-primary:hover {
+            background: #003bb3;
+        }
+
+        .tour-btn-outline {
+            background: transparent;
+            color: rgba(0, 0, 0, 0.6);
+            border-color: #e7e7e7;
+        }
+
+        .tour-btn-outline:hover {
+            border-color: #0052D9;
+            color: #0052D9;
+        }
+
+        .tour-btn-text {
+            background: transparent;
+            color: rgba(0, 0, 0, 0.4);
+            border: none;
+            font-size: 12px;
+        }
+
+        .tour-btn-text:hover {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* 步骤指示器 */
+        .tour-progress {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .tour-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .tour-dot.active {
+            background: #0052D9;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .tour-step-text {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.4);
+            margin-left: 8px;
+        }
+
+        /* 跳过按钮 - 固定在右上角 */
+        .tour-skip {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10002;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .tour-skip:hover {
+            background: #fff;
+            color: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .tour-skip.show {
+            display: block;
+        }
     </style>
+<base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -918,6 +1177,15 @@
             </div>
         </div>
         <div class="header-right">
+            <!-- 新增：帮助按钮 -->
+            <button class="t-button t-button--help" id="helpBtn" onclick="restartTour()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                帮助
+            </button>
             <button class="t-button t-button--outline">返回列表</button>
             <button class="t-button t-button--outline">保存草稿</button>
             <button class="t-button t-button--success" id="submitBtn" disabled>材料报送</button>
@@ -925,7 +1193,7 @@
     </header>
 
     <div class="main-layout">
-        <aside class="sidebar-left">
+        <aside class="sidebar-left" id="leftSidebar">
             <div class="sidebar-header">
                 <div class="filter-section">
                     <div class="filter-label">
@@ -940,7 +1208,7 @@
                         <span class="filter-tag system-IT" data-value="IT" onclick="toggleSystemFilter('IT')">信息安全体系(IT)</span>
                     </div>
                 </div>
-                
+
                 <div class="filter-section">
                     <div class="filter-label">
                         <span>📋</span>
@@ -954,13 +1222,13 @@
                         <span class="filter-tag" data-value="Recertification" onclick="toggleAuditTypeFilter('Recertification')">再认证</span>
                     </div>
                 </div>
-                
+
                 <div style="margin-bottom: 12px;">
                     <div style="font-weight: 600; margin-bottom: 4px; font-size: 13px;">快速筛选</div>
                     <div style="font-size: 12px; color: rgba(0,0,0,0.4); margin-bottom: 8px;">
                         共 <span id="totalCount">44</span> 项材料 | 显示 <span id="filteredCount">44</span> 项
                     </div>
-                    
+
                     <div style="margin-bottom: 12px; position: relative;">
                         <input type="text" id="materialSearch" placeholder="搜索材料名称..." 
                                style="width: 100%; padding: 8px 12px; padding-left: 32px; border: 1px solid #e7e7e7; border-radius: 4px; font-size: 13px; outline: none;"
@@ -971,7 +1239,7 @@
                             <path d="M21 21l-4.35-4.35"></path>
                         </svg>
                     </div>
-                    
+
                     <div class="filter-tags">
                         <span class="filter-tag active" onclick="filterByStatus('all', this)">全部</span>
                         <span class="filter-tag" onclick="filterByStatus('missing', this)">仅看缺失</span>
@@ -979,7 +1247,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="material-nav" id="materialNav">
                 <div class="material-group">
                     <div class="group-title" onclick="toggleGroup(this)">
@@ -1102,7 +1370,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="material-group">
                     <div class="group-title collapsed" onclick="toggleGroup(this)">
                         <span>📑 第一阶段审核（7项）</span>
@@ -1132,15 +1400,15 @@
             </div>
         </aside>
 
-        <main class="content-main">
+        <main class="content-main" id="contentArea">
             <div class="content-header">
                 <div class="material-title">
                     <div class="title-text" id="pageTitle">
                         全部材料汇总
                         <span class="t-tag t-tag--primary">跨体系视图</span>
                     </div>
-                    
-                    <div style="display: flex; gap: 8px; align-items: center;">
+
+                    <div style="display: flex; gap: 8px; align-items: center;" id="uploadActions">
                         <button class="t-button t-button--outline" style="font-size: 13px;" onclick="triggerLocalUpload()">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -1150,7 +1418,7 @@
                             本地上传
                         </button>
                         <input type="file" id="fileUpload" style="display: none;" multiple onchange="handleLocalUpload(event)">
-                        
+
                         <button class="t-button t-button--outline" style="font-size: 13px;" onclick="openLibraryModal()">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
                                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
@@ -1159,14 +1427,14 @@
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="system-tags" id="pageTags" style="margin-bottom: 12px;">
                     <span class="system-tag Q">质量管理体系</span>
                     <span class="system-tag E">环境管理体系</span>
                     <span class="system-tag S">职业健康安全</span>
                     <span class="system-tag IT">信息安全体系</span>
                 </div>
-                
+
                 <div class="material-desc" id="pageDesc">
                     当前展示所有认证领域的材料文件。您可以通过左侧筛选器按体系或认证类型进行过滤，系统会实时联动显示符合条件的文件。
                 </div>
@@ -1176,7 +1444,7 @@
                         已选择以下文件准备上传：
                     </div>
                     <div id="uploadFileList"></div>
-                    
+
                     <div style="margin-top: 12px; font-size: 13px; display: flex; align-items: center; gap: 12px;">
                         <span style="font-weight: 500; color: rgba(0,0,0,0.6);">选择覆盖体系：</span>
                         <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;"><input type="checkbox" value="Q" class="upload-sys-check" checked> QMS(质量)</label>
@@ -1191,7 +1459,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="content-body" id="contentBody">
                 <div id="all-files-view">
                     <div class="all-files-title">
@@ -1376,7 +1644,7 @@
             </div>
         </main>
 
-        <aside class="sidebar-right">
+        <aside class="sidebar-right" id="rightPanel">
             <div class="panel-section">
                 <div class="panel-title">
                     <span>分体系完整性检查</span>
@@ -1447,7 +1715,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="summary-cards">
                     <div class="summary-card">
                         <div class="summary-value" style="color: #0052D9;">44</div>
@@ -1463,7 +1731,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="panel-section" style="flex: 1;">
                 <div class="panel-title">
                     <span>当前视图状态</span>
@@ -1480,6 +1748,36 @@
         </aside>
     </div>
 </div>
+
+<!-- 引导层结构 -->
+<div class="tour-overlay" id="tourOverlay">
+    <div class="tour-spotlight" id="tourSpotlight"></div>
+    <div class="tour-tooltip" id="tourTooltip">
+        <div class="tour-title">
+            <span class="tour-step-badge" id="tourStepBadge">1</span>
+            <span id="tourTitleText">材料分类导航</span>
+        </div>
+        <div class="tour-content" id="tourContent">
+            点击左侧分类切换不同材料视图，中间列表自动联动更新。支持按体系/认证类型筛选。
+        </div>
+        <div class="tour-controls">
+            <div class="tour-progress">
+                <span class="tour-dot active" data-step="1"></span>
+                <span class="tour-dot" data-step="2"></span>
+                <span class="tour-dot" data-step="3"></span>
+                <span class="tour-step-text" id="tourStepText">步骤 1/3</span>
+            </div>
+            <div class="tour-buttons">
+                <button class="tour-btn tour-btn-text" id="tourSkipBtn" onclick="skipTour()">跳过引导</button>
+                <button class="tour-btn tour-btn-outline" id="tourPrevBtn" onclick="prevStep()" style="display: none;">上一步</button>
+                <button class="tour-btn tour-btn-primary" id="tourNextBtn" onclick="nextStep()">下一步</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 固定在右上角的跳过按钮（引导过程中显示） -->
+<button class="tour-skip" id="tourSkipFloating" onclick="skipTour()">跳过引导</button>
 
 <div id="submitModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
     <div style="background: #fff; width: 400px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
@@ -1515,12 +1813,12 @@
     function handleLocalUpload(event) {
         const files = event.target.files;
         if (files.length === 0) return;
-        
+
         const previewDiv = document.getElementById('uploadPreview');
         const fileListDiv = document.getElementById('uploadFileList');
-        
+
         fileListDiv.innerHTML = '';
-        
+
         Array.from(files).forEach(file => {
             const fileSize = (file.size / 1024 / 1024).toFixed(2);
             const fileItem = document.createElement('div');
@@ -1535,7 +1833,7 @@
             `;
             fileListDiv.appendChild(fileItem);
         });
-        
+
         previewDiv.classList.add('active');
     }
 
@@ -1548,17 +1846,17 @@
     function confirmUpload() {
         const fileInput = document.getElementById('fileUpload');
         if (fileInput.files.length === 0) return;
-        
+
         // 获取勾选的覆盖范围
         const selectedSysNodes = document.querySelectorAll('.upload-sys-check:checked');
         if (selectedSysNodes.length === 0) {
             alert('请至少选择一个覆盖体系');
             return;
         }
-        
+
         const selectedSys = Array.from(selectedSysNodes).map(n => n.value);
         const sysString = selectedSys.join(',');
-        
+
         let tagsHtml = '';
         selectedSys.forEach(sys => {
             tagsHtml += `<span class="system-tag-mini ${sys}">${sys}</span>`;
@@ -1627,7 +1925,7 @@
 
         // 3. 修改：触发数据模拟函数
         simulateCompletion();
-        
+
         clearUploadPreview();
     }
 
@@ -1650,7 +1948,7 @@
         const progressHeaders = document.querySelectorAll('.progress-header > span:nth-child(2)');
         progressHeaders.forEach(span => span.textContent = '100%');
 
-        // 更新具体的完成项文字（将“缺 X 项”变为“缺 0 项”状态）
+        // 更新具体的完成项文字（将"缺 X 项"变为"缺 0 项"状态）
         const statusTexts = document.querySelectorAll('.system-progress-item > div:last-child');
         statusTexts[0].innerHTML = '<span>35/35 项已完成</span><span style="color: #00A870;">缺 0 项</span>';
         statusTexts[1].innerHTML = '<span>32/32 项已完成</span><span style="color: #00A870;">缺 0 项</span>';
@@ -1661,7 +1959,7 @@
         const summaryValues = document.querySelectorAll('.summary-value');
         summaryValues[1].textContent = '44'; // 已完成项变为全部
         summaryValues[2].textContent = '0';  // 缺失项归零
-        
+
         // 移除警告卡片样式，改为安全成功色
         const errorCard = document.querySelector('.summary-card.error');
         if(errorCard) {
@@ -1677,17 +1975,17 @@
         const items = element.nextElementSibling;
         items.classList.toggle('collapsed');
     }
-    
+
     function showAllMaterials(element) {
         document.querySelectorAll('.material-item').forEach(item => {
             item.classList.remove('active');
             item.classList.remove('single-active');
         });
         element.classList.add('active');
-        
+
         currentViewMode = 'all';
         currentMaterialId = null;
-        
+
         document.getElementById('pageTitle').innerHTML = `全部材料汇总 <span class="t-tag t-tag--primary">跨体系视图</span>`;
         document.getElementById('pageTags').style.display = 'flex';
         document.getElementById('pageTags').innerHTML = `
@@ -1698,22 +1996,22 @@
         `;
         document.getElementById('pageDesc').textContent = '当前展示所有认证领域的材料文件。您可以通过左侧筛选器按体系或认证类型进行过滤，系统会实时联动显示符合条件的文件。';
         document.getElementById('currentMaterialName').textContent = '当前材料：全部材料';
-        
+
         document.getElementById('listTitle').textContent = '全部文件列表';
         document.getElementById('listStats').innerHTML = `
             <span class="stat-pill">PDF文件：8个</span>
             <span class="stat-pill">在线表单：3个</span>
             <span class="stat-pill">缺失：12个</span>
         `;
-        
+
         document.querySelectorAll('.section-block').forEach(block => {
             block.style.display = '';
         });
-        
+
         applyFileFilter();
         updateViewStatus();
     }
-    
+
     function switchMaterial(type, element) {
         document.querySelectorAll('.material-item').forEach(item => {
             item.classList.remove('active');
@@ -1721,35 +2019,35 @@
         });
         document.querySelector('.material-item.all-materials').classList.remove('active');
         element.classList.add('single-active');
-        
+
         currentViewMode = 'single';
-        
+
         let title = '';
         let systems = [];
         const materialId = element.getAttribute('data-id');
         currentMaterialId = materialId;
-        
+
         if (element) {
             const nameElement = element.querySelector('.item-name');
             const clone = nameElement.cloneNode(true);
             clone.querySelectorAll('span').forEach(span => span.remove());
             title = clone.textContent.trim();
-            
+
             const systemBadges = element.querySelectorAll('.sys-badge');
             systemBadges.forEach(badge => {
                 const sys = badge.textContent.trim();
                 if (!systems.includes(sys)) systems.push(sys);
             });
         }
-        
+
         const systemNames = {'Q': '质量管理体系', 'E': '环境管理体系', 'S': '职业健康安全', 'F': '食品安全体系', 'IT': '信息安全体系'};
-        
+
         if (type === 'legal') {
             document.getElementById('pageTitle').innerHTML = title + ' <span class="t-tag t-tag--warning">多文件材料</span>';
         } else {
             document.getElementById('pageTitle').textContent = title;
         }
-        
+
         let tagsHtml = '';
         systems.forEach(sys => {
             const sysClass = sys === 'IT' ? 'IT' : sys;
@@ -1760,9 +2058,9 @@
         document.getElementById('pageTags').innerHTML = tagsHtml;
         document.getElementById('pageDesc').textContent = `适用于 ${systems.join('/')} 体系。当前仅展示该材料下的文件列表。`;
         document.getElementById('currentMaterialName').textContent = `当前材料：${title}`;
-        
+
         document.getElementById('listTitle').textContent = title;
-        
+
         document.querySelectorAll('.section-block').forEach(block => {
             const blockMaterialId = block.getAttribute('data-material-id');
             if (blockMaterialId === materialId) {
@@ -1777,10 +2075,10 @@
                 block.style.display = 'none';
             }
         });
-        
+
         updateViewStatus();
     }
-    
+
     function toggleSystemFilter(system) {
         const tag = document.querySelector(`.filter-tag[data-value="${system}"]`);
         if (selectedSystems.has(system)) {
@@ -1791,7 +2089,7 @@
             tag.classList.add('active');
         }
         updateFilterStats();
-        
+
         if (currentViewMode === 'single') {
             const allMaterialsBtn = document.querySelector('.material-item.all-materials');
             showAllMaterials(allMaterialsBtn);
@@ -1800,7 +2098,7 @@
         }
         applyLeftPanelFilter();
     }
-    
+
     function toggleAuditTypeFilter(type) {
         const tag = document.querySelector(`#auditTypeFilters .filter-tag[data-value="${type}"]`);
         if (selectedAuditTypes.has(type)) {
@@ -1811,7 +2109,7 @@
             tag.classList.add('active');
         }
         updateFilterStats();
-        
+
         if (currentViewMode === 'single') {
             const allMaterialsBtn = document.querySelector('.material-item.all-materials');
             showAllMaterials(allMaterialsBtn);
@@ -1819,17 +2117,17 @@
             applyLeftPanelFilter();
         }
     }
-    
+
     function updateFilterStats() {
         const sysStats = document.getElementById('systemFilterStats');
         const auditStats = document.getElementById('auditFilterStats');
-        
+
         if (selectedSystems.size === 0) {
             sysStats.textContent = '已选：全部';
         } else {
             sysStats.textContent = `已选：${Array.from(selectedSystems).join('+')}`;
         }
-        
+
         if (selectedAuditTypes.size === 0) {
             auditStats.textContent = '已选：全部';
         } else {
@@ -1840,17 +2138,17 @@
             auditStats.textContent = `已选：${names.join('+')}`;
         }
     }
-    
+
     function applyFileFilter() {
         if (currentViewMode !== 'all') return; 
-        
+
         const fileCards = document.querySelectorAll('.file-card');
         let visibleCount = 0;
-        
+
         fileCards.forEach(card => {
             const fileSystems = card.getAttribute('data-file-systems').split(',');
             const systemMatch = selectedSystems.size === 0 || fileSystems.some(s => selectedSystems.has(s));
-            
+
             if (systemMatch) {
                 card.classList.remove('hidden-file');
                 visibleCount++;
@@ -1870,38 +2168,38 @@
                 card.classList.add('hidden-file');
             }
         });
-        
+
         document.querySelectorAll('.section-block').forEach(block => {
             const visibleFiles = block.querySelectorAll('.file-card:not(.hidden-file)');
             const hasVisibleFiles = visibleFiles.length > 0;
             const hasEmptyState = block.querySelector('.empty-state') !== null;
-            
+
             if (hasVisibleFiles || hasEmptyState) {
                 block.style.display = '';
             } else {
                 block.style.display = 'none';
             }
         });
-        
+
         const visibleSections = document.querySelectorAll('.section-block:not([style*="display: none"])').length;
         document.getElementById('listStats').innerHTML = `
             <span class="stat-pill">可见分组：${visibleSections}</span>
             <span class="stat-pill">可见文件：${visibleCount}</span>
             <span class="stat-pill">已筛选：${selectedSystems.size > 0 ? Array.from(selectedSystems).join('+') : '全部'}</span>
         `;
-        
+
         updateViewStatus();
     }
-    
+
     function applyLeftPanelFilter() {
         const items = document.querySelectorAll('.material-item:not(.all-materials)');
         items.forEach(item => {
             const systems = item.getAttribute('data-systems').split(',');
             const auditTypes = item.getAttribute('data-audit-types').split(',');
-            
+
             const systemMatch = selectedSystems.size === 0 || systems.some(s => selectedSystems.has(s));
             const auditMatch = selectedAuditTypes.size === 0 || auditTypes.some(t => selectedAuditTypes.has(t));
-            
+
             if (systemMatch && auditMatch) {
                 item.classList.remove('hidden');
                 item.style.display = '';
@@ -1919,15 +2217,15 @@
                 item.style.display = 'none';
             }
         });
-        
+
         document.querySelectorAll('.material-group').forEach(group => {
             const visibleItems = group.querySelectorAll('.material-item:not(.hidden)');
             group.style.display = visibleItems.length > 0 ? '' : 'none';
         });
-        
+
         document.getElementById('filteredCount').textContent = document.querySelectorAll('.material-item:not(.hidden):not(.all-materials)').length;
     }
-    
+
     function filterByStatus(type, element) {
         document.querySelectorAll('.filter-tag').forEach(tag => {
             if (tag.parentElement.id !== 'systemFilters' && tag.parentElement.id !== 'auditTypeFilters') {
@@ -1938,17 +2236,17 @@
         currentStatusFilter = type;
         applyLeftPanelFilter();
     }
-    
+
     function filterMaterials(keyword) {
         searchKeyword = keyword;
         applyLeftPanelFilter();
     }
-    
+
     function updateViewStatus() {
         const viewModeText = document.getElementById('viewModeText');
         const viewFilterText = document.getElementById('viewFilterText');
         const viewFileCount = document.getElementById('viewFileCount');
-        
+
         if (currentViewMode === 'all') {
             viewModeText.textContent = '当前视图：全部材料汇总';
             const visibleFiles = document.querySelectorAll('.file-card:not(.hidden-file)').length;
@@ -1959,19 +2257,204 @@
             const fileCount = currentSection ? currentSection.querySelectorAll('.file-card').length : 0;
             viewFileCount.textContent = `显示文件：${fileCount}个（仅当前材料）`;
         }
-        
+
         const sysText = selectedSystems.size > 0 ? Array.from(selectedSystems).join('+') : '全部';
         const auditText = selectedAuditTypes.size > 0 ? 
             Array.from(selectedAuditTypes).map(t => {
                 const map = {'Initial':'初次','Surveillance1':'监督一','Surveillance2':'监督二','Recertification':'再认证'};
                 return map[t];
             }).join('+') : '全部';
-        
+
         viewFilterText.textContent = `认证领域：${sysText} | 认证类型：${auditText}`;
     }
-    
+
+    /* ========================================
+     * 新手引导功能 - Tour Guide
+     * ======================================== */
+
+    const tourSteps = [
+        {
+            target: '#leftSidebar',
+            title: '材料分类导航',
+            content: '点击左侧分类切换不同材料视图，中间列表自动联动更新。支持按体系/认证类型筛选。',
+            position: 'right'
+        },
+        {
+            target: '#uploadActions',
+            title: '文件来源与上传',
+            content: '现有文件已自动同步自前期业务环节。点击"本地上传"或"从资料库选择"可补充材料。',
+            position: 'bottom'
+        },
+        {
+            target: '#rightPanel',
+            title: '完善度检查',
+            content: '实时查看各体系材料完整度。全部达到100%后，即可点击"材料报送"提交审核。',
+            position: 'left'
+        }
+    ];
+
+    let currentStep = 0;
+    let tourActive = false;
+
+    // 检查是否是首次访问
+    function checkFirstVisit() {
+        const hasSeenTour = localStorage.getItem('archiveMaterialTourSeen');
+        if (!hasSeenTour) {
+            setTimeout(startTour, 800); // 延迟启动，确保页面渲染完成
+        }
+    }
+
+    // 启动引导
+    function startTour() {
+        currentStep = 0;
+        tourActive = true;
+        document.getElementById('tourOverlay').classList.add('show');
+        document.getElementById('tourSkipFloating').classList.add('show');
+        showStep(0);
+    }
+
+    // 显示指定步骤
+    function showStep(stepIndex) {
+        const step = tourSteps[stepIndex];
+        const target = document.querySelector(step.target);
+        const spotlight = document.getElementById('tourSpotlight');
+        const tooltip = document.getElementById('tourTooltip');
+        const title = document.getElementById('tourTitleText');
+        const content = document.getElementById('tourContent');
+        const stepBadge = document.getElementById('tourStepBadge');
+        const stepText = document.getElementById('tourStepText');
+        const prevBtn = document.getElementById('tourPrevBtn');
+        const nextBtn = document.getElementById('tourNextBtn');
+
+        // 更新内容
+        title.textContent = step.title;
+        content.textContent = step.content;
+        stepBadge.textContent = stepIndex + 1;
+        stepText.textContent = `步骤 ${stepIndex + 1}/${tourSteps.length}`;
+
+        // 更新按钮状态
+        prevBtn.style.display = stepIndex === 0 ? 'none' : 'block';
+        nextBtn.textContent = stepIndex === tourSteps.length - 1 ? '完成' : '下一步';
+
+        // 更新步骤指示器
+        document.querySelectorAll('.tour-dot').forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === stepIndex);
+        });
+
+        // 计算目标位置
+        const rect = target.getBoundingClientRect();
+        const padding = 8;
+
+        // 设置spotlight位置
+        spotlight.style.left = (rect.left - padding) + 'px';
+        spotlight.style.top = (rect.top - padding) + 'px';
+        spotlight.style.width = (rect.width + padding * 2) + 'px';
+        spotlight.style.height = (rect.height + padding * 2) + 'px';
+
+        // 计算tooltip位置
+        const tooltipRect = tooltip.getBoundingClientRect();
+        let tooltipLeft, tooltipTop;
+        const spacing = 20;
+
+        switch(step.position) {
+            case 'right':
+                tooltipLeft = rect.right + spacing;
+                tooltipTop = rect.top + (rect.height - tooltipRect.height) / 2;
+                tooltip.className = 'tour-tooltip arrow-left';
+                break;
+            case 'left':
+                tooltipLeft = rect.left - tooltipRect.width - spacing;
+                tooltipTop = rect.top + (rect.height - tooltipRect.height) / 2;
+                tooltip.className = 'tour-tooltip arrow-right';
+                break;
+            case 'bottom':
+                tooltipLeft = rect.left + (rect.width - tooltipRect.width) / 2;
+                tooltipTop = rect.bottom + spacing;
+                tooltip.className = 'tour-tooltip arrow-top';
+                break;
+            case 'top':
+                tooltipLeft = rect.left + (rect.width - tooltipRect.width) / 2;
+                tooltipTop = rect.top - tooltipRect.height - spacing;
+                tooltip.className = 'tour-tooltip arrow-bottom';
+                break;
+        }
+
+        // 边界检查
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        if (tooltipLeft < 10) tooltipLeft = 10;
+        if (tooltipLeft + tooltipRect.width > viewportWidth - 10) tooltipLeft = viewportWidth - tooltipRect.width - 10;
+        if (tooltipTop < 10) tooltipTop = 10;
+        if (tooltipTop + tooltipRect.height > viewportHeight - 10) tooltipTop = viewportHeight - tooltipRect.height - 10;
+
+        tooltip.style.left = tooltipLeft + 'px';
+        tooltip.style.top = tooltipTop + 'px';
+
+        // 显示tooltip
+        setTimeout(() => {
+            tooltip.classList.add('show');
+        }, 100);
+    }
+
+    // 下一步
+    function nextStep() {
+        if (currentStep < tourSteps.length - 1) {
+            document.getElementById('tourTooltip').classList.remove('show');
+            setTimeout(() => {
+                currentStep++;
+                showStep(currentStep);
+            }, 300);
+        } else {
+            endTour();
+        }
+    }
+
+    // 上一步
+    function prevStep() {
+        if (currentStep > 0) {
+            document.getElementById('tourTooltip').classList.remove('show');
+            setTimeout(() => {
+                currentStep--;
+                showStep(currentStep);
+            }, 300);
+        }
+    }
+
+    // 跳过引导
+    function skipTour() {
+        endTour();
+    }
+
+    // 结束引导
+    function endTour() {
+        tourActive = false;
+        document.getElementById('tourOverlay').classList.remove('show');
+        document.getElementById('tourTooltip').classList.remove('show');
+        document.getElementById('tourSkipFloating').classList.remove('show');
+
+        // 标记已查看
+        localStorage.setItem('archiveMaterialTourSeen', 'true');
+    }
+
+    // 重新启动引导（通过帮助按钮）
+    function restartTour() {
+        // 重置标记，允许重新查看
+        localStorage.removeItem('archiveMaterialTourSeen');
+        startTour();
+    }
+
+    // 窗口大小改变时重新计算位置
+    window.addEventListener('resize', () => {
+        if (tourActive) {
+            showStep(currentStep);
+        }
+    });
+
+    // 页面加载完成后检查是否首次访问
     document.addEventListener('DOMContentLoaded', function() {
         showAllMaterials(document.querySelector('.material-item.all-materials'));
+        checkFirstVisit();
     });
 </script>
 
