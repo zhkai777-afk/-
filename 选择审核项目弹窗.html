@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1200, initial-scale=1.0">
+    <title>选择项目 - 审核任务</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        /* 弹窗容器 - 固定尺寸 1200x800 */
+        .modal-container {
+            width: 1200px;
+            height: 800px;
+            background: #fff;
+            border-radius: 2px;
+            box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* 头部 */
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.85);
+        }
+        
+        .close-btn {
+            color: rgba(0, 0, 0, 0.45);
+            font-size: 18px;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+        
+        .close-btn:hover {
+            color: rgba(0, 0, 0, 0.75);
+        }
+        
+        /* 内容区 */
+        .modal-body {
+            flex: 1;
+            padding: 20px 24px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        /* 客户信息区 */
+        .customer-info {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 2px;
+            padding: 12px 16px;
+            display: flex;
+            gap: 48px;
+            align-items: center;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-label {
+            color: rgba(0, 0, 0, 0.65);
+            font-size: 14px;
+        }
+        
+        .info-value {
+            color: rgba(0, 0, 0, 0.85);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .stage-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 22px;
+            font-size: 12px;
+            border-radius: 2px;
+            border: 1px solid #91d5ff;
+            background: #e6f7ff;
+            color: #1890ff;
+            line-height: 20px;
+        }
+        
+        /* 搜索区 */
+        .search-area {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .search-input {
+            height: 32px;
+            padding: 4px 11px;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            font-size: 14px;
+            width: 220px;
+            transition: all 0.3s;
+            outline: none;
+        }
+        
+        .search-input:hover, .search-input:focus {
+            border-color: #40a9ff;
+        }
+        
+        /* 新增：多选下拉框样式 */
+        .multi-select-container {
+            position: relative;
+            width: 220px;
+        }
+        
+        .multi-select-trigger {
+            height: 32px;
+            padding: 4px 11px;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+        
+        .multi-select-trigger:hover {
+            border-color: #40a9ff;
+        }
+        
+        .multi-select-trigger.active {
+            border-color: #40a9ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .multi-select-placeholder {
+            color: rgba(0, 0, 0, 0.25);
+        }
+        
+        .multi-select-values {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            overflow: hidden;
+            height: 22px;
+        }
+        
+        .multi-select-tag {
+            background: #f5f5f5;
+            border: 1px solid #f0f0f0;
+            border-radius: 2px;
+            padding: 0 4px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .multi-select-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            margin-top: 4px;
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            border-radius: 2px;
+            box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            display: none;
+            max-height: 256px;
+            overflow-y: auto;
+        }
+        
+        .multi-select-dropdown.show {
+            display: block;
+        }
+        
+        .multi-select-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+        
+        .multi-select-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .multi-select-item input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #1890ff;
+        }
+        
+        .multi-select-arrow {
+            color: rgba(0, 0, 0, 0.25);
+            font-size: 12px;
+            transition: transform 0.3s;
+        }
+        
+        .multi-select-trigger.active .multi-select-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .btn {
+            height: 32px;
+            padding: 4px 15px;
+            border-radius: 2px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            outline: none;
+        }
+        
+        .btn-default {
+            background: #fff;
+            border-color: #d9d9d9;
+            color: rgba(0, 0, 0, 0.85);
+        }
+        
+        .btn-default:hover {
+            color: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .btn-primary:disabled {
+            background: #f5f5f5;
+            border-color: #d9d9d9;
+            color: rgba(0, 0, 0, 0.25);
+            cursor: not-allowed;
+        }
+        
+        /* 提示区 */
+        .constraint-tip {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 2px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .tip-icon {
+            color: #1890ff;
+            font-weight: bold;
+        }
+        
+        .tip-text {
+            color: rgba(0, 0, 0, 0.65);
+        }
+        
+        .highlight {
+            color: #1890ff;
+            font-weight: 500;
+        }
+        
+        /* 表格区 */
+        .table-container {
+            flex: 1;
+            border: 1px solid #f0f0f0;
+            border-radius: 2px;
+            overflow: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        thead {
+            background: #fafafa;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        
+        th {
+            padding: 12px 16px;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.85);
+            border-bottom: 1px solid #f0f0f0;
+            text-align: left;
+            background: #fafafa;
+        }
+        
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            color: rgba(0, 0, 0, 0.65);
+        }
+        
+        tr:hover td {
+            background: #fafafa;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .checkbox-col {
+            width: 50px;
+            text-align: center;
+        }
+        
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1890ff;
+        }
+        
+        .ellipsis {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 300px;
+            display: inline-block;
+        }
+        
+        .audit-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 22px;
+            font-size: 12px;
+            border-radius: 2px;
+            border: 1px solid transparent;
+            line-height: 20px;
+        }
+        
+        .tag-blue {
+            background: #e6f7ff;
+            border-color: #91d5ff;
+            color: #1890ff;
+        }
+        
+        .tag-green {
+            background: #f6ffed;
+            border-color: #b7eb8f;
+            color: #52c41a;
+        }
+        
+        .tag-orange {
+            background: #fff7e6;
+            border-color: #ffd591;
+            color: #fa8c16;
+        }
+        
+        /* 底部操作区 */
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="modal-container">
+        <!-- 头部 -->
+        <div class="modal-header">
+            <div class="modal-title">选择项目</div>
+            <div class="close-btn" onclick="handleCancel()">×</div>
+        </div>
+        
+        <!-- 内容区 -->
+        <div class="modal-body">
+            <!-- 客户信息独立展示 -->
+            <div class="customer-info">
+                <div class="info-item">
+                    <span class="info-label">客户名称：</span>
+                    <span class="info-value">北京市地铁运营有限公司</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">审核阶段：</span>
+                    <span class="stage-tag">二阶段</span>
+                </div>
+            </div>
+            
+            <!-- 搜索筛选 -->
+            <div class="search-area">
+                <input type="text" class="search-input" id="projectNo" placeholder="请输入项目编号">
+                <!-- 修改：项目类型改为多选下拉 -->
+                <div class="multi-select-container" id="projectTypeContainer">
+                    <div class="multi-select-trigger" onclick="toggleDropdown()" id="projectTypeTrigger">
+                        <span class="multi-select-placeholder" id="projectTypePlaceholder">请选择项目类型</span>
+                        <div class="multi-select-values" id="projectTypeValues" style="display: none;"></div>
+                        <span class="multi-select-arrow">▼</span>
+                    </div>
+                    <div class="multi-select-dropdown" id="projectTypeDropdown">
+                        <div class="multi-select-item" onclick="toggleOption('初次认证', event)">
+                            <input type="checkbox" value="初次认证" id="opt-初次认证" onchange="updateSelection()">
+                            <label for="opt-初次认证">初次认证</label>
+                        </div>
+                        <div class="multi-select-item" onclick="toggleOption('监督审核', event)">
+                            <input type="checkbox" value="监督审核" id="opt-监督审核" onchange="updateSelection()">
+                            <label for="opt-监督审核">监督审核</label>
+                        </div>
+                        <div class="multi-select-item" onclick="toggleOption('再认证', event)">
+                            <input type="checkbox" value="再认证" id="opt-再认证" onchange="updateSelection()">
+                            <label for="opt-再认证">再认证</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-default" onclick="handleReset()">重置</button>
+                <button class="btn btn-primary" onclick="handleSearch()">查询</button>
+            </div>
+            
+            <!-- 约束提示 -->
+            <div class="constraint-tip">
+                <span class="tip-icon">ⓘ</span>
+                <span class="tip-text">
+                    约束条件：只能选择 <span class="highlight">同一客户</span> 下的 <span class="highlight">同一阶段</span> （一阶段或二阶段）的项目。已选 <span class="highlight" id="selectedCount">5</span> 项。
+                </span>
+            </div>
+            
+            <!-- 数据表格 -->
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-col">
+                                <input type="checkbox" class="checkbox" id="selectAll" checked onchange="toggleSelectAll()">
+                            </th>
+                            <th>项目编号</th>
+                            <th>项目类型</th>
+                            <th>认证领域+认证范围+认可机构</th>
+                            <th>认证标准</th>
+                            <!-- 修改：审核类型改为认证类型 -->
+                            <th>认证类型</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- 数据行由 JS 生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 底部操作 -->
+        <div class="modal-footer">
+            <button class="btn btn-default" onclick="handleCancel()">取消</button>
+            <button class="btn btn-primary" id="confirmBtn" onclick="handleConfirm()">确定 (5)</button>
+        </div>
+    </div>
+
+    <script>
+        // 5条模拟数据（项目类型包含：初次认证、监督审核）
+        const mockData = [
+            {
+                projectNo: 'PRJ-2024-00189-01',
+                projectType: '初次认证',
+                certField: 'QMS',
+                certScope: '轨道交通运营服务',
+                accBody: 'CNAS',
+                certStandard: 'GB/T 19001-2016',
+                auditType: '监督',
+                auditTypeColor: 'tag-blue'
+            },
+            {
+                projectNo: 'PRJ-2024-00189-02',
+                projectType: '初次认证',
+                certField: 'EMS',
+                certScope: '城市轨道交通运营环境',
+                accBody: 'CNAS',
+                certStandard: 'GB/T 24001-2016',
+                auditType: '监督',
+                auditTypeColor: 'tag-blue'
+            },
+            {
+                projectNo: 'PRJ-2024-00189-03',
+                projectType: '监督审核',
+                certField: 'ISMS',
+                certScope: '软件开发',
+                accBody: 'CNAS',
+                certStandard: 'ISO/IEC 27001:2013',
+                auditType: '初次认证',
+                auditTypeColor: 'tag-green'
+            },
+            {
+                projectNo: 'PRJ-2024-00189-04',
+                projectType: '监督审核',
+                certField: 'QMS',
+                certScope: '软件开发',
+                accBody: 'CNAS',
+                certStandard: 'GB/T 19001-2016',
+                auditType: '初次认证',
+                auditTypeColor: 'tag-green'
+            },
+            {
+                projectNo: 'PRJ-2024-00189-05',
+                projectType: '初次认证',
+                certField: 'OHSMS',
+                certScope: '轨道交通',
+                accBody: 'CNAS',
+                certStandard: 'GB/T 45001-2020',
+                auditType: '初次认证',
+                auditTypeColor: 'tag-green'
+            }
+        ];
+
+        let tableData = [...mockData];
+        let selectedKeys = mockData.map(item => item.projectNo);
+        let selectedProjectTypes = []; // 存储选中的项目类型
+
+        // 初始化渲染表格
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            tableData.forEach(row => {
+                const tr = document.createElement('tr');
+                const isChecked = selectedKeys.includes(row.projectNo) ? 'checked' : '';
+                
+                tr.innerHTML = `
+                    <td class="checkbox-col">
+                        <input type="checkbox" class="checkbox row-checkbox" 
+                               value="${row.projectNo}" ${isChecked} 
+                               onchange="handleRowSelect('${row.projectNo}')">
+                    </td>
+                    <td>${row.projectNo}</td>
+                    <td>${row.projectType}</td>
+                    <td>
+                        <span class="ellipsis" title="${row.certField}+${row.certScope}+${row.accBody}">
+                            ${row.certField}+${row.certScope}+${row.accBody}
+                        </span>
+                    </td>
+                    <td>${row.certStandard}</td>
+                    <!-- 修改：显示改为认证类型 -->
+                    <td>
+                        <span class="audit-tag ${row.auditTypeColor}">${row.auditType}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            updateSelectedCount();
+        }
+
+        // 多选下拉相关函数
+        function toggleDropdown() {
+            const dropdown = document.getElementById('projectTypeDropdown');
+            const trigger = document.getElementById('projectTypeTrigger');
+            dropdown.classList.toggle('show');
+            trigger.classList.toggle('active');
+        }
+
+        function toggleOption(value, event) {
+            event.stopPropagation();
+            const checkbox = document.getElementById(`opt-${value}`);
+            checkbox.checked = !checkbox.checked;
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('#projectTypeDropdown input[type="checkbox"]');
+            selectedProjectTypes = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedProjectTypes.push(cb.value);
+                }
+            });
+            
+            // 更新显示
+            const placeholder = document.getElementById('projectTypePlaceholder');
+            const valuesDiv = document.getElementById('projectTypeValues');
+            
+            if (selectedProjectTypes.length === 0) {
+                placeholder.style.display = 'block';
+                valuesDiv.style.display = 'none';
+                valuesDiv.innerHTML = '';
+            } else {
+                placeholder.style.display = 'none';
+                valuesDiv.style.display = 'flex';
+                valuesDiv.innerHTML = selectedProjectTypes.map(type => 
+                    `<span class="multi-select-tag">${type}</span>`
+                ).join('');
+            }
+            
+            // 实时联动筛选
+            handleSearch();
+        }
+
+        // 点击外部关闭下拉
+        document.addEventListener('click', function(event) {
+            const container = document.getElementById('projectTypeContainer');
+            if (!container.contains(event.target)) {
+                document.getElementById('projectTypeDropdown').classList.remove('show');
+                document.getElementById('projectTypeTrigger').classList.remove('active');
+            }
+        });
+
+        // 更新选中数量显示
+        function updateSelectedCount() {
+            const count = selectedKeys.length;
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('confirmBtn').textContent = `确定 (${count})`;
+            document.getElementById('confirmBtn').disabled = count === 0;
+            
+            // 更新全选框状态
+            const allChecked = tableData.length > 0 && tableData.every(row => selectedKeys.includes(row.projectNo));
+            document.getElementById('selectAll').checked = allChecked;
+        }
+
+        // 单行选择
+        function handleRowSelect(projectNo) {
+            const index = selectedKeys.indexOf(projectNo);
+            if (index > -1) {
+                // 如果只剩一个，不允许取消（至少保留一个）
+                if (selectedKeys.length === 1) {
+                    alert('至少选择一个项目');
+                    renderTable(); // 重新渲染恢复选中状态
+                    return;
+                }
+                selectedKeys.splice(index, 1);
+            } else {
+                selectedKeys.push(projectNo);
+            }
+            updateSelectedCount();
+        }
+
+        // 全选/取消全选
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            if (selectAll) {
+                selectedKeys = tableData.map(item => item.projectNo);
+            } else {
+                // 至少保留一个，默认保留第一个
+                if (tableData.length > 0) {
+                    selectedKeys = [tableData[0].projectNo];
+                }
+            }
+            renderTable();
+        }
+
+        // 修改：搜索逻辑支持多选项目类型联动
+        function handleSearch() {
+            const projectNo = document.getElementById('projectNo').value.toLowerCase();
+            
+            tableData = mockData.filter(item => {
+                const matchNo = !projectNo || item.projectNo.toLowerCase().includes(projectNo);
+                // 修改：支持多选项目类型筛选，未选择时不限制
+                const matchType = selectedProjectTypes.length === 0 || selectedProjectTypes.includes(item.projectType);
+                return matchNo && matchType;
+            });
+            
+            renderTable();
+        }
+
+        // 修改：重置时清空多选下拉
+        function handleReset() {
+            document.getElementById('projectNo').value = '';
+            // 清空多选下拉
+            selectedProjectTypes = [];
+            const checkboxes = document.querySelectorAll('#projectTypeDropdown input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+            document.getElementById('projectTypePlaceholder').style.display = 'block';
+            document.getElementById('projectTypeValues').style.display = 'none';
+            document.getElementById('projectTypeValues').innerHTML = '';
+            
+            tableData = [...mockData];
+            selectedKeys = mockData.map(item => item.projectNo);
+            renderTable();
+        }
+
+        // 取消
+        function handleCancel() {
+            console.log('取消操作');
+        }
+
+        // 确认
+        function handleConfirm() {
+            if (selectedKeys.length === 0) {
+                alert('请至少选择一个项目');
+                return;
+            }
+            const selectedRows = mockData.filter(item => selectedKeys.includes(item.projectNo));
+            console.log('确认选择:', selectedRows);
+        }
+
+        // 初始化
+        renderTable();
+    </script>
+</body>
+</html>
