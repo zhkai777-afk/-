@@ -383,6 +383,16 @@
             gap: 4px;
         }
 
+        /* 文件数量标签样式 */
+        .file-count {
+            color: #0052D9;
+            font-weight: 600;
+            background: #F2F3FF;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
         .status-dot {
             width: 6px;
             height: 6px;
@@ -1561,6 +1571,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1613,18 +1624,6 @@
                     </div>
                 </div>
 
-                <div class="filter-section">
-                    <div class="filter-label">
-                        <span>📊</span>
-                        <span>评定状态</span>
-                    </div>
-                    <div class="filter-tags">
-                        <span class="filter-tag active" onclick="filterByStatus(this, 'all')">全部</span>
-                        <span class="filter-tag" onclick="filterByStatus(this, 'pending')">待评定</span>
-                        <span class="filter-tag" onclick="filterByStatus(this, 'completed')">已评定</span>
-                    </div>
-                </div>
-
                 <div class="search-box">
                     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
@@ -1657,10 +1656,7 @@
                             </div>
                             <div class="item-meta">
                                 <span>查看所有体系文件</span>
-                                <div class="item-status">
-                                    <span class="status-dot approved"></span>
-                                    <span id="allMaterialsCount">44个文件</span>
-                                </div>
+                                <span class="file-count">44个文件</span>
                             </div>
                         </div>
                     </div>
@@ -1672,7 +1668,7 @@
                         <span class="arrow">▼</span>
                     </div>
                     <div class="group-items" id="commonGroup">
-                        <div class="material-item" data-id="3" data-systems="Q,E,S,F" data-status="pending" data-name="认证申请表" onclick="switchMaterial(this, '3')">
+                        <div class="material-item" data-id="3" data-systems="Q,E,S,F" data-name="认证申请表" onclick="switchMaterial(this, '3')">
                             <div class="item-header">
                                 <div class="item-name">认证申请表</div>
                                 <div class="item-systems">
@@ -1683,14 +1679,11 @@
                             </div>
                             <div class="item-meta">
                                 <span>跨体系材料</span>
-                                <div class="item-status">
-                                    <span class="status-dot pending"></span>
-                                    <span>待评定</span>
-                                </div>
+                                <span class="file-count">2个文件</span>
                             </div>
                         </div>
 
-                        <div class="material-item" data-id="9" data-systems="Q,E,S,F" data-status="pending" data-name="法律地位证明文件复印件（如营业执照）" onclick="switchMaterial(this, '9')">
+                        <div class="material-item" data-id="9" data-systems="Q,E,S,F" data-name="法律地位证明文件复印件（如营业执照）" onclick="switchMaterial(this, '9')">
                             <div class="item-header">
                                 <div class="item-name">法律地位证明文件复印件（如营业执照）</div>
                                 <div class="item-systems">
@@ -1702,14 +1695,11 @@
                             </div>
                             <div class="item-meta">
                                 <span>多文件材料</span>
-                                <div class="item-status">
-                                    <span class="status-dot pending"></span>
-                                    <span>待评定</span>
-                                </div>
+                                <span class="file-count">3个文件</span>
                             </div>
                         </div>
 
-                        <div class="material-item" data-id="12" data-systems="Q,E,S,F" data-status="pending" data-name="认证申请评审表" onclick="switchMaterial(this, '12')">
+                        <div class="material-item" data-id="12" data-systems="Q,E,S,F" data-name="认证申请评审表" onclick="switchMaterial(this, '12')">
                             <div class="item-header">
                                 <div class="item-name">认证申请评审表</div>
                                 <div class="item-systems">
@@ -1719,14 +1709,11 @@
                             </div>
                             <div class="item-meta">
                                 <span>通用材料</span>
-                                <div class="item-status">
-                                    <span class="status-dot pending"></span>
-                                    <span>待评定</span>
-                                </div>
+                                <span class="file-count">1个文件</span>
                             </div>
                         </div>
 
-                        <div class="material-item" data-id="15" data-systems="Q,E,S,F" data-status="approved" data-name="审核计划书" onclick="switchMaterial(this, '15')">
+                        <div class="material-item" data-id="15" data-systems="Q,E,S,F" data-name="审核计划书" onclick="switchMaterial(this, '15')">
                             <div class="item-header">
                                 <div class="item-name">审核计划书</div>
                                 <div class="item-systems">
@@ -1738,10 +1725,7 @@
                             </div>
                             <div class="item-meta">
                                 <span>通用材料</span>
-                                <div class="item-status">
-                                    <span class="status-dot approved"></span>
-                                    <span>已通过</span>
-                                </div>
+                                <span class="file-count">2个文件</span>
                             </div>
                         </div>
                     </div>
@@ -1951,7 +1935,6 @@
 <script>
     // 全局状态
     let selectedSystems = new Set();
-    let currentStatusFilter = 'all';
     let currentTopFilter = 'all';
     let searchKeyword = '';
     let currentMaterialId = 'all';
@@ -1995,12 +1978,13 @@
     // 所有体系
     const allSystems = ['Q', 'E', 'S', 'F'];
 
-    // 材料详细数据
+    // 材料详细数据 - 包含文件数量信息
     const materialsData = {
         '3': {
             title: '认证申请表',
             tag: '跨体系材料',
             subtitle: '适用体系：Q/E/S - 初次评定：已通过',
+            fileCount: 2,
             files: [
                 {
                     fileId: 'f3-1',
@@ -2034,6 +2018,20 @@
                     adminDecision: null,
                     rejectCategory: '',
                     rejectReason: ''
+                },
+                {
+                    fileId: 'f3-2',
+                    name: '认证申请表_附表.pdf',
+                    source: '客户上传',
+                    size: '0.8 MB',
+                    uploadTime: '2026-03-14 10:00',
+                    applicableSystems: ['Q', 'E'],
+                    status: 'approved',
+                    statusText: '已通过',
+                    reviews: [],
+                    adminDecision: null,
+                    rejectCategory: '',
+                    rejectReason: ''
                 }
             ],
             supplements: {
@@ -2049,6 +2047,7 @@
             title: '法律地位证明文件复印件（如营业执照）',
             tag: '多文件材料',
             subtitle: '适用体系：质量体系(Q)、环境体系(E)、职业健康(S)、食品安全(F)',
+            fileCount: 3,
             files: [
                 {
                     fileId: 'f9-1',
@@ -2150,6 +2149,7 @@
             title: '认证申请评审表',
             tag: '通用材料',
             subtitle: '适用体系：Q/E - 专家退回',
+            fileCount: 1,
             files: [
                 {
                     fileId: 'f12-1',
@@ -2185,6 +2185,7 @@
             title: '审核计划书',
             tag: '通用材料',
             subtitle: '适用体系：Q/E/S/F',
+            fileCount: 2,
             files: [
                 {
                     fileId: 'f15-1',
@@ -2218,6 +2219,20 @@
                     adminDecision: 'pass_selected',
                     rejectCategory: '',
                     rejectReason: ''
+                },
+                {
+                    fileId: 'f15-2',
+                    name: '审核计划书_补充说明.pdf',
+                    source: '客户上传',
+                    size: '1.2 MB',
+                    uploadTime: '2026-03-11 09:00',
+                    applicableSystems: ['Q', 'E'],
+                    status: 'approved',
+                    statusText: '已通过',
+                    reviews: [],
+                    adminDecision: 'pass_selected',
+                    rejectCategory: '',
+                    rejectReason: ''
                 }
             ],
             supplements: {
@@ -2242,14 +2257,6 @@
         element.classList.add('active');
         currentTopFilter = type;
 
-        if (type === 'abnormal') {
-            currentStatusFilter = 'rejected';
-        } else if (type === 'pending') {
-            currentStatusFilter = 'pending';
-        } else {
-            currentStatusFilter = 'all';
-        }
-
         applyFilters();
     }
 
@@ -2266,27 +2273,6 @@
         }
 
         updateFilterStats();
-        applyFilters();
-    }
-
-    // 状态筛选
-    function filterByStatus(element, status) {
-        const section = element.closest('.filter-section');
-        section.querySelectorAll('.filter-tag').forEach(tag => tag.classList.remove('active'));
-        element.classList.add('active');
-        currentStatusFilter = status;
-
-        document.querySelectorAll('.top-filter-tags .filter-tag').forEach(tag => {
-            tag.classList.remove('active');
-            if (status === 'all' && tag.textContent === '全部') {
-                tag.classList.add('active');
-            } else if (status === 'pending' && tag.textContent === '待专家评审') {
-                tag.classList.add('active');
-            } else if (status === 'rejected' && tag.textContent === '有异常项') {
-                tag.classList.add('active');
-            }
-        });
-
         applyFilters();
     }
 
@@ -2313,24 +2299,14 @@
 
         items.forEach(item => {
             const systems = item.getAttribute('data-systems').split(',');
-            const status = item.getAttribute('data-status');
             const name = item.querySelector('.item-name').textContent.toLowerCase();
 
             const systemMatch = selectedSystems.size === 0 || 
                 systems.some(s => selectedSystems.has(s));
 
-            let statusMatch = true;
-            if (currentStatusFilter === 'pending') {
-                statusMatch = status === 'pending';
-            } else if (currentStatusFilter === 'rejected') {
-                statusMatch = status === 'rejected';
-            } else if (currentStatusFilter === 'completed') {
-                statusMatch = status === 'approved' || status === 'rejected';
-            }
-
             const searchMatch = !searchKeyword || name.includes(searchKeyword.toLowerCase());
 
-            if (systemMatch && statusMatch && searchMatch) {
+            if (systemMatch && searchMatch) {
                 item.classList.remove('hidden');
                 visibleCount++;
 
@@ -2376,23 +2352,14 @@
         const hasIssues = issuesData['all'] && issuesData['all'].length > 0;
 
         if (!allAssigned) {
-            // 未指派完专家：置灰
             btn.disabled = true;
             btn.classList.remove('active');
-            btn.style.background = '#c0c0c0';
-            btn.style.cursor = 'not-allowed';
         } else if (hasIssues) {
-            // 已指派完但存在问题：置灰
             btn.disabled = true;
             btn.classList.remove('active');
-            btn.style.background = '#c0c0c0';
-            btn.style.cursor = 'not-allowed';
         } else {
-            // 已指派完且无问题：高亮
             btn.disabled = false;
             btn.classList.add('active');
-            btn.style.background = '';
-            btn.style.cursor = 'pointer';
             btn.onclick = showPassTaskConfirm;
         }
     }
@@ -2648,7 +2615,6 @@
 
         body.innerHTML = statsHtml + issuesHtml + tableHtml;
 
-        // 更新通过任务按钮状态
         updatePassTaskButton();
     }
 
@@ -2675,7 +2641,6 @@
                 materialName = materialsData[issue.materialId].title;
             }
 
-            // 判断是否是当前用户创建的（简单模拟：管理员创建的显示删除按钮）
             const isCreator = issue.submitter === '管理员';
             const deleteBtn = `<button class="issue-delete-btn ${!isCreator ? 'need-confirm' : ''}" onclick="handleDeleteIssue(${issue.id}, '${isCreator}')">删除</button>`;
 
@@ -2759,13 +2724,11 @@
         title.innerHTML = `<span style="color: ${style.color};">⚠️</span><span>${type}</span>`;
         title.style.color = style.color;
 
-        // 重置表单
         document.getElementById('issueInputDesc').value = '';
         document.getElementById('issueInputCharCount').textContent = '0字';
         document.getElementById('issueInputCharCount').style.color = '#999';
         document.getElementById('confirmIssueBtn').disabled = true;
 
-        // 重置复选框
         document.querySelectorAll('input[name="issueSystem"]').forEach(cb => cb.checked = true);
 
         modal.classList.add('active');
@@ -2827,19 +2790,16 @@
         closeIssueForm();
         renderAllMaterialsView();
 
-        // 更新按钮状态
         updatePassTaskButton();
     }
 
     // 处理问题删除
     function handleDeleteIssue(issueId, isCreator) {
         if (isCreator === 'true') {
-            // 自己创建的，直接删除
             if (confirm('确定删除此问题记录吗？')) {
                 deleteIssue(issueId);
             }
         } else {
-            // 不是自己创建的，需要二次确认
             issueToDelete = issueId;
             document.getElementById('deleteConfirmModal').classList.add('active');
         }
@@ -3275,9 +3235,7 @@
             }
         }
 
-        // 更新通过任务按钮状态
         updatePassTaskButton();
-        // 重新渲染中间栏以更新数据展示
         if (currentMaterialId === 'all') {
             renderAllMaterialsView();
         }
@@ -3295,10 +3253,7 @@
 
     function openExpertModal() {
         document.getElementById('expertSelectionModal').classList.add('active');
-
-        // 默认展示全部领域
         document.getElementById('modalFilterDomain').value = '';
-
         renderModalExperts();
     }
 
