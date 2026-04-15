@@ -15,13 +15,12 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-            background-color: #333; /* 模拟深色外层背景 */
+            background-color: #333;
             color: rgba(0, 0, 0, 0.9);
             font-size: 14px;
-            overflow: hidden; /* 作为弹窗底层，禁止滚动 */
+            overflow: hidden;
         }
 
-        /* TDesign 色彩系统 */
         :root {
             --td-brand-color: #0052D9;
             --td-brand-color-hover: #366EF4;
@@ -39,7 +38,6 @@
             --td-shadow-2: 0 3px 6px rgba(0, 0, 0, 0.04), 0 6px 12px rgba(0, 0, 0, 0.04);
         }
 
-        /* --- 弹窗遮罩及固定尺寸样式 --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -54,8 +52,9 @@
         }
 
         .page-container.modal-box {
-            width: 1200px !important;
-            height: 800px !important;
+            width: 90vw !important;
+            height: 85vh !important;
+            max-width: 1400px;
             border-radius: 8px;
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
             overflow: hidden;
@@ -85,7 +84,6 @@
             overflow: hidden;
         }
 
-        /* 左侧边栏 */
         .sidebar {
             width: 260px;
             background-color: var(--td-bg-color-container);
@@ -118,44 +116,75 @@
         .category-tree {
             flex: 1;
             overflow-y: auto;
-            padding: 12px;
+            padding: 12px 20px;
         }
 
         .tree-node {
-            padding: 10px 12px;
             cursor: pointer;
             border-radius: var(--td-radius-default);
-            margin-bottom: 4px;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .tree-node:hover {
-            background-color: #f5f5f5;
-        }
-
-        .tree-node.active {
-            background-color: #E8F0FF;
-            color: var(--td-brand-color);
-            font-weight: 500;
+            user-select: none;
+            position: relative;
         }
 
         .tree-node-content {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            padding: 8px 12px;
+            transition: all 0.2s;
+            border-radius: var(--td-radius-default);
+        }
+
+        .tree-node:hover > .tree-node-content {
+            background-color: #f5f5f5;
+        }
+
+        .tree-node.active > .tree-node-content {
+            background-color: #E8F0FF;
+            color: var(--td-brand-color);
+            font-weight: 500;
+        }
+
+        .tree-node-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             flex: 1;
+            overflow: hidden;
+        }
+
+        .tree-toggle {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--td-text-color-secondary);
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .tree-toggle.expanded {
+            transform: rotate(90deg);
+        }
+
+        .tree-toggle.leaf {
+            visibility: hidden;
         }
 
         .tree-icon {
             font-size: 16px;
             color: inherit;
+            flex-shrink: 0;
         }
 
         .tree-label {
             flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 14px;
         }
 
         .tree-badge {
@@ -164,18 +193,93 @@
             font-size: 12px;
             padding: 2px 8px;
             border-radius: 10px;
+            flex-shrink: 0;
+            margin-left: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
         }
 
-        .tree-node.active .tree-badge {
+        .tree-node.active > .tree-node-content .tree-badge {
             background-color: var(--td-brand-color);
             color: white;
         }
 
         .tree-children {
-            padding-left: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        /* 右侧内容区 */
+        .tree-children.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .tree-children.expanded {
+            max-height: 2000px;
+            opacity: 1;
+        }
+
+        /* 添加层级引导线 */
+        .tree-children::before {
+            content: '';
+            position: absolute;
+            left: 28px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: var(--td-border-level-1-color);
+        }
+
+        .level-1 .tree-node-content {
+            padding-left: 32px;
+        }
+
+        .level-2 .tree-node-content {
+            padding-left: 56px;
+        }
+
+        /* 父级节点样式（文件夹） */
+        .level-0 > .tree-node-content .tree-icon {
+            color: var(--td-brand-color);
+            font-size: 18px;
+        }
+
+        .level-0 > .tree-node-content .tree-label {
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        /* 一级子节点样式 */
+        .level-1 > .tree-node-content .tree-icon {
+            color: rgba(0, 0, 0, 0.75);
+        }
+
+        .level-1 > .tree-node-content .tree-label {
+            color: rgba(0, 0, 0, 0.75);
+            font-weight: 500;
+        }
+
+        /* 叶子节点样式（文件） */
+        .level-2 > .tree-node-content .tree-icon {
+            color: var(--td-text-color-secondary);
+            font-size: 14px;
+        }
+
+        .level-2 > .tree-node-content .tree-label {
+            color: var(--td-text-color-secondary);
+            font-size: 13px;
+        }
+
+        /* 悬停效果层级区分 */
+        .level-0:hover > .tree-node-content {
+            background-color: #e8e8e8;
+        }
+
+        .level-1:hover > .tree-node-content {
+            background-color: #f0f0f0;
+        }
+
         .main-content {
             flex: 1;
             display: flex;
@@ -224,7 +328,6 @@
             gap: 12px;
         }
 
-        /* 工具栏 */
         .toolbar {
             padding: 16px 24px;
             display: flex;
@@ -240,14 +343,14 @@
             gap: 12px;
             align-items: center;
             flex: 1;
+            flex-wrap: wrap;
         }
 
         .search-box {
             position: relative;
-            width: 320px;
+            width: 240px;
         }
 
-        /* 调整高度，保持协调 */
         .search-input {
             width: 100%;
             height: 32px;
@@ -278,7 +381,6 @@
             gap: 8px;
         }
 
-        /* 调整高度，保持协调 */
         .filter-select {
             height: 32px;
             padding: 0 12px;
@@ -288,7 +390,7 @@
             background-color: #fff;
             cursor: pointer;
             outline: none;
-            min-width: 120px;
+            min-width: 110px;
         }
 
         .filter-select:focus {
@@ -298,10 +400,9 @@
         .toolbar-right {
             display: flex;
             gap: 8px;
-            flex-shrink: 0; /* 防止被左侧较长区域挤压导致换行 */
+            flex-shrink: 0;
         }
 
-        /* 基础按钮样式 */
         .btn {
             padding: 8px 16px;
             border-radius: var(--td-radius-default);
@@ -315,10 +416,9 @@
             gap: 6px;
             font-weight: 400;
             line-height: 1.5;
-            white-space: nowrap; /* 防止按钮内的文字换行 */
+            white-space: nowrap;
         }
 
-        /* 针对工具栏右侧按钮调整高度比例 */
         .toolbar-right .btn {
             height: 32px;
             padding: 0 16px;
@@ -358,18 +458,19 @@
             background-color: rgba(0, 82, 217, 0.05);
         }
 
-        /* 表格区域 */
         .table-container {
             flex: 1;
             overflow: auto;
-            padding: 0 24px 24px;
+            padding: 0;
         }
 
         .data-table {
             width: 100%;
+            min-width: 1100px;
             border-collapse: separate;
             border-spacing: 0;
             font-size: 14px;
+            table-layout: fixed;
         }
 
         .data-table thead {
@@ -378,21 +479,18 @@
             z-index: 10;
         }
 
-        .data-table th {
-            background-color: #f5f5f5;
-            padding: 12px 16px;
-            text-align: left;
-            font-weight: 500;
-            color: var(--td-text-color-primary);
-            border-bottom: 1px solid var(--td-border-level-1-color);
-            white-space: nowrap;
-        }
-
+        .data-table th,
         .data-table td {
             padding: 16px;
             border-bottom: 1px solid var(--td-border-level-1-color);
             color: var(--td-text-color-primary);
             vertical-align: middle;
+        }
+
+        .data-table th {
+            background-color: #f5f5f5;
+            text-align: left;
+            font-weight: 500;
         }
 
         .data-table tbody tr {
@@ -407,18 +505,25 @@
             background-color: #E8F0FF;
         }
 
-        /* 复选框 */
+        .data-table th.type-col,
+        .data-table td.type-col {
+            text-align: center;
+        }
+
+        /* 复选框样式 - 使用内部span显示对号 */
         .checkbox {
             width: 16px;
             height: 16px;
             border: 1px solid var(--td-border-level-2-color);
-            border-radius: var(--td-radius-small);
+            border-radius: 3px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
             background-color: #fff;
+            position: relative;
+            vertical-align: middle;
         }
 
         .checkbox:hover {
@@ -428,18 +533,33 @@
         .checkbox.checked {
             background-color: var(--td-brand-color);
             border-color: var(--td-brand-color);
-            color: white;
         }
 
-        /* 类型标签 */
+        /* 对号span默认隐藏 */
+        .checkbox .check-icon {
+            display: none;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1;
+            font-family: sans-serif;
+        }
+
+        /* 选中时显示 */
+        .checkbox.checked .check-icon {
+            display: block;
+        }
+
         .type-tag {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             padding: 4px 8px;
             border-radius: var(--td-radius-small);
             font-size: 12px;
             font-weight: 500;
             gap: 4px;
+            white-space: nowrap;
         }
 
         .type-attachment {
@@ -452,21 +572,108 @@
             color: #D46B08;
         }
 
-        /* 资料名称 */
+        .field-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+            align-items: center;
+            position: relative;
+        }
+
+        .field-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .field-more-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            background-color: var(--td-bg-color-secondarycontainer);
+            color: var(--td-text-color-secondary);
+            border: 1px solid var(--td-border-level-2-color);
+            white-space: nowrap;
+            cursor: help;
+        }
+
+        .field-Q { background-color: #E8F0FF; color: #0052D9; border-color: #0052D9; }
+        .field-E { background-color: #E8F8F0; color: #05943D; border-color: #05943D; }
+        .field-S { background-color: #FFF2F0; color: #CF1322; border-color: #CF1322; }
+        .field-IT { background-color: #F0F5FF; color: #2F54EB; border-color: #2F54EB; }
+        .field-F { background-color: #FFF7E6; color: #FA8C16; border-color: #FA8C16; }
+        .field-En { background-color: #F6FFED; color: #52C41A; border-color: #52C41A; }
+
+        .custom-tooltip {
+            position: fixed;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            max-width: 250px;
+            line-height: 1.5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .custom-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 4px 4px 0;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+        }
+
+        .custom-tooltip.show {
+            opacity: 1;
+        }
+
         .doc-name {
             display: flex;
             align-items: center;
             gap: 8px;
             color: var(--td-text-color-primary);
             font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .doc-name:hover {
+            color: var(--td-brand-color);
+        }
+
+        .doc-name:hover .doc-icon {
+            color: var(--td-brand-color-hover);
         }
 
         .doc-icon {
             font-size: 20px;
             color: var(--td-brand-color);
+            flex-shrink: 0;
+            transition: color 0.2s;
         }
 
-        /* 环节标签 */
+        .doc-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .stage-tag {
             display: inline-block;
             padding: 2px 8px;
@@ -474,13 +681,19 @@
             font-size: 12px;
             background-color: var(--td-bg-color-secondarycontainer);
             color: var(--td-text-color-secondary);
+            white-space: nowrap;
         }
 
         .stage-auth { background-color: #E8F0FF; color: var(--td-brand-color); }
         .stage-plan { background-color: #F0F5FF; color: #2F54EB; }
         .stage-audit { background-color: #FFF2F0; color: #CF1322; }
 
-        /* 底部操作栏 */
+        .upload-time {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .bottom-bar {
             padding: 16px 24px;
             background-color: #fff;
@@ -506,7 +719,6 @@
             gap: 12px;
         }
 
-        /* 空状态 */
         .empty-state {
             display: flex;
             flex-direction: column;
@@ -522,7 +734,6 @@
             opacity: 0.3;
         }
 
-        /* 滚动条美化 */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -541,7 +752,6 @@
             background: rgba(0, 0, 0, 0.3);
         }
 
-        /* 分页 */
         .pagination {
             display: flex;
             align-items: center;
@@ -578,7 +788,24 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        .current-category-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--td-text-color-primary);
+            margin-bottom: 12px;
+            padding: 0 24px;
+            padding-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .current-category-title .t-icon {
+            color: var(--td-brand-color);
+        }
     </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -591,69 +818,10 @@
                         <i class="t-icon t-icon-folder-open"></i>
                         客户认证审核资料
                     </div>
-                    <div class="sidebar-subtitle">共 128 份资料</div>
+                    <div class="sidebar-subtitle">共 <span id="totalCount">19</span> 份资料</div>
                 </div>
 
-                <div class="category-tree">
-                    <div class="tree-node active" data-category="all">
-                        <div class="tree-node-content">
-                            <i class="t-icon t-icon-folder tree-icon"></i>
-                            <span class="tree-label">全部资料</span>
-                        </div>
-                        <span class="tree-badge">128</span>
-                    </div>
-
-                    <div class="tree-node" data-category="auth">
-                        <div class="tree-node-content">
-                            <i class="t-icon t-icon-credential tree-icon"></i>
-                            <span class="tree-label">认证申请资料</span>
-                        </div>
-                        <span class="tree-badge">32</span>
-                    </div>
-
-                    <div class="tree-node" data-category="plan">
-                        <div class="tree-node-content">
-                            <i class="t-icon t-icon-edit-1 tree-icon"></i>
-                            <span class="tree-label">方案策划资料</span>
-                        </div>
-                        <span class="tree-badge">28</span>
-                    </div>
-
-                    <div class="tree-node" data-category="audit">
-                        <div class="tree-node-content">
-                            <i class="t-icon t-icon-search tree-icon"></i>
-                            <span class="tree-label">认证审核资料</span>
-                        </div>
-                        <span class="tree-badge">45</span>
-                    </div>
-
-                    <div class="tree-node" data-category="report">
-                        <div class="tree-node-content">
-                            <i class="t-icon t-icon-file-paste tree-icon"></i>
-                            <span class="tree-label">审核报告</span>
-                        </div>
-                        <span class="tree-badge">23</span>
-                    </div>
-
-                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--td-border-level-1-color);">
-                        <div style="font-size: 12px; color: var(--td-text-color-placeholder); margin-bottom: 8px; padding-left: 12px;">
-                            更多分类
-                        </div>
-                        <div class="tree-node" data-category="contract">
-                            <div class="tree-node-content">
-                                <i class="t-icon t-icon-file-open tree-icon"></i>
-                                <span class="tree-label">合同协议</span>
-                            </div>
-                            <span class="tree-badge">15</span>
-                        </div>
-                        <div class="tree-node" data-category="certificate">
-                            <div class="tree-node-content">
-                                <i class="t-icon t-icon-certificate tree-icon"></i>
-                                <span class="tree-label">资质证书</span>
-                            </div>
-                            <span class="tree-badge">12</span>
-                        </div>
-                    </div>
+                <div class="category-tree" id="categoryTree">
                 </div>
             </aside>
 
@@ -673,6 +841,11 @@
                     </div>
                 </div>
 
+                <div class="current-category-title" id="currentCategoryTitle">
+                    <i class="t-icon t-icon-folder"></i>
+                    <span>全部资料</span>
+                </div>
+
                 <div class="toolbar">
                     <div class="toolbar-left">
                         <div class="search-box">
@@ -680,6 +853,15 @@
                             <input type="text" class="search-input" placeholder="搜索资料名称、上传人..." id="searchInput">
                         </div>
                         <div class="filter-group">
+                            <select class="filter-select" id="fieldFilter" multiple size="1" style="min-width: 140px;">
+                                <option value="">认证领域</option>
+                                <option value="Q">Q（质量）</option>
+                                <option value="E">E（环境）</option>
+                                <option value="S">S（安全）</option>
+                                <option value="IT">IT（信息）</option>
+                                <option value="F">F（食品）</option>
+                                <option value="En">En（能源）</option>
+                            </select>
                             <select class="filter-select" id="typeFilter">
                                 <option value="">全部类型</option>
                                 <option value="attachment">附件</option>
@@ -690,12 +872,6 @@
                                 <option value="认证申请">认证申请</option>
                                 <option value="方案策划">方案策划</option>
                                 <option value="认证审核">认证审核</option>
-                            </select>
-                            <select class="filter-select">
-                                <option value="">时间范围</option>
-                                <option value="today">今天</option>
-                                <option value="week">近一周</option>
-                                <option value="month">近一月</option>
                             </select>
                         </div>
                     </div>
@@ -708,27 +884,25 @@
                         <thead>
                             <tr>
                                 <th width="40">
-                                    <span class="checkbox" id="selectAll" onclick="toggleSelectAll()">
-                                        <i class="t-icon t-icon-check" style="font-size: 12px; display: none;"></i>
-                                    </span>
+                                    <span class="checkbox" id="selectAll" onclick="toggleSelectAll()"><span class="check-icon">✓</span></span>
                                 </th>
                                 <th width="40">#</th>
-                                <th>资料名称</th>
-                                <th width="100">类型</th>
-                                <th width="160">上传时间</th>
-                                <th width="120">上传人</th>
-                                <th width="120">上传环节</th>
-                                <th width="100">操作</th>
+                                <th style="width: 280px; min-width: 280px;">资料名称</th>
+                                <th width="120">认证领域</th>
+                                <th width="130">文件类型</th>
+                                <th width="80" class="type-col">类型</th>
+                                <th width="140">上传时间</th>
+                                <th width="100">上传环节</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            </tbody>
+                        </tbody>
                     </table>
 
                     <div class="empty-state" id="emptyState" style="display: none;">
                         <i class="t-icon t-icon-folder-open empty-icon"></i>
                         <p>暂无资料数据</p>
-                        <button class="btn btn-text" style="margin-top: 12px;">
+                        <button class="btn btn-text" style="margin-top: 12px;" onclick="refreshData()">
                             <i class="t-icon t-icon-refresh"></i>
                             重新加载
                         </button>
@@ -744,11 +918,9 @@
                             <button class="page-btn" onclick="changePage('prev')" id="prevBtn">
                                 <i class="t-icon t-icon-chevron-left"></i>
                             </button>
-                            <button class="page-btn active">1</button>
-                            <button class="page-btn" onclick="changePage(2)">2</button>
-                            <button class="page-btn" onclick="changePage(3)">3</button>
+                            <button class="page-btn active" id="page1">1</button>
+                            <button class="page-btn" id="page2" onclick="changePage(2)">2</button>
                             <span style="color: var(--td-text-color-placeholder);">...</span>
-                            <button class="page-btn" onclick="changePage(10)">10</button>
                             <button class="page-btn" onclick="changePage('next')" id="nextBtn">
                                 <i class="t-icon t-icon-chevron-right"></i>
                             </button>
@@ -765,32 +937,287 @@
         </div>
     </div>
 
-    <script>
-        // --- 关闭弹窗逻辑 ---
-        function closeModal() {
-            document.getElementById('fileModal').style.display = 'none';
-        }
+    <div class="custom-tooltip" id="customTooltip"></div>
 
-        // 模拟数据
-        const mockData = [
-            { id: 1, name: "客户基本信息登记表.pdf", type: "form", uploadTime: "2024-01-15 09:23", uploader: "张经理", stage: "认证申请", size: "2.4MB" },
-            { id: 2, name: "营业执照扫描件.jpg", type: "attachment", uploadTime: "2024-01-15 10:45", uploader: "李助理", stage: "认证申请", size: "1.8MB" },
-            { id: 3, name: "认证方案策划书.docx", type: "form", uploadTime: "2024-01-16 14:30", uploader: "王主管", stage: "方案策划", size: "3.2MB" },
-            { id: 4, name: "现场审核记录表.xlsx", type: "form", uploadTime: "2024-01-17 16:20", uploader: "审核员A", stage: "认证审核", size: "1.5MB" },
-            { id: 5, name: "不符合项报告.pdf", type: "attachment", uploadTime: "2024-01-18 09:00", uploader: "审核员B", stage: "认证审核", size: "856KB" },
-            { id: 6, name: "整改证据材料.zip", type: "attachment", uploadTime: "2024-01-20 11:30", uploader: "张经理", stage: "认证审核", size: "15.6MB" },
-            { id: 7, name: "审核计划表.xlsx", type: "form", uploadTime: "2024-01-16 08:15", uploader: "王主管", stage: "方案策划", size: "980KB" },
-            { id: 8, name: "组织机构代码证.pdf", type: "attachment", uploadTime: "2024-01-15 11:20", uploader: "李助理", stage: "认证申请", size: "2.1MB" },
-            { id: 9, name: "管理体系文件.pdf", type: "attachment", uploadTime: "2024-01-19 15:45", uploader: "张经理", stage: "认证审核", size: "8.4MB" },
-            { id: 10, name: "认证合同.docx", type: "form", uploadTime: "2024-01-14 16:00", uploader: "陈总监", stage: "认证申请", size: "1.2MB" },
-            { id: 11, name: "年度监督审核报告.pdf", type: "attachment", uploadTime: "2024-01-21 10:30", uploader: "审核员A", stage: "认证审核", size: "3.8MB" },
-            { id: 12, name: "客户满意度调查表.xlsx", type: "form", uploadTime: "2024-01-18 14:20", uploader: "王主管", stage: "方案策划", size: "1.1MB" }
+    <script>
+        const fieldConfig = {
+            'Q': { name: 'Q', fullName: '质量', class: 'field-Q' },
+            'E': { name: 'E', fullName: '环境', class: 'field-E' },
+            'S': { name: 'S', fullName: '安全', class: 'field-S' },
+            'IT': { name: 'IT', fullName: '信息', class: 'field-IT' },
+            'F': { name: 'F', fullName: '食品', class: 'field-F' },
+            'En': { name: 'En', fullName: '能源', class: 'field-En' }
+        };
+
+        const treeData = [
+            {
+                id: 'all',
+                label: '全部',
+                icon: 'folder',
+                expanded: true,
+                children: [
+                    {
+                        id: 'general',
+                        label: '通用材料',
+                        icon: 'folder',
+                        expanded: true,
+                        children: [
+                            { id: 'application_form', label: '认证申请表', icon: 'file', leaf: true },
+                            { id: 'legal_proof', label: '法律地位证明文件复印件（如营业执照）', icon: 'file', leaf: true },
+                            { id: 'review_form', label: '认证申请评审表', icon: 'file', leaf: true },
+                            { id: 'audit_plan', label: '审核计划书', icon: 'file', leaf: true }
+                        ]
+                    },
+                    {
+                        id: 'phase1',
+                        label: '一阶段审核材料',
+                        icon: 'folder',
+                        expanded: true,
+                        children: [
+                            { id: 'quality_standard', label: '产品质量标准清单', icon: 'file', leaf: true }
+                        ]
+                    },
+                    {
+                        id: 'phase2',
+                        label: '二阶段审核材料',
+                        icon: 'folder',
+                        expanded: true,
+                        children: [
+                            { id: 'manual', label: '质量/环境管理手册', icon: 'file', leaf: true },
+                            { id: 'procedure', label: '程序文件汇编', icon: 'file', leaf: true }
+                        ]
+                    }
+                ]
+            }
         ];
+
+        const mockData = [
+            { id: 1, name: "ISO9001认证申请表.pdf", type: "form", uploadTime: "2024-01-15 09:23", uploader: "张经理", stage: "认证申请", size: "1.5MB", fileCategory: "application_form", fields: ["Q"] },
+            { id: 2, name: "质量环境双体系认证申请表.pdf", type: "form", uploadTime: "2024-01-16 10:45", uploader: "李助理", stage: "认证申请", size: "2.1MB", fileCategory: "application_form", fields: ["Q", "E"] },
+            { id: 3, name: "营业执照副本.pdf", type: "attachment", uploadTime: "2024-01-15 11:20", uploader: "李助理", stage: "认证申请", size: "2.2MB", fileCategory: "legal_proof", fields: ["Q", "E", "S", "IT", "F", "En"] },
+            { id: 4, name: "组织机构代码证.pdf", type: "attachment", uploadTime: "2024-01-16 09:00", uploader: "王主管", stage: "认证申请", size: "1.8MB", fileCategory: "legal_proof", fields: ["Q", "E", "S", "IT", "F", "En"] },
+            { id: 5, name: "QMS申请评审记录表.xlsx", type: "form", uploadTime: "2024-01-17 14:30", uploader: "王主管", stage: "认证申请", size: "980KB", fileCategory: "review_form", fields: ["Q"] },
+            { id: 6, name: "ITSMS申请评审意见通知书.docx", type: "form", uploadTime: "2024-01-18 16:00", uploader: "陈总监", stage: "认证申请", size: "1.2MB", fileCategory: "review_form", fields: ["IT"] },
+            { id: 7, name: "2024年度EMS审核计划.pdf", type: "form", uploadTime: "2024-01-19 08:15", uploader: "王主管", stage: "方案策划", size: "3.5MB", fileCategory: "audit_plan", fields: ["E"] },
+            { id: 8, name: "OHSMS监督审核计划.xlsx", type: "form", uploadTime: "2024-01-20 11:30", uploader: "审核员A", stage: "方案策划", size: "1.1MB", fileCategory: "audit_plan", fields: ["S"] },
+            { id: 9, name: "产品执行标准清单QMS.xlsx", type: "form", uploadTime: "2024-01-21 09:30", uploader: "审核员A", stage: "认证审核", size: "1.2MB", fileCategory: "quality_standard", fields: ["Q"] },
+            { id: 10, name: "企业标准备案清单.pdf", type: "attachment", uploadTime: "2024-01-22 10:00", uploader: "张经理", stage: "认证审核", size: "3.8MB", fileCategory: "quality_standard", fields: ["Q", "E"] },
+            { id: 11, name: "行业标准清单FSSC.docx", type: "form", uploadTime: "2024-01-23 14:20", uploader: "审核员B", stage: "认证审核", size: "2.4MB", fileCategory: "quality_standard", fields: ["F"] },
+            { id: 12, name: "能源管理体系标准清单.xlsx", type: "form", uploadTime: "2024-01-24 11:00", uploader: "李助理", stage: "认证审核", size: "980KB", fileCategory: "quality_standard", fields: ["En"] },
+            { id: 13, name: "质量管理手册V3.0.pdf", type: "attachment", uploadTime: "2024-01-25 10:00", uploader: "张经理", stage: "认证审核", size: "5.6MB", fileCategory: "manual", fields: ["Q", "E"] },
+            { id: 14, name: "环境管理手册V2.0.docx", type: "form", uploadTime: "2024-01-26 15:30", uploader: "王主管", stage: "认证审核", size: "4.2MB", fileCategory: "manual", fields: ["E"] },
+            { id: 15, name: "质量环境整合手册.pdf", type: "attachment", uploadTime: "2024-01-27 09:00", uploader: "陈总监", stage: "认证审核", size: "6.8MB", fileCategory: "manual", fields: ["Q", "E", "S"] },
+            { id: 16, name: "三体系程序文件汇编2024.pdf", type: "form", uploadTime: "2024-01-28 16:30", uploader: "审核员A", stage: "认证审核", size: "8.5MB", fileCategory: "procedure", fields: ["Q", "E", "S"] },
+            { id: 17, name: "QMS程序文件修订记录.xlsx", type: "form", uploadTime: "2024-01-29 11:20", uploader: "审核员B", stage: "认证审核", size: "1.5MB", fileCategory: "procedure", fields: ["Q"] },
+            { id: 18, name: "食品安全管理手册.pdf", type: "attachment", uploadTime: "2024-01-30 14:00", uploader: "张经理", stage: "认证审核", size: "4.8MB", fileCategory: "manual", fields: ["F"] },
+            { id: 19, name: "信息技术服务程序文件.docx", type: "form", uploadTime: "2024-01-31 10:30", uploader: "王主管", stage: "认证审核", size: "3.2MB", fileCategory: "procedure", fields: ["IT"] }
+        ];
+
+        const categoryNameMap = {
+            'all': '全部',
+            'general': '通用材料',
+            'phase1': '一阶段审核材料',
+            'phase2': '二阶段审核材料',
+            'application_form': '认证申请表',
+            'legal_proof': '法律地位证明文件复印件（如营业执照）',
+            'review_form': '认证申请评审表',
+            'audit_plan': '审核计划书',
+            'quality_standard': '产品质量标准清单',
+            'manual': '质量/环境管理手册',
+            'procedure': '程序文件汇编'
+        };
 
         let selectedItems = new Set();
         let currentData = [...mockData];
+        let currentCategory = 'all';
 
-        // 初始化表格
+        function calculateCount(nodeId) {
+            if (nodeId === 'all') return mockData.length;
+
+            let isLeaf = true;
+            let parentCategory = null;
+
+            treeData[0].children.forEach(cat => {
+                if (cat.id === nodeId) {
+                    isLeaf = false;
+                    parentCategory = cat;
+                }
+                if (cat.children) {
+                    cat.children.forEach(child => {
+                        if (child.id === nodeId) isLeaf = true;
+                    });
+                }
+            });
+
+            if (isLeaf) {
+                return mockData.filter(item => item.fileCategory === nodeId).length;
+            } else {
+                if (parentCategory && parentCategory.children) {
+                    const childIds = parentCategory.children.map(child => child.id);
+                    return mockData.filter(item => childIds.includes(item.fileCategory)).length;
+                }
+                return 0;
+            }
+        }
+
+        function renderTree() {
+            const treeContainer = document.getElementById('categoryTree');
+
+            function buildTreeHTML(nodes, level = 0) {
+                return nodes.map(node => {
+                    const count = calculateCount(node.id);
+                    const hasChildren = node.children && node.children.length > 0;
+                    const isExpanded = node.expanded !== false;
+                    const isActive = currentCategory === node.id;
+                    const levelClass = `level-${level}`;
+
+                    return `
+                        <div class="tree-node ${isActive ? 'active' : ''} ${levelClass}" data-id="${node.id}">
+                            <div class="tree-node-content" onclick="handleNodeClick('${node.id}', ${hasChildren}, event)">
+                                <div class="tree-node-left">
+                                    <span class="tree-toggle ${hasChildren ? (isExpanded ? 'expanded' : '') : 'leaf'}" onclick="toggleExpand(event, '${node.id}')">
+                                        <i class="t-icon t-icon-chevron-right"></i>
+                                    </span>
+                                    <i class="t-icon t-icon-${node.icon} tree-icon"></i>
+                                    <span class="tree-label">${node.label}</span>
+                                </div>
+                                <span class="tree-badge">${count}</span>
+                            </div>
+                            ${hasChildren ? `
+                                <div class="tree-children ${isExpanded ? 'expanded' : 'collapsed'}" id="children-${node.id}">
+                                    ${buildTreeHTML(node.children, level + 1)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            treeContainer.innerHTML = buildTreeHTML(treeData);
+        }
+
+        function toggleExpand(event, nodeId) {
+            event.stopPropagation();
+            const childrenContainer = document.getElementById(`children-${nodeId}`);
+            const toggleIcon = event.currentTarget;
+
+            if (childrenContainer) {
+                const isExpanded = childrenContainer.classList.contains('expanded');
+                if (isExpanded) {
+                    childrenContainer.classList.remove('expanded');
+                    childrenContainer.classList.add('collapsed');
+                    toggleIcon.classList.remove('expanded');
+                } else {
+                    childrenContainer.classList.remove('collapsed');
+                    childrenContainer.classList.add('expanded');
+                    toggleIcon.classList.add('expanded');
+                }
+            }
+        }
+
+        function handleNodeClick(nodeId, hasChildren, event) {
+            if (event.target.closest('.tree-toggle')) return;
+            currentCategory = nodeId;
+            filterByCategory(nodeId);
+            renderTree();
+            updateCategoryTitle(nodeId);
+        }
+
+        function updateCategoryTitle(categoryId) {
+            const titleEl = document.getElementById('currentCategoryTitle');
+            const name = categoryNameMap[categoryId] || '全部资料';
+            titleEl.innerHTML = `
+                <i class="t-icon t-icon-folder"></i>
+                <span>${name}</span>
+                <span style="color: var(--td-text-color-secondary); font-weight: normal; margin-left: 8px;">(${currentData.length}份)</span>
+            `;
+        }
+
+        function filterByCategory(categoryId) {
+            if (categoryId === 'all') {
+                currentData = [...mockData];
+            } else if (categoryId === 'general') {
+                const childIds = ['application_form', 'legal_proof', 'review_form', 'audit_plan'];
+                currentData = mockData.filter(item => childIds.includes(item.fileCategory));
+            } else if (categoryId === 'phase1') {
+                currentData = mockData.filter(item => item.fileCategory === 'quality_standard');
+            } else if (categoryId === 'phase2') {
+                const childIds = ['manual', 'procedure'];
+                currentData = mockData.filter(item => childIds.includes(item.fileCategory));
+            } else {
+                currentData = mockData.filter(item => item.fileCategory === categoryId);
+            }
+            selectedItems.clear();
+            updateSelectionUI();
+            renderTable(currentData);
+        }
+
+        function renderFieldTags(fields) {
+            if (!fields || fields.length === 0) return '-';
+
+            const displayCount = 3;
+            const displayFields = fields.slice(0, displayCount);
+            const remainingCount = fields.length - displayCount;
+
+            let html = '<div class="field-tags">';
+
+            displayFields.forEach(field => {
+                const config = fieldConfig[field];
+                if (config) {
+                    html += `<span class="field-tag ${config.class}">${config.name}</span>`;
+                }
+            });
+
+            if (remainingCount > 0) {
+                const allFieldsText = fields.map(f => {
+                    const cfg = fieldConfig[f];
+                    return cfg ? `${cfg.fullName}(${cfg.name})` : f;
+                }).join('、');
+
+                html += `<span class="field-more-tag" data-tooltip="${allFieldsText}">+${remainingCount}</span>`;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        function initTooltip() {
+            const tooltip = document.getElementById('customTooltip');
+
+            document.addEventListener('mouseover', function(e) {
+                const target = e.target.closest('[data-tooltip]');
+                if (target) {
+                    const text = target.getAttribute('data-tooltip');
+                    tooltip.textContent = '认证领域：' + text;
+                    tooltip.classList.add('show');
+
+                    const rect = target.getBoundingClientRect();
+                    const tooltipRect = tooltip.getBoundingClientRect();
+
+                    let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+                    let top = rect.top - tooltipRect.height - 8;
+
+                    if (left < 10) left = 10;
+                    if (left + tooltipRect.width > window.innerWidth - 10) {
+                        left = window.innerWidth - tooltipRect.width - 10;
+                    }
+                    if (top < 10) {
+                        top = rect.bottom + 8;
+                    }
+
+                    tooltip.style.left = left + 'px';
+                    tooltip.style.top = top + 'px';
+                }
+            });
+
+            document.addEventListener('mouseout', function(e) {
+                const target = e.target.closest('[data-tooltip]');
+                if (target) {
+                    tooltip.classList.remove('show');
+                }
+            });
+        }
+
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             const emptyState = document.getElementById('emptyState');
@@ -805,67 +1232,53 @@
             tbody.innerHTML = data.map((item, index) => `
                 <tr class="${selectedItems.has(item.id) ? 'selected' : ''}" data-id="${item.id}">
                     <td>
-                        <span class="checkbox ${selectedItems.has(item.id) ? 'checked' : ''}" onclick="toggleSelect(${item.id}, event)">
-                            <i class="t-icon t-icon-check" style="font-size: 12px; ${selectedItems.has(item.id) ? '' : 'display: none;'}"></i>
-                        </span>
+                        <span class="checkbox ${selectedItems.has(item.id) ? 'checked' : ''}" onclick="toggleSelect(${item.id}, event)"><span class="check-icon">✓</span></span>
                     </td>
                     <td>${index + 1}</td>
                     <td>
-                        <div class="doc-name">
+                        <div class="doc-name" onclick="previewDoc(${item.id})" title="点击预览：${item.name}">
                             <i class="t-icon t-icon-${item.type === 'form' ? 'file-paste' : 'file'} doc-icon"></i>
-                            <span>${item.name}</span>
+                            <span class="doc-text">${item.name}</span>
                         </div>
                         <div style="font-size: 12px; color: var(--td-text-color-placeholder); margin-top: 4px; margin-left: 28px;">
                             ${item.size}
                         </div>
                     </td>
+                    <td>${renderFieldTags(item.fields)}</td>
                     <td>
+                        <span style="font-size: 12px; color: var(--td-text-color-secondary);">
+                            ${categoryNameMap[item.fileCategory] || item.fileCategory}
+                        </span>
+                    </td>
+                    <td class="type-col">
                         <span class="type-tag ${item.type === 'attachment' ? 'type-attachment' : 'type-form'}">
                             <i class="t-icon t-icon-${item.type === 'attachment' ? 'attach' : 'file-open'}"></i>
                             ${item.type === 'attachment' ? '附件' : '表单'}
                         </span>
                     </td>
-                    <td>${item.uploadTime}</td>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #0052D9; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px;">
-                                ${item.uploader.charAt(0)}
-                            </div>
-                            ${item.uploader}
-                        </div>
-                    </td>
+                    <td class="upload-time">${item.uploadTime}</td>
                     <td>
                         <span class="stage-tag stage-${item.stage === '认证申请' ? 'auth' : item.stage === '方案策划' ? 'plan' : 'audit'}">
                             ${item.stage}
                         </span>
                     </td>
-                    <td>
-                        <button class="btn btn-text" style="padding: 4px 8px;" onclick="previewDoc(${item.id})">
-                            <i class="t-icon t-icon-browse"></i>
-                        </button>
-                        <button class="btn btn-text" style="padding: 4px 8px;" onclick="downloadDoc(${item.id})">
-                            <i class="t-icon t-icon-download"></i>
-                        </button>
-                    </td>
                 </tr>
             `).join('');
+
+            initTooltip();
         }
 
-        // 选择/取消选择
         function toggleSelect(id, event) {
             if (event) event.stopPropagation();
-
             if (selectedItems.has(id)) {
                 selectedItems.delete(id);
             } else {
                 selectedItems.add(id);
             }
-
             updateSelectionUI();
             renderTable(currentData);
         }
 
-        // 全选/取消全选
         function toggleSelectAll() {
             const allCheckbox = document.getElementById('selectAll');
             const isChecked = allCheckbox.classList.contains('checked');
@@ -875,12 +1288,10 @@
             } else {
                 currentData.forEach(item => selectedItems.add(item.id));
             }
-
             updateSelectionUI();
             renderTable(currentData);
         }
 
-        // 更新选择状态UI
         function updateSelectionUI() {
             const count = selectedItems.size;
             document.getElementById('selectedCount').textContent = count;
@@ -889,98 +1300,84 @@
             const allCheckbox = document.getElementById('selectAll');
             if (count === currentData.length && currentData.length > 0) {
                 allCheckbox.classList.add('checked');
-                allCheckbox.querySelector('i').style.display = 'block';
             } else {
                 allCheckbox.classList.remove('checked');
-                allCheckbox.querySelector('i').style.display = 'none';
             }
         }
 
-        // 分类切换
-        document.querySelectorAll('.tree-node').forEach(node => {
-            node.addEventListener('click', function() {
-                document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('active'));
-                this.classList.add('active');
-
-                const category = this.dataset.category;
-                filterByCategory(category);
-            });
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            applyAllFilters(e.target.value.toLowerCase());
         });
 
-        // 按分类筛选
-        function filterByCategory(category) {
-            if (category === 'all') {
-                currentData = [...mockData];
-            } else if (category === 'auth') {
-                currentData = mockData.filter(item => item.stage === '认证申请');
-            } else if (category === 'plan') {
-                currentData = mockData.filter(item => item.stage === '方案策划');
-            } else if (category === 'audit') {
-                currentData = mockData.filter(item => item.stage === '认证审核');
-            } else {
-                currentData = mockData.slice(0, 6);
-            }
-            selectedItems.clear();
-            updateSelectionUI();
-            renderTable(currentData);
-        }
+        document.getElementById('fieldFilter').addEventListener('change', function() {
+            applyAllFilters();
+        });
 
-        // 搜索功能
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const keyword = e.target.value.toLowerCase();
-            if (keyword === '') {
-                currentData = [...mockData];
-            } else {
-                currentData = mockData.filter(item => 
-                    item.name.toLowerCase().includes(keyword) || 
-                    item.uploader.toLowerCase().includes(keyword)
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            applyAllFilters();
+        });
+
+        document.getElementById('stageFilter').addEventListener('change', function() {
+            applyAllFilters();
+        });
+
+        function applyAllFilters(keyword) {
+            const searchKeyword = keyword !== undefined ? keyword : document.getElementById('searchInput').value.toLowerCase();
+            const fieldSelect = document.getElementById('fieldFilter');
+            const selectedFields = Array.from(fieldSelect.selectedOptions).map(opt => opt.value).filter(v => v);
+            const type = document.getElementById('typeFilter').value;
+            const stage = document.getElementById('stageFilter').value;
+
+            let filtered = [...mockData];
+
+            if (currentCategory !== 'all') {
+                if (currentCategory === 'general') {
+                    const childIds = ['application_form', 'legal_proof', 'review_form', 'audit_plan'];
+                    filtered = filtered.filter(item => childIds.includes(item.fileCategory));
+                } else if (currentCategory === 'phase1') {
+                    filtered = filtered.filter(item => item.fileCategory === 'quality_standard');
+                } else if (currentCategory === 'phase2') {
+                    const childIds = ['manual', 'procedure'];
+                    filtered = filtered.filter(item => childIds.includes(item.fileCategory));
+                } else {
+                    filtered = filtered.filter(item => item.fileCategory === currentCategory);
+                }
+            }
+
+            if (selectedFields.length > 0) {
+                filtered = filtered.filter(item => {
+                    if (!item.fields) return false;
+                    return selectedFields.some(field => item.fields.includes(field));
+                });
+            }
+
+            if (type) filtered = filtered.filter(item => item.type === type);
+            if (stage) filtered = filtered.filter(item => item.stage === stage);
+            if (searchKeyword) {
+                filtered = filtered.filter(item => 
+                    item.name.toLowerCase().includes(searchKeyword) || 
+                    item.uploader.toLowerCase().includes(searchKeyword)
                 );
             }
+
+            currentData = filtered;
             selectedItems.clear();
             updateSelectionUI();
             renderTable(currentData);
-        });
-
-        // 类型筛选
-        document.getElementById('typeFilter').addEventListener('change', function(e) {
-            const type = e.target.value;
-            if (type === '') {
-                currentData = [...mockData];
-            } else {
-                currentData = mockData.filter(item => item.type === type);
-            }
-            selectedItems.clear();
-            updateSelectionUI();
-            renderTable(currentData);
-        });
-
-        // 环节筛选
-        document.getElementById('stageFilter').addEventListener('change', function(e) {
-            const stage = e.target.value;
-            if (stage === '') {
-                currentData = [...mockData];
-            } else {
-                currentData = mockData.filter(item => item.stage === stage);
-            }
-            selectedItems.clear();
-            updateSelectionUI();
-            renderTable(currentData);
-        });
-
-        // 刷新数据
-        function refreshData() {
-            const btn = document.querySelector('.btn-refresh');
-            document.querySelector('.t-icon-refresh').style.animation = 'spin 1s linear';
-            setTimeout(() => {
-                currentData = [...mockData];
-                selectedItems.clear();
-                updateSelectionUI();
-                renderTable(currentData);
-                document.querySelector('.t-icon-refresh').style.animation = '';
-            }, 500);
+            updateCategoryTitle(currentCategory);
         }
 
-        // 确认选择
+        function refreshData() {
+            currentCategory = 'all';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('fieldFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('stageFilter').value = '';
+            filterByCategory('all');
+            renderTree();
+            updateCategoryTitle('all');
+        }
+
         function confirmSelection() {
             if (selectedItems.size === 0) {
                 alert('请至少选择一份资料');
@@ -988,47 +1385,32 @@
             }
             const selectedDocs = mockData.filter(item => selectedItems.has(item.id));
             console.log('已选择的资料：', selectedDocs);
-            
-            // --- 确认选择后关闭弹窗 ---
+            alert(`已选择 ${selectedItems.size} 份资料`);
             closeModal();
         }
 
-        // 取消选择
         function cancelSelection() {
             selectedItems.clear();
             updateSelectionUI();
             renderTable(currentData);
         }
 
-        // 预览文档
         function previewDoc(id) {
             const doc = mockData.find(item => item.id === id);
             alert(`预览：${doc.name}`);
         }
 
-        // 下载文档
-        function downloadDoc(id) {
-            const doc = mockData.find(item => item.id === id);
-            alert(`开始下载：${doc.name}`);
+        function closeModal() {
+            document.getElementById('fileModal').style.display = 'none';
         }
 
-        // 分页（模拟）
         function changePage(page) {
             console.log('切换到页面：', page);
         }
 
-        // 初始化
+        renderTree();
         renderTable(currentData);
-
-        // 添加旋转动画样式
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(style);
+        updateCategoryTitle('all');
     </script>
 </body>
 </html>
