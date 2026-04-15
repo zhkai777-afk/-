@@ -397,6 +397,11 @@
             border-color: var(--td-brand-color);
         }
 
+        /* 认证领域下拉框选项样式调整 - 复选框不贴边 */
+        #fieldFilter option {
+            padding: 4px 12px;
+        }
+
         .toolbar-right {
             display: flex;
             gap: 8px;
@@ -854,7 +859,7 @@
                         </div>
                         <div class="filter-group">
                             <select class="filter-select" id="fieldFilter" multiple size="1" style="min-width: 140px;">
-                                <option value="">认证领域</option>
+                                <option value="" selected>全部领域</option>
                                 <option value="Q">Q（质量）</option>
                                 <option value="E">E（环境）</option>
                                 <option value="S">S（安全）</option>
