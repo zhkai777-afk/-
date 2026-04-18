@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>认证服务评价 - 中国质量认证中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+        }
+
+        /* 设计令牌颜色系统 */
+        :root {
+            --primary: #253BFF;
+            --primary-light: #EEF0FF;
+            --bg-page: #F6F7FB;
+            --text-primary: #1F2329;
+            --text-secondary: #646A73;
+            --border: #DEE0E3;
+            --star-default: #DEE0E3;
+            --star-active: #FAAD14;
+            --success: #00D26A;
+            --warning: #FF8800;
+        }
+
+        .modal-container {
+            width: 640px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .star-icon {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .star-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .star-icon.active {
+            fill: var(--star-active);
+            color: var(--star-active);
+        }
+
+        .star-icon.inactive {
+            fill: var(--star-default);
+            color: var(--star-default);
+        }
+
+        .dimension-item {
+            border-bottom: 1px solid #F0F1F2;
+        }
+
+        .dimension-item:last-child {
+            border-bottom: none;
+        }
+
+        .tag-item {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .tag-item:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .tag-item.selected {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nps-option {
+            transition: all 0.2s ease;
+        }
+
+        .nps-option:hover {
+            transform: translateY(-2px);
+        }
+
+        .nps-option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            background: #1a2fd9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 59, 255, 0.3);
+        }
+
+        .feedback-hint {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feedback-hint.show {
+            opacity: 1;
+        }
+
+        .success-animation {
+            display: none;
+        }
+
+        .success-animation.show {
+            display: flex;
+        }
+
+        .main-content.hide {
+            display: none;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .slider-track {
+            background: linear-gradient(to right, #FF4D4F 0%, #FF8800 50%, #00D26A 100%);
+            height: 6px;
+            border-radius: 3px;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- 弹窗容器 -->
+    <div class="modal-container">
+
+        <!-- 头部 -->
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+            <div>
+                <h2 class="text-lg font-semibold text-[#1F2329]">服务评价</h2>
+                <p class="text-sm text-[#646A73] mt-0.5">您的评价将帮助我们持续改进服务质量</p>
+            </div>
+            <button class="text-[#646A73] hover:text-[#1F2329] transition-colors" onclick="closeModal()">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 5L5 15M5 5L15 15"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 项目信息摘要 -->
+        <div class="mx-6 mt-5 p-4 rounded-lg bg-[#F6F7FB] border border-[#E8E9EB]">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center border border-[#DEE0E3]">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#253BFF" stroke-width="2">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="text-sm font-medium text-[#1F2329]">ISO 9001质量管理体系认证</div>
+                    <div class="text-xs text-[#646A73] mt-0.5">证书编号：00124Q12345R0M/1100</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 text-xs">
+                <div>
+                    <span class="text-[#646A73]">认证机构：</span>
+                    <span class="text-[#1F2329] font-medium">中国质量认证中心</span>
+                </div>
+                <div>
+                    <span class="text-[#646A73]">完成日期：</span>
+                    <span class="text-[#1F2329]">2024年12月15日</span>
+                </div>
+                <div>
+                    <span class="text-[#646A73]">所属分支：</span>
+                    <span class="text-[#1F2329]">北京检查部</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div id="mainContent" class="main-content px-6 py-5 max-h-[60vh] overflow-y-auto">
+
+            <!-- 总体满意度 -->
+            <div class="mb-8 text-center">
+                <label class="block text-base font-medium text-[#1F2329] mb-3">您对本次认证服务的总体满意度</label>
+                <div class="flex justify-center gap-2" id="overallStars">
+                    <svg class="star-icon inactive" width="36" height="36" viewBox="0 0 24 24" data-value="1">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <svg class="star-icon inactive" width="36" height="36" viewBox="0 0 24 24" data-value="2">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <svg class="star-icon inactive" width="36" height="36" viewBox="0 0 24 24" data-value="3">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <svg class="star-icon inactive" width="36" height="36" viewBox="0 0 24 24" data-value="4">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <svg class="star-icon inactive" width="36" height="36" viewBox="0 0 24 24" data-value="5">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                </div>
+                <div id="overallFeedback" class="feedback-hint text-sm mt-2 font-medium"></div>
+            </div>
+
+            <!-- 详细维度评价 -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-[#1F2329] mb-4">详细评价</label>
+                <div class="space-y-4">
+
+                    <!-- 维度1：审核员专业度 -->
+                    <div class="dimension-item pb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-[#1F2329]">审核员专业度</span>
+                            <div class="flex gap-1" data-dimension="professional">
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="4"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2" id="professional-tags">
+                            <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="expertise">业务精通</span>
+                            <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="experience">经验丰富</span>
+                            <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="insight">洞察深入</span>
+                            <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="standard">标准理解透彻</span>
+                        </div>
+                    </div>
+
+                    <!-- 维度2：服务响应效率 -->
+                    <div class="dimension-item pb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-[#1F2329]">服务响应效率</span>
+                            <div class="flex gap-1" data-dimension="efficiency">
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="4"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 维度3：沟通体验 -->
+                    <div class="dimension-item pb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-[#1F2329]">沟通体验</span>
+                            <div class="flex gap-1" data-dimension="communication">
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="4"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 维度4：报告质量（新增） -->
+                    <div class="dimension-item pb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-[#1F2329]">报告质量</span>
+                            <div class="flex gap-1" data-dimension="report">
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="4"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 维度5：审核准备指导（新增） -->
+                    <div class="dimension-item pb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-[#1F2329]">审核准备指导</span>
+                            <div class="flex gap-1" data-dimension="guidance">
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="4"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 维度6：收费合理性（新增） -->
+                    <div class="dimension-item pb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm text-[#1F2329]">收费合理性</span>
+                            <div class="flex gap-1" data-dimension="pricing">
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="4"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <svg class="star-icon inactive" width="20" height="20" viewBox="0 0 24 24" data-value="5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- NPS推荐值 -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-[#1F2329] mb-3">
+                    推荐意愿：您有多大可能向中国质量认证中心推荐给其他企业？
+                    <span class="text-xs text-[#646A73] font-normal ml-1">（0-10分，0=绝不推荐，10=非常推荐）</span>
+                </label>
+                <div class="flex justify-between gap-1" id="npsContainer">
+                    <!-- 0-10 分将通过JS生成 -->
+                </div>
+                <div class="flex justify-between text-xs text-[#646A73] mt-2 px-1">
+                    <span>绝不推荐</span>
+                    <span>非常推荐</span>
+                </div>
+            </div>
+
+            <!-- 快速标签评价 -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-[#1F2329] mb-3">快速评价（可多选）</label>
+                <div class="flex flex-wrap gap-2">
+                    <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="professional">专业高效</span>
+                    <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="patient">耐心细致</span>
+                    <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="responsive">响应及时</span>
+                    <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="clear">流程清晰</span>
+                    <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="valuable">物超所值</span>
+                    <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="improve">有待改进</span>
+                    <span class="tag-item px-3 py-1.5 rounded-full border border-[#DEE0E3] text-xs text-[#646A73] bg-white" data-tag="expensive">收费偏高</span>
+                </div>
+            </div>
+
+            <!-- 文字评价 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-[#1F2329] mb-2">其他建议或意见（选填）</label>
+                <textarea 
+                    class="w-full h-24 p-3 text-sm border border-[#DEE0E3] rounded-lg resize-none placeholder-[#AFB3B9]"
+                    placeholder="请分享您的具体体验，帮助我们做得更好..."
+                ></textarea>
+                <div class="text-xs text-[#AFB3B9] mt-1 text-right">0/500</div>
+            </div>
+
+            <!-- 匿名选项 -->
+            <div class="flex items-center gap-2 mb-2">
+                <input type="checkbox" id="anonymous" class="w-4 h-4 rounded border-[#DEE0E3] text-[#253BFF] focus:ring-[#253BFF]">
+                <label for="anonymous" class="text-sm text-[#646A73] cursor-pointer">匿名评价（提交后将不展示您的企业名称）</label>
+            </div>
+
+        </div>
+
+        <!-- 底部按钮 -->
+        <div id="footerButtons" class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-white rounded-b-lg">
+            <button class="px-5 py-2 text-sm text-[#646A73] hover:text-[#1F2329] transition-colors" onclick="closeModal()">
+                暂不评价
+            </button>
+            <button class="submit-btn px-6 py-2 text-sm font-medium text-white rounded-lg" onclick="submitEvaluation()">
+                提交评价
+            </button>
+        </div>
+
+        <!-- 成功动画层 -->
+        <div id="successAnimation" class="success-animation absolute inset-0 flex-col items-center justify-center bg-white rounded-lg z-10">
+            <div class="w-16 h-16 rounded-full bg-[#00D26A] bg-opacity-10 flex items-center justify-center mb-4">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00D26A" stroke-width="3">
+                    <path d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-[#1F2329] mb-1">评价提交成功</h3>
+            <p class="text-sm text-[#646A73]">感谢您的反馈，我们会认真听取您的建议</p>
+        </div>
+
+    </div>
+
+    <script>
+        // 数据存储
+        const ratings = {
+            overall: 0,
+            dimensions: {
+                professional: 0,
+                efficiency: 0,
+                communication: 0,
+                report: 0,
+                guidance: 0,
+                pricing: 0
+            },
+            nps: null,
+            tags: new Set(),
+            anonymous: false
+        };
+
+        // 智能反馈文案
+        const feedbackTexts = {
+            1: { text: '非常抱歉给您带来不好的体验，我们会认真改进', color: '#FF4D4F' },
+            2: { text: '抱歉未达到您的期望，请告诉我们改进方向', color: '#FF8800' },
+            3: { text: '感谢您的评价，我们会继续优化服务', color: '#646A73' },
+            4: { text: '很高兴您认可我们的服务，我们会继续努力', color: '#253BFF' },
+            5: { text: '非常感谢您的认可！您的满意是我们最大的动力', color: '#00D26A' }
+        };
+
+        // 初始化NPS选项
+        function initNPS() {
+            const container = document.getElementById('npsContainer');
+            for (let i = 0; i <= 10; i++) {
+                const div = document.createElement('div');
+                div.className = 'nps-option w-8 h-8 flex items-center justify-center rounded border border-[#DEE0E3] text-xs text-[#646A73] cursor-pointer bg-white';
+                div.textContent = i;
+                div.dataset.value = i;
+                div.onclick = () => selectNPS(i);
+                container.appendChild(div);
+            }
+        }
+
+        // 总体满意度星级交互
+        document.querySelectorAll('#overallStars .star-icon').forEach(star => {
+            star.addEventListener('mouseenter', function() {
+                const value = parseInt(this.dataset.value);
+                highlightStars('overallStars', value, true);
+            });
+
+            star.addEventListener('mouseleave', function() {
+                highlightStars('overallStars', ratings.overall, false);
+            });
+
+            star.addEventListener('click', function() {
+                const value = parseInt(this.dataset.value);
+                ratings.overall = value;
+                highlightStars('overallStars', value, false);
+                showFeedback(value);
+
+                // 联动：同步所有详细评价维度
+                syncDetailRatings(value);
+            });
+        });
+
+        // 维度星级交互
+        document.querySelectorAll('[data-dimension]').forEach(container => {
+            const dimension = container.dataset.dimension;
+            const stars = container.querySelectorAll('.star-icon');
+
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', function() {
+                    const value = parseInt(this.dataset.value);
+                    highlightDimensionStars(container, value, true);
+                });
+
+                star.addEventListener('mouseleave', function() {
+                    highlightDimensionStars(container, ratings.dimensions[dimension], false);
+                });
+
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.dataset.value);
+                    ratings.dimensions[dimension] = value;
+                    highlightDimensionStars(container, value, false);
+                });
+            });
+        });
+
+        // 高亮星级函数
+        function highlightStars(containerId, value, isHover) {
+            const container = document.getElementById(containerId);
+            const stars = container.querySelectorAll('.star-icon');
+            stars.forEach((star, index) => {
+                if (index < value) {
+                    star.classList.remove('inactive');
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                    star.classList.add('inactive');
+                }
+            });
+        }
+
+        function highlightDimensionStars(container, value, isHover) {
+            const stars = container.querySelectorAll('.star-icon');
+            stars.forEach((star, index) => {
+                if (index < value) {
+                    star.classList.remove('inactive');
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                    star.classList.add('inactive');
+                }
+            });
+        }
+
+        // 显示反馈提示
+        function showFeedback(value) {
+            const hint = document.getElementById('overallFeedback');
+            const feedback = feedbackTexts[value];
+            hint.textContent = feedback.text;
+            hint.style.color = feedback.color;
+            hint.classList.add('show');
+        }
+
+        // NPS选择
+        function selectNPS(value) {
+            ratings.nps = value;
+            document.querySelectorAll('.nps-option').forEach(opt => {
+                if (parseInt(opt.dataset.value) === value) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+        }
+
+        // 标签选择
+        document.querySelectorAll('.tag-item').forEach(tag => {
+            tag.addEventListener('click', function() {
+                const tagValue = this.dataset.tag;
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    ratings.tags.delete(tagValue);
+                } else {
+                    this.classList.add('selected');
+                    ratings.tags.add(tagValue);
+                }
+            });
+        });
+
+        // 匿名选项
+        document.getElementById('anonymous').addEventListener('change', function() {
+            ratings.anonymous = this.checked;
+        });
+
+        // 同步详细评价维度
+        function syncDetailRatings(value) {
+            // 更新数据
+            Object.keys(ratings.dimensions).forEach(key => {
+                ratings.dimensions[key] = value;
+            });
+
+            // 更新UI显示
+            document.querySelectorAll('[data-dimension]').forEach(container => {
+                const dimension = container.dataset.dimension;
+                highlightDimensionStars(container, value, false);
+            });
+        }
+
+        // 提交评价
+        function submitEvaluation() {
+            if (ratings.overall === 0) {
+                alert('请至少完成总体满意度评分');
+                return;
+            }
+
+            // 显示成功动画
+            document.getElementById('mainContent').classList.add('hide');
+            document.getElementById('footerButtons').style.display = 'none';
+            document.getElementById('successAnimation').classList.add('show');
+
+            // 3秒后自动关闭
+            setTimeout(() => {
+                closeModal();
+            }, 3000);
+
+            console.log('提交评价数据：', ratings);
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            if (window.parent !== window) {
+                window.parent.postMessage('closeModal', '*');
+            } else {
+                alert('关闭弹窗（演示模式）');
+            }
+        }
+
+        // 初始化
+        initNPS();
+    </script>
+</body>
+</html>
