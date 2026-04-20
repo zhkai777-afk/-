@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本企业近三年各体系不符合项变动趋势</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background: #F5F6F7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .chart-container {
+            width: 1818px;
+            height: 328px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 1px rgba(0, 0, 0, 0.08);
+            padding: 24px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #0052D9 0%, #00A870 100%);
+            opacity: 0.8;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-left: 4px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1D2129;
+            line-height: 24px;
+            letter-spacing: 0.2px;
+        }
+
+        .chart-subtitle {
+            font-size: 12px;
+            color: #86909C;
+            margin-left: 8px;
+            font-weight: 400;
+        }
+
+        .legend-custom {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #4E5969;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .legend-item:hover {
+            opacity: 0.7;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .legend-dot.qms {
+            background: #0052D9;
+            box-shadow: 0 0 0 2px rgba(0, 82, 217, 0.15);
+        }
+
+        .legend-dot.ems {
+            background: #00A870;
+            box-shadow: 0 0 0 2px rgba(0, 168, 112, 0.15);
+        }
+
+        #trendChart {
+            width: 100%;
+            height: 248px;
+        }
+
+        .tooltip-custom {
+            background: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            min-width: 200px;
+            border: 1px solid #E5E6EB;
+        }
+
+        .tooltip-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1D2129;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #F2F3F5;
+        }
+
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .tooltip-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #4E5969;
+        }
+
+        .tooltip-value {
+            font-weight: 600;
+            color: #1D2129;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .tooltip-detail {
+            margin-top: 4px;
+            padding-left: 16px;
+            font-size: 12px;
+            color: #86909C;
+            line-height: 1.6;
+        }
+
+        .dot-inline {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .divider {
+            height: 1px;
+            background: #F2F3F5;
+            margin: 8px 0;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="chart-container">
+        <div class="chart-header">
+            <div style="display: flex; align-items: baseline;">
+                <span class="chart-title">本企业近三年各体系不符合项变动趋势</span>
+                <span class="chart-subtitle">单位：项</span>
+            </div>
+            <div class="legend-custom">
+                <div class="legend-item">
+                    <div class="legend-dot qms"></div>
+                    <span>QMS 质量管理体系</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot ems"></div>
+                    <span>EMS 环境管理体系</span>
+                </div>
+            </div>
+        </div>
+        <div id="trendChart"></div>
+    </div>
+
+    <script>
+        const chartDom = document.getElementById('trendChart');
+        const myChart = echarts.init(chartDom);
+
+        // 模拟数据：近三年QMS和EMS的轻微/严重不符合项数量
+        const rawData = {
+            years: ['2023年', '2024年', '2025年'],
+            qms: {
+                minor: [12, 15, 9],    // 轻微不符合
+                major: [3, 1, 2]       // 严重不符合
+            },
+            ems: {
+                minor: [8, 10, 7],     // 轻微不符合
+                major: [2, 3, 1]       // 严重不符合
+            }
+        };
+
+        // 计算总数用于折线展示
+        const qmsTotal = rawData.qms.minor.map((val, idx) => val + rawData.qms.major[idx]);
+        const emsTotal = rawData.ems.minor.map((val, idx) => val + rawData.ems.major[idx]);
+
+        const option = {
+            grid: {
+                left: 10,
+                right: 32,
+                top: 16,
+                bottom: 10,
+                containLabel: true
+            },
+            tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'transparent',
+                borderWidth: 0,
+                padding: 0,
+                shadowBlur: 0,
+                shadowOffsetX: 0,
+                shadowOffsetY: 0,
+                shadowColor: 'transparent',
+                extraCssText: 'box-shadow: none;',
+                formatter: function(params) {
+                    const year = params[0].axisValue;
+                    const qmsData = {
+                        minor: rawData.qms.minor[params[0].dataIndex],
+                        major: rawData.qms.major[params[0].dataIndex],
+                        total: qmsTotal[params[0].dataIndex]
+                    };
+                    const emsData = {
+                        minor: rawData.ems.minor[params[0].dataIndex],
+                        major: rawData.ems.major[params[0].dataIndex],
+                        total: emsTotal[params[0].dataIndex]
+                    };
+
+                    return `
+                        <div class="tooltip-custom">
+                            <div class="tooltip-title">${year}</div>
+                            <div class="tooltip-row">
+                                <div class="tooltip-label">
+                                    <span class="dot-inline" style="background: #0052D9;"></span>
+                                    <span>QMS 质量管理体系</span>
+                                </div>
+                                <span class="tooltip-value" style="color: #0052D9;">${qmsData.total} 项</span>
+                            </div>
+                            <div class="tooltip-detail">
+                                轻微不符合：${qmsData.minor} 项　|　严重不符合：${qmsData.major} 项
+                            </div>
+                            <div class="divider"></div>
+                            <div class="tooltip-row">
+                                <div class="tooltip-label">
+                                    <span class="dot-inline" style="background: #00A870;"></span>
+                                    <span>EMS 环境管理体系</span>
+                                </div>
+                                <span class="tooltip-value" style="color: #00A870;">${emsData.total} 项</span>
+                            </div>
+                            <div class="tooltip-detail">
+                                轻微不符合：${emsData.minor} 项　|　严重不符合：${emsData.major} 项
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: rawData.years,
+                boundaryGap: false,
+                axisLine: {
+                    lineStyle: {
+                        color: '#E5E6EB',
+                        width: 1
+                    }
+                },
+                axisTick: {
+                    show: false
+                },
+                axisLabel: {
+                    color: '#86909C',
+                    fontSize: 13,
+                    margin: 16,
+                    fontWeight: 500
+                }
+            },
+            yAxis: {
+                type: 'value',
+                min: 0,
+                max: 20,
+                interval: 5,
+                axisLine: {
+                    show: false
+                },
+                axisTick: {
+                    show: false
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: '#F2F3F5',
+                        type: [4, 4],
+                        width: 1
+                    }
+                },
+                axisLabel: {
+                    color: '#86909C',
+                    fontSize: 12,
+                    margin: 12,
+                    fontVariantNumeric: 'tabular-nums'
+                }
+            },
+            series: [
+                {
+                    name: 'QMS',
+                    type: 'line',
+                    data: qmsTotal,
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    showSymbol: true,
+                    lineStyle: {
+                        color: '#0052D9',
+                        width: 2.5,
+                        cap: 'round',
+                        join: 'round'
+                    },
+                    itemStyle: {
+                        color: '#FFFFFF',
+                        borderColor: '#0052D9',
+                        borderWidth: 2.5,
+                        shadowColor: 'rgba(0, 82, 217, 0.2)',
+                        shadowBlur: 6,
+                        shadowOffsetY: 2
+                    },
+                    emphasis: {
+                        scale: 1.5,
+                        itemStyle: {
+                            color: '#0052D9',
+                            borderColor: '#FFFFFF',
+                            borderWidth: 2,
+                            shadowColor: 'rgba(0, 82, 217, 0.3)',
+                            shadowBlur: 10
+                        }
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(0, 82, 217, 0.08)' },
+                                { offset: 1, color: 'rgba(0, 82, 217, 0.01)' }
+                            ]
+                        }
+                    }
+                },
+                {
+                    name: 'EMS',
+                    type: 'line',
+                    data: emsTotal,
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    showSymbol: true,
+                    lineStyle: {
+                        color: '#00A870',
+                        width: 2.5,
+                        cap: 'round',
+                        join: 'round'
+                    },
+                    itemStyle: {
+                        color: '#FFFFFF',
+                        borderColor: '#00A870',
+                        borderWidth: 2.5,
+                        shadowColor: 'rgba(0, 168, 112, 0.2)',
+                        shadowBlur: 6,
+                        shadowOffsetY: 2
+                    },
+                    emphasis: {
+                        scale: 1.5,
+                        itemStyle: {
+                            color: '#00A870',
+                            borderColor: '#FFFFFF',
+                            borderWidth: 2,
+                            shadowColor: 'rgba(0, 168, 112, 0.3)',
+                            shadowBlur: 10
+                        }
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [
+                                { offset: 0, color: 'rgba(0, 168, 112, 0.08)' },
+                                { offset: 1, color: 'rgba(0, 168, 112, 0.01)' }
+                            ]
+                        }
+                    }
+                }
+            ],
+            animationDuration: 1200,
+            animationEasing: 'cubicOut',
+            animationDelay: function(idx) {
+                return idx * 100;
+            }
+        };
+
+        myChart.setOption(option);
+
+        // 响应式处理
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    </script>
+</body>
+</html>
