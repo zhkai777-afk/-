@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CQC体系认证平台 - 监督审核申请</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* 全宽布局优化 */
+        .full-width-container {
+            width: 100%;
+            max-width: 100%;
+            /* padding: 0 24px; */
+        }
+
+        @media (min-width: 1920px) {
+            .full-width-container {
+                padding: 0 48px;
+            }
+        }
+
+        /* 输入框统一样式 */
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="month"],
+        select,
+        textarea {
+            min-height: 40px;
+            padding: 8px 12px;
+            font-size: 14px;
+            line-height: 20px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            transition: all 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input:read-only,
+        input:disabled,
+        select:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        /* Tab样式 */
+        .tab-active {
+            border-bottom: 2px solid #2563eb;
+            color: #2563eb;
+            font-weight: 600;
+            background: #eff6ff;
+        }
+
+        /* 附件卡片样式 */
+        .attachment-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .attachment-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.15);
+        }
+
+        .attachment-card.has-files {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .attachment-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .attachment-icon.pdf-icon { background: #fef2f2; color: #dc2626; }
+
+        .file-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #166534;
+            max-width: 100%;
+        }
+
+        /* 小模块标题 */
+        .sub-section-title {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            margin: 20px 0 12px 0;
+            border-radius: 0 8px 8px 0;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 变更项卡片 */
+        .change-item-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .change-item-card:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        /* 必填标记 */
+        .required::after {
+            content: "*";
+            color: #ef4444;
+            margin-left: 4px;
+        }
+
+        /* 状态标签 */
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pending { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24; }
+        .status-customer-filled { background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa; }
+        .status-ready-submit { background: #e0e7ff; color: #3730a3; border: 1px solid #818cf8; }
+        .status-submitted { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+
+        /* 监督审核通知样式 - 仿公文 */
+        .notice-document {
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-family: 'Noto Sans SC', 'SimSun', serif;
+            line-height: 1.8;
+            color: #1f2937;
+        }
+
+        .notice-header {
+            text-align: center;
+            padding: 40px 40px 20px;
+            border-bottom: 2px solid #dc2626;
+            margin: 0 40px;
+        }
+
+        .notice-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #dc2626;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .notice-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .notice-body {
+            padding: 30px 60px;
+            font-size: 16px;
+        }
+
+        .notice-recipient {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 24px;
+        }
+
+        .notice-paragraph {
+            margin-bottom: 16px;
+            text-indent: 2em;
+        }
+
+        .notice-highlight {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .notice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        .notice-table th,
+        .notice-table td {
+            border: 1px solid #d1d5db;
+            padding: 12px 16px;
+            text-align: left;
+        }
+
+        .notice-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            width: 20%;
+        }
+
+        .notice-footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .notice-stamp {
+            width: 120px;
+            height: 120px;
+            border: 3px solid #dc2626;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #dc2626;
+            font-size: 18px;
+            font-weight: 700;
+            transform: rotate(-15deg);
+            opacity: 0.6;
+            margin-left: 40px;
+        }
+
+        .notice-signature {
+            text-align: right;
+            line-height: 2;
+        }
+
+        .notice-contact {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px dashed #d1d5db;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .notice-bank-info {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* 响应式优化 */
+        @media (max-width: 768px) {
+            .full-width-container {
+                padding: 0 16px;
+            }
+            .notice-body {
+                padding: 20px;
+            }
+        }
+
+        /* 禁用按钮样式 */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #9ca3af !important;
+            border-color: #9ca3af !important;
+        }
+
+        /* 动画 */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<!-- 全局导航 - 简化版 -->
+
+<div class="full-width-container mx-auto">
+    <!-- 监督审核申请详情页 -->
+    <div id="applicationDetailView" class="fade-in space-y-6">
+        <!-- 顶部操作栏 -->
+        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200 flex justify-between items-center sticky z-40">
+            <div class="flex items-center space-x-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-900" id="detailTitle">监督审核申请 - JD202403001</h3>
+                    <p class="text-sm text-slate-500 mt-1" id="detailSubtitle">北京某某科技有限公司 | QMS/EMS体系监督 | 审核时间：2026年4月15日-17日</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span id="detailStatus" class="status-badge status-pending">
+                    <i class="fas fa-clock"></i>
+                    待确认
+                </span>
+                <button onclick="confirmSubmit()" id="confirmSubmitBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm transition flex items-center gap-2 font-medium" disabled>
+                    <i class="fas fa-check"></i>
+                    确认提交
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab导航 - 只保留调查表和通知 -->
+        <div class="bg-white border-b border-slate-200 rounded-t-lg">
+            <nav class="flex space-x-1 px-6 overflow-x-auto" aria-label="Tabs">
+                <button onclick="switchTab('survey')" id="tab-survey" class="tab-active py-4 px-4 inline-flex items-center text-sm font-medium whitespace-nowrap transition-colors hover:text-blue-600">
+                    <i class="fas fa-clipboard-list mr-2"></i>
+                    获证方情况调查表
+                    <span id="surveyBadge" class="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">待填写</span>
+                </button>
+                <button onclick="switchTab('notice')" id="tab-notice" class="text-slate-500 hover:text-slate-700 py-4 px-4 inline-flex items-center text-sm font-medium whitespace-nowrap transition-colors border-b-2 border-transparent hover:border-slate-300">
+                    <i class="fas fa-bell mr-2"></i>
+                    监督审核通知
+                    <span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">已发送</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab内容容器 -->
+        <div class="bg-white shadow rounded-b-lg p-6 min-h-[600px] border-x border-b border-slate-200">
+
+            <!-- 1. 获证方情况调查表（默认第一个） -->
+            <div id="content-survey" class="tab-content">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-slate-900">获证方情况调查表</h3>
+                        <p class="text-sm text-slate-500 mt-1">请确认自上次审核以来的变更情况，所有信息需真实有效</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <span id="surveyStatusBadge" class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium border border-red-200">
+                            待填写
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 在线填写表单 -->
+                <div id="onlineForm" class="space-y-6">
+                    <!-- 客户信息确认 -->
+                    <div class="border rounded-lg p-5 bg-slate-50 border-slate-200">
+                        <div class="sub-section-title mb-4">
+                            <i class="fas fa-building"></i>
+                            一、客户信息确认
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">客户名称</label>
+                                <input type="text" id="surveyCustomerName" class="bg-slate-100" readonly value="北京某某科技有限公司">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2 required">联系人/联系方式 </label>
+                                <input type="text" id="surveyContact" placeholder="请输入联系人及电话" value="">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2 required">组织人数或体系覆盖人数 </label>
+                                <input type="number" id="surveyStaffCount" placeholder="请输入人数" value="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 变更事项检查清单 -->
+                    <div class="border rounded-lg p-5 border-slate-200">
+                        <div class="sub-section-title mb-4">
+                            <i class="fas fa-clipboard-check"></i>
+                            二、自上次审核以来是否有变更
+                            <span class="text-xs font-normal text-slate-500 ml-2">（选择"是"将触发证书变更流程）</span>
+                        </div>
+                        <div class="space-y-3" id="changeChecklist">
+                            <!-- 动态生成20个变更检查项 -->
+                        </div>
+                    </div>
+
+                    <!-- 业务评审开关 -->
+                    <div class="border rounded-lg p-5 bg-amber-50 border-amber-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-semibold text-amber-900 flex items-center gap-2">
+                                    <i class="fas fa-gavel text-amber-600"></i>
+                                    是否需要业务评审
+                                </h4>
+                                <p class="text-sm text-amber-700 mt-1">如选择"是"，将流经业务评审节点；选择"否"直接进入方案策划</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="needBusinessReview" class="sr-only peer" onchange="toggleBusinessReview(this.checked)">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                <span class="ml-3 text-sm font-medium text-slate-700" id="reviewStatusText">否 / 是</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 审核日期确认 -->
+                    <div class="border rounded-lg p-5 border-slate-200">
+                        <div class="sub-section-title mb-4">
+                            <i class="fas fa-calendar-alt"></i>
+                            三、审核日期确认
+                        </div>
+                        <div class="space-y-4">
+                            <label class="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition">
+                                <input type="radio" name="auditDateConfirm" value="yes" checked class="w-4 h-4 text-blue-600" onchange="toggleDateChange(false)">
+                                <div>
+                                    <span class="text-sm font-medium text-slate-900 block">同意《监督/再认证通知书》中的审核日期</span>
+                                    <span class="text-xs text-slate-500">2026年4月15日 至 2026年4月17日</span>
+                                </div>
+                            </label>
+                            <label class="flex items-start gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition">
+                                <input type="radio" name="auditDateConfirm" value="no" class="w-4 h-4 text-blue-600 mt-1" onchange="toggleDateChange(true)">
+                                <div class="flex-1">
+                                    <span class="text-sm font-medium text-slate-900 block mb-3">不同意，希望调整审核日期</span>
+                                    <div id="dateAdjustForm" class="hidden space-y-3 pl-0">
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-slate-600 mb-1">希望的现场审核日期 <span class="text-red-500">*</span></label>
+                                                <input type="date" class="border-slate-300" id="preferredDate">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-slate-600 mb-1">不能安排的原因 <span class="text-red-500">*</span></label>
+                                                <input type="text" placeholder="请说明原因" maxlength="500" id="dateChangeReason">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 调查表附件上传（选填） -->
+                    <div class="border rounded-lg p-5 border-slate-200 bg-blue-50/30">
+                        <div class="sub-section-title mb-4 border-l-4 border-indigo-500 bg-gradient-to-r from-indigo-50 to-blue-50">
+                            <i class="fas fa-paperclip text-indigo-600"></i>
+                            四、调查表附件上传（选填）
+                        </div>
+                        <p class="text-sm text-slate-600 mb-4">如客户已手填纸质调查表，可在此处扫描上传作为补充材料</p>
+
+                        <div class="attachment-card" id="card_survey_attachment">
+                            <div class="flex items-center gap-4">
+                                <div class="attachment-icon pdf-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-semibold text-slate-900">调查表扫描件</span>
+                                        <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200">选填</span>
+                                    </div>
+                                    <div class="text-xs text-slate-500" id="meta_survey_attachment">0 个文件</div>
+                                </div>
+                                <button class="px-4 py-2 bg-white border border-blue-500 text-blue-600 rounded-lg text-sm hover:bg-blue-50 transition flex items-center gap-2" onclick="document.getElementById('file_survey_attachment').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    上传
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-3" id="files_survey_attachment"></div>
+                            <input type="file" id="file_survey_attachment" multiple class="hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="handleSurveyAttachmentUpload(this)">
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-2">
+                        <p class="font-semibold text-slate-700 mb-2">注意事项：</p>
+                        <p><strong>注1：</strong>若根据变更信息需要变更认证证书的，则还应请客户提交《证书变更申请书》；</p>
+                        <p><strong>注2：</strong>若客户属于多场所组织且场所发生了变更，则还应请客户提交最新的《认证场所清单》；</p>
+                        <p><strong>注3：</strong>列明除建筑施工（28大类）、建筑监理（34.01.01）、开采业（02）之外的、正在实施以及已经签订合同，拟在半年内实施的服务项目。</p>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-6 border-t border-slate-200">
+                        <button onclick="saveSurvey()" class="px-8 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium shadow-sm flex items-center gap-2">
+                            <i class="fas fa-save"></i>
+                            保存调查表
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 监督审核通知（仿公文样式） -->
+            <div id="content-notice" class="tab-content hidden">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="text-lg font-semibold text-slate-900">监督审核通知</h3>
+                        <p class="text-sm text-slate-500">依据MSF11-22标准生成的正式通知文书</p>
+                    </div>
+                    <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium border border-blue-200 flex items-center gap-2">
+                        <i class="fas fa-lock"></i>
+                        只读状态
+                    </div>
+                </div>
+
+                <!-- 仿公文样式的监督审核通知 -->
+                <div class="notice-document w-full">
+                    <div class="notice-header">
+                        <div class="notice-title">监督审核通知</div>
+                        <div class="notice-subtitle">文件编号：MSF11-22 &nbsp;|&nbsp; 版本：2015版</div>
+                    </div>
+
+                    <div class="notice-body">
+                        <div class="notice-recipient">致：北京某某科技有限公司</div>
+
+                        <p class="notice-paragraph">
+                            感谢一年以来贵方对我中心认证工作的支持和配合，依据认证的相关规定及《管理体系认证合同》（以下简称"合同"）约定，拟于<span class="notice-highlight">2026年4月</span>对贵方进行监督审核，现将有关情况告知如下：
+                        </p>
+
+                        <p class="notice-paragraph">
+                            根据合同约定，请贵方确认并真实填写本通知附件《获证方情况调查表》，尽快回传给我中心。请贵方尽快确认审核时间，并在《获证方情况调查表》中注明，根据合同约定，若在<span class="notice-highlight">2026年4月</span>前贵方仍不能接受监督审核，我们将暂停或撤销贵方获得的认证证书并发布公告。
+                        </p>
+
+                        <p class="notice-paragraph">
+                            根据合同约定，本次监督审核费为<span class="notice-highlight">15,000.00元人民币</span>，请收到本通知后，在两周内将监督审核费用汇入如下帐号：
+                        </p>
+
+                        <div class="notice-bank-info">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-slate-500">开户银行：</span>
+                                    <span class="font-medium">中国工商银行北京分行</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500">开户名称：</span>
+                                    <span class="font-medium">中国质量认证中心</span>
+                                </div>
+                                <div class="col-span-2">
+                                    <span class="text-slate-500">开户帐号：</span>
+                                    <span class="font-medium font-mono">0200000319200123456</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="notice-table">
+                            <tr>
+                                <th>证书编号</th>
+                                <td>00123Q34567R0S/37000</td>
+                                <th>认证领域</th>
+                                <td>QMS（质量管理体系）、EMS（环境管理体系）</td>
+                            </tr>
+                            <tr>
+                                <th>审核类型</th>
+                                <td>监督审核（一阶段+二阶段）</td>
+                                <th>审核人日</th>
+                                <td>3天（含路途0.5天）</td>
+                            </tr>
+                            <tr>
+                                <th>审核范围</th>
+                                <td colspan="3">计算机软件开发、系统集成服务及相关管理活动</td>
+                            </tr>
+                        </table>
+
+                        <p class="notice-paragraph" style="margin-top: 24px;">
+                            我们期望能为贵方提供公正规范、诚信高效的认证服务！
+                        </p>
+
+                        <div class="notice-footer">
+                            <div class="notice-stamp">
+                                <div style="text-align: center;">
+                                    <div>中国质量</div>
+                                    <div>认证中心</div>
+                                    <div style="font-size: 12px; margin-top: 4px;">（公章）</div>
+                                </div>
+                            </div>
+                            <div class="notice-signature">
+                                <div>中国质量认证中心</div>
+                                <div style="margin-top: 8px;">2026年3月30日</div>
+                            </div>
+                        </div>
+
+                        <div class="notice-contact">
+                            <div class="font-semibold mb-2">联系方式：</div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div><span class="text-slate-500">联系人：</span>张经理</div>
+                                <div><span class="text-slate-500">电话：</span>010-12345678</div>
+                                <div><span class="text-slate-500">传真：</span>010-87654321</div>
+                                <div class="col-span-3"><span class="text-slate-500">E-mail：</span>zhang@cqc.com.cn</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast提示 -->
+<div id="toast" class="toast">
+    <i class="fas fa-check-circle text-green-400 text-xl"></i>
+    <span id="toastMessage" class="font-medium">操作成功</span>
+</div>
+
+<script>
+// ===== 全局状态管理 =====
+let currentRole = 'customer_service'; // customer_service, customer
+let applicationStatus = 'pending'; // pending, customer_filled, ready_submit, submitted
+let surveyAttachmentFiles = [];
+
+// 变更检查项配置（20项）
+const changeItems = [
+    {id: 'orgName', label: '组织名称', hasDesc: true},
+    {id: 'businessScope', label: '营业执照的经营范围、资质许可的范围', hasDesc: true},
+    {id: 'legalStatus', label: '法律地位或所有权', hasDesc: true},
+    {id: 'address', label: '注册地址或运营地址', hasDesc: true},
+    {id: 'topManager', label: '最高管理者（法定代表人、总经理、管理体系负责人等）', hasDesc: true},
+    {id: 'contact', label: '联系人/联系方式', hasDesc: false, alwaysShow: true},
+    {id: 'orgStructure', label: '组织机构', hasDesc: true},
+    {id: 'staffCount', label: '组织人数或体系覆盖人数', hasDesc: false, alwaysShow: true},
+    {id: 'branches', label: '分支机构/常设多场所', hasDesc: true},
+    {id: 'mainProcess', label: '管理体系的主要过程', hasDesc: true},
+    {id: 'productService', label: '产品/服务（或业务）', hasDesc: true},
+    {id: 'facilities', label: '主要生产（服务）设施设备', hasDesc: true},
+    {id: 'documentation', label: '体系文件化信息', hasDesc: true},
+    {id: 'tempSites', label: '临时服务现场信息', hasDesc: true},
+    {id: 'outsourcing', label: '外部提供的职能或过程（外包）', hasDesc: true},
+    {id: 'externalServices', label: '在本组织之外其他场所提供的服务', hasDesc: true},
+    {id: 'ims', label: '整合管理体系（IMS）的整合程度', hasDesc: true},
+    {id: 'emergency', label: '应急或业务连续性演练活动的日期安排情况（BCMS适用）', hasDesc: true},
+    {id: 'incidents', label: '是否发生过不良信息事件（如重大事故/行政检查和抽查发现的问题）', hasDesc: true},
+    {id: 'blacklist', label: '是否被市场监管部门列入异常经营名录、严重违法失信名单', hasDesc: true}
+];
+
+// ===== 初始化 =====
+document.addEventListener('DOMContentLoaded', function() {
+    renderChangeChecklist();
+    updateStatusDisplay();
+
+    // 日期默认值
+    const today = new Date().toISOString().split('T')[0];
+    const preferredDate = document.getElementById('preferredDate');
+    if(preferredDate) preferredDate.value = today;
+});
+
+// ===== 状态管理 =====
+function updateStatusDisplay() {
+    const statusBadge = document.getElementById('detailStatus');
+    const confirmBtn = document.getElementById('confirmSubmitBtn');
+    const surveyBadge = document.getElementById('surveyBadge');
+    const surveyStatusBadge = document.getElementById('surveyStatusBadge');
+
+    let statusConfig = {
+        'pending': {
+            class: 'status-pending',
+            icon: 'fa-clock',
+            text: '待确认',
+            btnDisabled: true,
+            surveyText: '待填写',
+            surveyClass: 'bg-red-100 text-red-800 border-red-200'
+        },
+        'customer_filled': {
+            class: 'status-customer-filled',
+            icon: 'fa-user-check',
+            text: '待客服提交',
+            btnDisabled: currentRole !== 'customer_service',
+            surveyText: '客户已填',
+            surveyClass: 'bg-blue-100 text-blue-800 border-blue-200'
+        },
+        'ready_submit': {
+            class: 'status-ready-submit',
+            icon: 'fa-check-circle',
+            text: '待提交',
+            btnDisabled: false,
+            surveyText: '已填写',
+            surveyClass: 'bg-indigo-100 text-indigo-800 border-indigo-200'
+        },
+        'submitted': {
+            class: 'status-submitted',
+            icon: 'fa-check-double',
+            text: '已提交',
+            btnDisabled: true,
+            surveyText: '已完成',
+            surveyClass: 'bg-green-100 text-green-800 border-green-200'
+        }
+    };
+
+    let config = statusConfig[applicationStatus];
+    statusBadge.className = `status-badge ${config.class}`;
+    statusBadge.innerHTML = `<i class="fas ${config.icon}"></i>${config.text}`;
+
+    confirmBtn.disabled = config.btnDisabled;
+    if(config.btnDisabled) {
+        confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        confirmBtn.classList.remove('hover:bg-blue-700');
+    } else {
+        confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        confirmBtn.classList.add('hover:bg-blue-700');
+    }
+
+    surveyBadge.textContent = config.surveyText;
+    surveyBadge.className = `ml-2 px-2 py-0.5 text-xs rounded-full ${applicationStatus === 'submitted' ? 'bg-green-500 text-white' : applicationStatus === 'customer_filled' ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'}`;
+
+    surveyStatusBadge.textContent = config.surveyText;
+    surveyStatusBadge.className = `px-3 py-1 rounded-full text-sm font-medium border ${config.surveyClass}`;
+}
+
+function confirmSubmit() {
+    if(applicationStatus !== 'customer_filled' && applicationStatus !== 'ready_submit') {
+        showNotification('请先完成获证方情况调查表', 'error');
+        switchTab('survey');
+        return;
+    }
+
+    if(confirm('确认提交监督审核申请？提交后将转入方案策划管理模块。')) {
+        applicationStatus = 'submitted';
+        updateStatusDisplay();
+        showNotification('监督审核申请已确认提交，流转至方案策划管理', 'success');
+    }
+}
+
+// ===== Tab切换 =====
+function switchTab(tabName) {
+    document.querySelectorAll('nav button').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('text-slate-500', 'border-b-2', 'border-transparent');
+    });
+    const activeBtn = document.getElementById(`tab-${tabName}`);
+    activeBtn.classList.add('tab-active');
+    activeBtn.classList.remove('text-slate-500', 'border-b-2', 'border-transparent');
+
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    document.getElementById(`content-${tabName}`).classList.remove('hidden');
+}
+
+// ===== 获证方调查表功能 =====
+function renderChangeChecklist() {
+    const container = document.getElementById('changeChecklist');
+    container.innerHTML = '';
+
+    changeItems.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = `change-item-card ${item.alwaysShow ? '' : ''}`;
+
+        if(item.alwaysShow) {
+            div.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-sm font-semibold text-slate-800">${item.label}</span>
+                            <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded border border-red-200">必填</span>
+                        </div>
+                        <input type="text" class="w-full md:w-1/2" placeholder="请输入${item.label}" id="input_${item.id}">
+                    </div>
+                </div>
+            `;
+        } else {
+            div.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-sm font-semibold text-slate-800">${item.label}</span>
+                        </div>
+                        <div class="flex items-center gap-6 mb-2">
+                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-slate-100 transition">
+                                <input type="radio" name="change_${item.id}" value="no" checked class="w-4 h-4 text-blue-600" onchange="toggleChangeDetail('${item.id}', false)">
+                                <span class="text-sm text-slate-700">否</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-red-50 transition">
+                                <input type="radio" name="change_${item.id}" value="yes" class="w-4 h-4 text-red-600" onchange="toggleChangeDetail('${item.id}', true)">
+                                <span class="text-sm text-slate-700 font-medium">是（触发变更）</span>
+                            </label>
+                        </div>
+                        <div id="detail_${item.id}" class="hidden mt-2">
+                            <textarea maxlength="500" class="w-full resize-none border-slate-300" rows="2" placeholder="请详细描述变更情况（500字以内）"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        container.appendChild(div);
+    });
+}
+
+function toggleChangeDetail(field, show) {
+    const detail = document.getElementById(`detail_${field}`);
+    if(show) {
+        detail.classList.remove('hidden');
+    } else {
+        detail.classList.add('hidden');
+    }
+}
+
+function toggleBusinessReview(checked) {
+    const statusText = document.getElementById('reviewStatusText');
+    if(checked) {
+        statusText.textContent = '是（需流经业务评审）';
+        statusText.className = 'ml-3 text-sm font-medium text-blue-600';
+    } else {
+        statusText.textContent = '否 / 是';
+        statusText.className = 'ml-3 text-sm font-medium text-slate-700';
+    }
+}
+
+function toggleDateChange(show) {
+    const form = document.getElementById('dateAdjustForm');
+    if(show) {
+        form.classList.remove('hidden');
+    } else {
+        form.classList.add('hidden');
+    }
+}
+
+function saveSurvey() {
+    // 验证必填项
+    const contact = document.getElementById('surveyContact').value;
+    const staffCount = document.getElementById('surveyStaffCount').value;
+
+    if(!contact || !staffCount) {
+        showNotification('请填写必填项：联系人、组织人数', 'error');
+        return;
+    }
+
+    // 检查日期调整
+    const dateConfirm = document.querySelector('input[name="auditDateConfirm"]:checked').value;
+    if(dateConfirm === 'no') {
+        const preferredDate = document.getElementById('preferredDate').value;
+        const reason = document.getElementById('dateChangeReason').value;
+        if(!preferredDate || !reason) {
+            showNotification('请填写日期调整相关信息', 'error');
+            return;
+        }
+    }
+
+    applicationStatus = 'customer_filled';
+    showNotification('获证方情况调查表已保存', 'success');
+
+    updateStatusDisplay();
+}
+
+// ===== 调查表附件上传 =====
+function handleSurveyAttachmentUpload(input) {
+    const files = Array.from(input.files);
+    if(files.length === 0) return;
+
+    surveyAttachmentFiles = surveyAttachmentFiles.concat(files);
+    updateSurveyAttachmentUI();
+    showNotification(`已添加 ${files.length} 个附件`, 'success');
+}
+
+function updateSurveyAttachmentUI() {
+    const filesContainer = document.getElementById('files_survey_attachment');
+    const countSpan = document.getElementById('meta_survey_attachment');
+    const card = document.getElementById('card_survey_attachment');
+
+    if(surveyAttachmentFiles.length > 0) {
+        countSpan.textContent = `${surveyAttachmentFiles.length} 个文件`;
+        card.classList.add('has-files');
+    } else {
+        countSpan.textContent = '0 个文件';
+        card.classList.remove('has-files');
+    }
+
+    filesContainer.innerHTML = surveyAttachmentFiles.map((file, index) => `
+        <div class="file-tag">
+            <span class="truncate max-w-[200px]" title="${file.name}">${file.name}</span>
+            <span class="text-xs opacity-75">(${formatFileSize(file.size)})</span>
+            <button onclick="removeSurveyAttachment(${index})" class="ml-2 text-red-600 hover:text-red-800">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+function removeSurveyAttachment(index) {
+    surveyAttachmentFiles.splice(index, 1);
+    updateSurveyAttachmentUI();
+    showNotification('已删除附件', 'info');
+}
+
+function formatFileSize(bytes) {
+    if(bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// ===== 全局操作 =====
+function showNotification(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const msg = document.getElementById('toastMessage');
+    const icon = toast.querySelector('i');
+
+    msg.textContent = message;
+
+    const colors = {
+        'success': 'fa-check-circle text-green-400',
+        'error': 'fa-exclamation-circle text-red-400',
+        'warning': 'fa-exclamation-triangle text-amber-400',
+        'info': 'fa-info-circle text-blue-400'
+    };
+
+    icon.className = 'fas ' + colors[type];
+
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+</script>
+
+</body>
+</html>
