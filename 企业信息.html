@@ -14,74 +14,168 @@
             background-color: #f8fafc;
         }
         
-        .edit-mode input:not([readonly]),
-        .edit-mode select:not([disabled]),
-        .edit-mode textarea:not([readonly]) {
-            background-color: #ffffff;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .view-mode input,
-        .view-mode select,
-        .view-mode textarea {
-            background-color: #f1f5f9;
-            border-color: #e2e8f0;
-            color: #334155;
-        }
-        
-        .card-section {
+        /* 查看模式样式 - 信息卡片 */
+        .view-mode .card-section {
             background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+            border: 1px solid #f1f5f9;
         }
         
-        .section-header {
+        .view-mode .section-header {
             border-left: 4px solid #2563eb;
             background: linear-gradient(to right, #eff6ff, #ffffff);
+            padding: 14px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .form-label {
-            color: #334155;
+        .view-mode .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px 32px;
+        }
+        
+        .view-mode .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .view-mode .info-label {
+            font-size: 13px;
+            color: #64748b;
             font-weight: 500;
+            letter-spacing: 0.3px;
         }
         
-        .required::after {
+        .view-mode .info-value {
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 600;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+        
+        .view-mode .info-value.text-mono {
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+            color: #334155;
+            background: #f8fafc;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 13px;
+        }
+        
+        .view-mode .info-full {
+            grid-column: 1 / -1;
+        }
+        
+        /* 编辑模式样式 - 标准表单 */
+        .edit-mode .form-section {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            padding: 32px;
+        }
+        
+        .edit-mode .form-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .edit-mode .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+        
+        .edit-mode .form-label.required::after {
             content: " *";
             color: #dc2626;
         }
         
-        .upload-area {
-            border: 2px dashed #cbd5e1;
-            transition: all 0.3s;
+        .edit-mode .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1f2937;
+            background-color: #ffffff;
+            transition: all 0.2s;
+            outline: none;
         }
         
-        .upload-area:hover {
+        .edit-mode .form-input:focus {
             border-color: #2563eb;
-            background-color: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         
-        .upload-area.active {
-            border-color: #2563eb;
-            background-color: #eff6ff;
+        .edit-mode .form-input:disabled,
+        .edit-mode .form-input[readonly] {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            cursor: not-allowed;
         }
         
+        .edit-mode select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        
+        /* 按钮样式 */
         .btn-primary {
             background-color: #2563eb;
             color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .btn-primary:hover {
             background-color: #1d4ed8;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
         
         .btn-secondary {
             background-color: #ffffff;
             color: #475569;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
             border: 1px solid #e2e8f0;
+            cursor: pointer;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .btn-secondary:hover {
@@ -89,458 +183,946 @@
             border-color: #cbd5e1;
         }
         
-        .license-preview {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
+        .btn-text {
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 500;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
         }
         
-        .status-badge {
+        .btn-text:hover {
+            background-color: #eff6ff;
+        }
+        
+        /* 表格样式 - 查看模式 */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .data-table th {
+            background-color: #f8fafc;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .data-table tr:hover td {
+            background-color: #f8fafc;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* 侧拉抽屉 */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 560px;
+            height: 100vh;
+            background: #ffffff;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
+            z-index: 51;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+        
+        .drawer.active {
+            transform: translateX(0);
+        }
+        
+        .drawer-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 2;
+        }
+        
+        .drawer-body {
+            padding: 32px;
+        }
+        
+        .drawer-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .drawer-close:hover {
+            background: #f8fafc;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
+        
+        /* 标签 */
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-tag.success {
             background-color: #dcfce7;
             color: #166534;
             border: 1px solid #86efac;
         }
         
-        .input-group-icon {
-            color: #64748b;
+        /* 营业执照预览 */
+        .license-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
         }
         
-        .divider {
-            height: 1px;
-            background: linear-gradient(to right, #e2e8f0, transparent);
+        .license-thumb {
+            width: 120px;
+            height: 160px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .license-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
+        }
+        
+        /* 编辑模式上传区域 */
+        .upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .upload-box:hover {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+        
+        /* 提示条 */
+        .tip-bar {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        
+        .edit-mode .tip-bar {
+            margin-bottom: 24px;
+        }
+        
+        /* 响应式微调 */
+        @media (max-width: 1848px) {
+            .max-w-[1848px] {
+                max-width: 100%;
+            }
+        }
+        
+        /* 动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        /* 子场所详情信息网格 */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .detail-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            font-size: 15px;
+            color: #1e293b;
+            font-weight: 600;
         }
     </style>
 <base target="_blank">
 </head>
-<body class="p-6 view-mode" id="pageBody">
+<body class="view-mode" id="pageBody">
 
-    <!-- 页面头部 -->
-    <div class="max-w-[1848px] mx-auto mb-6 flex justify-between items-center">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">企业信息管理</h1>
-            <p class="text-slate-500 mt-1 text-sm">维护企业基础信息、人员数量及营业执照，确保认证信息准确有效</p>
-        </div>
-        <div class="flex gap-3" id="actionButtons">
-            <button onclick="enterEditMode()" class="btn-primary px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
-                <i class="fas fa-edit"></i>
-                编辑信息
-            </button>
-        </div>
-    </div>
-
-    <!-- 主内容区 -->
-    <div class="max-w-[1848px] mx-auto space-y-6">
-
-        <!-- 企业基础信息卡片 -->
-        <div class="card-section p-6">
-            <div class="section-header px-4 py-3 rounded-r-lg mb-6 flex items-center gap-2">
-                <i class="fas fa-building text-[#2563eb]"></i>
-                <h2 class="text-lg font-semibold text-slate-800">企业基础信息</h2>
-            </div>
-            
-            <div class="grid grid-cols-3 gap-x-8 gap-y-6">
-                <!-- 企业名称 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">企业名称</label>
-                    <input type="text" id="companyName" value="华夏质量认证有限公司" readonly 
-                           class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm">
+    <!-- ========== 查看模式（详情页） ========== -->
+    <div id="viewMode" class="animate-fade-in">
+        <!-- 页面头部 -->
+        <div class="max-w-[1848px] mx-auto mb-8 pt-6 px-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">企业信息管理</h1>
+                    <p class="text-slate-500 mt-2 text-sm">查看企业基础信息、开票信息、子场所及营业执照详情</p>
                 </div>
-
-                <!-- 统一社会信用代码 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">统一社会信用代码</label>
-                    <div class="relative">
-                        <input type="text" id="creditCode" value="91110108MA01M7B88C" readonly 
-                               class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm font-mono">
-                        <i class="fas fa-id-card input-group-icon absolute right-3 top-1/2 -translate-y-1/2"></i>
-                    </div>
-                </div>
-
-                <!-- 企业类型 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">企业类型</label>
-                    <select id="companyType" disabled class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm bg-slate-50">
-                        <option value="private" selected>有限责任公司</option>
-                        <option value="state">国有企业</option>
-                        <option value="joint">中外合资</option>
-                        <option value="foreign">外商独资</option>
-                        <option value="other">其他</option>
-                    </select>
-                </div>
-
-                <!-- 法定代表人 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">法定代表人</label>
-                    <input type="text" id="legalPerson" value="张三" readonly 
-                           class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm">
-                </div>
-
-                <!-- 成立日期 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">成立日期</label>
-                    <div class="relative">
-                        <input type="date" id="establishDate" value="2019-03-15" readonly 
-                               class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm">
-                        <i class="fas fa-calendar input-group-icon absolute right-3 top-1/2 -translate-y-1/2"></i>
-                    </div>
-                </div>
-
-                <!-- 注册资本 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">注册资本（万元）</label>
-                    <div class="relative">
-                        <input type="number" id="registeredCapital" value="5000" readonly 
-                               class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm">
-                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">万元</span>
-                    </div>
-                </div>
-
-                <!-- 注册地址（跨两列） -->
-                <div class="col-span-2 space-y-2">
-                    <label class="form-label required text-sm">注册地址</label>
-                    <input type="text" id="registeredAddress" value="北京市海淀区中关村大街1号中关村大厦12层1201-1208室" readonly 
-                           class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm">
-                </div>
-
-                <!-- 邮政编码 -->
-                <div class="space-y-2">
-                    <label class="form-label text-sm">邮政编码</label>
-                    <input type="text" id="postCode" value="100080" readonly 
-                           class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm">
-                </div>
-
-                <!-- 经营范围（跨三列） -->
-                <div class="col-span-3 space-y-2">
-                    <label class="form-label required text-sm">经营范围</label>
-                    <textarea id="businessScope" readonly rows="3" 
-                              class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm resize-none">质量管理体系认证、环境管理体系认证、职业健康安全管理体系认证；认证培训；企业管理咨询；技术服务等。</textarea>
-                </div>
+                <button onclick="enterEditMode()" class="btn-primary">
+                    <i class="fas fa-edit"></i>
+                    编辑信息
+                </button>
             </div>
         </div>
 
-        <!-- 人员数量信息卡片（参考您上传的图片布局） -->
-        <div class="card-section p-6">
-            <div class="section-header px-4 py-3 rounded-r-lg mb-6 flex items-center gap-2">
-                <i class="fas fa-users text-[#2563eb]"></i>
-                <h2 class="text-lg font-semibold text-slate-800">组织/人员及其他认证信息</h2>
-            </div>
-            
-            <div class="bg-blue-50/50 rounded-lg p-5 border border-blue-100">
-                <h3 class="text-base font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-user-friends text-[#2563eb]"></i>
-                    管理体系范围内人员数量情况
-                </h3>
+        <!-- 主内容区 -->
+        <div class="max-w-[1848px] mx-auto px-6 pb-12 space-y-6">
+
+            <!-- 第一行：企业基本信息 + 开票信息 -->
+            <div class="grid grid-cols-2 gap-6">
                 
-                <div class="grid grid-cols-4 gap-6">
-                    <!-- 公司总人数 -->
-                    <div class="space-y-2">
-                        <label class="form-label required text-sm">公司总人数</label>
-                        <input type="number" id="totalEmployees" value="286" readonly 
-                               class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm bg-white">
-                        <p class="text-xs text-slate-400">包含所有正式员工</p>
-                    </div>
-
-                    <!-- 全职人员 -->
-                    <div class="space-y-2">
-                        <label class="form-label required text-sm">全职人员</label>
-                        <input type="number" id="fullTimeEmployees" value="245" readonly 
-                               class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm bg-white">
-                        <p class="text-xs text-slate-400">正式劳动合同员工</p>
-                    </div>
-
-                    <!-- 兼职人员 -->
-                    <div class="space-y-2">
-                        <label class="form-label required text-sm">兼职人员</label>
-                        <input type="number" id="partTimeEmployees" value="41" readonly 
-                               class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm bg-white">
-                        <p class="text-xs text-slate-400">非全职/派遣人员</p>
-                    </div>
-
-                    <!-- 兼职工作时间 -->
-                    <div class="space-y-2">
-                        <label class="form-label text-sm">兼职工作时间(小时/天)</label>
-                        <input type="number" id="partTimeHours" value="4" readonly 
-                               class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm bg-white">
-                        <p class="text-xs text-slate-400">兼职人员平均工作时长</p>
-                    </div>
-                </div>
-
-                <div class="divider my-4"></div>
-
-                <!-- 人员统计摘要 -->
-                <div class="flex items-center gap-8 text-sm">
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">认证覆盖比例：</span>
-                        <span class="font-semibold text-[#2563eb]">100%</span>
-                        <span class="text-slate-400">(全公司纳入体系)</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">管理人员：</span>
-                        <span class="font-semibold text-slate-700">32人</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">技术人员：</span>
-                        <span class="font-semibold text-slate-700">198人</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">行政人员：</span>
-                        <span class="font-semibold text-slate-700">56人</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 营业执照信息卡片 -->
-        <div class="card-section p-6">
-            <div class="section-header px-4 py-3 rounded-r-lg mb-6 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i class="fas fa-file-contract text-[#2563eb]"></i>
-                    <h2 class="text-lg font-semibold text-slate-800">营业执照信息</h2>
-                </div>
-                <span class="status-badge px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                    <i class="fas fa-check-circle"></i>
-                    已上传
-                </span>
-            </div>
-            
-            <div class="grid grid-cols-3 gap-6">
-                <!-- 证件号码 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">营业执照注册号</label>
-                    <input type="text" id="licenseNumber" value="91110108MA01M7B88C" readonly 
-                           class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm font-mono">
-                </div>
-
-                <!-- 发证机关 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">发证机关</label>
-                    <input type="text" id="issuer" value="北京市海淀区市场监督管理局" readonly 
-                           class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm">
-                </div>
-
-                <!-- 有效期至 -->
-                <div class="space-y-2">
-                    <label class="form-label required text-sm">有效期至</label>
-                    <div class="relative">
-                        <input type="date" id="validUntil" value="2049-03-14" readonly 
-                               class="w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm">
-                        <i class="fas fa-calendar-alt input-group-icon absolute right-3 top-1/2 -translate-y-1/2"></i>
-                    </div>
-                </div>
-
-                <!-- 营业执照扫描件（跨两列） -->
-                <div class="col-span-2 space-y-2">
-                    <label class="form-label required text-sm">营业执照扫描件</label>
-                    <div class="license-preview rounded-lg p-4 flex items-start gap-4" id="licensePreview">
-                        <div class="w-32 h-40 bg-white rounded border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%232563eb'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3E%3C/svg%3E" 
-                                 alt="营业执照" class="w-full h-full object-contain p-2" id="licenseImage">
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-slate-700 mb-1">营业执照-正本.pdf</p>
-                            <p class="text-xs text-slate-400 mb-3">上传时间：2024-01-15 14:32:08 · 文件大小：2.4MB</p>
-                            <div class="flex gap-2">
-                                <button onclick="previewLicense()" class="text-[#2563eb] hover:text-blue-700 text-sm font-medium flex items-center gap-1 px-3 py-1.5 rounded hover:bg-blue-50 transition-colors">
-                                    <i class="fas fa-eye"></i>
-                                    查看大图
-                                </button>
-                                <button onclick="downloadLicense()" class="text-slate-600 hover:text-slate-800 text-sm font-medium flex items-center gap-1 px-3 py-1.5 rounded hover:bg-slate-100 transition-colors">
-                                    <i class="fas fa-download"></i>
-                                    下载
-                                </button>
-                            </div>
-                        </div>
+                <!-- 企业基本信息 -->
+                <div class="card-section p-6">
+                    <div class="section-header">
+                        <i class="fas fa-building text-[#2563eb] text-lg"></i>
+                        <h2 class="text-lg font-bold text-slate-800">企业基础信息</h2>
                     </div>
                     
-                    <!-- 编辑模式下的上传区域（默认隐藏） -->
-                    <div class="upload-area rounded-lg p-8 hidden" id="uploadArea">
-                        <div class="text-center">
-                            <i class="fas fa-cloud-upload-alt text-4xl text-slate-300 mb-3"></i>
-                            <p class="text-sm text-slate-600 mb-1">点击上传或拖拽文件到此处</p>
-                            <p class="text-xs text-slate-400 mb-3">支持 PDF、JPG、PNG，文件大小不超过 10MB</p>
-                            <button class="btn-secondary px-4 py-2 rounded-lg text-sm">
-                                选择文件
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">企业名称</span>
+                            <span class="info-value">华夏质量认证有限公司</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">统一社会信用代码</span>
+                            <span class="info-value text-mono">91110108MA01M7B88C</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">企业类型</span>
+                            <span class="info-value">有限责任公司</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">法定代表人</span>
+                            <span class="info-value">张三</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">成立日期</span>
+                            <span class="info-value">2019年03月15日</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">注册资本</span>
+                            <span class="info-value">5,000 万元</span>
+                        </div>
+                        <div class="info-item info-full">
+                            <span class="info-label">注册地址</span>
+                            <span class="info-value">北京市海淀区中关村大街1号中关村大厦12层1201-1208室</span>
+                        </div>
+                        <div class="info-item info-full">
+                            <span class="info-label">经营范围</span>
+                            <span class="info-value">质量管理体系认证、环境管理体系认证、职业健康安全管理体系认证；认证培训；企业管理咨询；技术服务等。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 开票信息（新增） -->
+                <div class="card-section p-6">
+                    <div class="section-header">
+                        <i class="fas fa-file-invoice-dollar text-[#2563eb] text-lg"></i>
+                        <h2 class="text-lg font-bold text-slate-800">开票信息</h2>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">发票抬头</span>
+                            <span class="info-value">华夏质量认证有限公司</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">纳税人识别号</span>
+                            <span class="info-value text-mono">91110108MA01M7B88C</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">开户银行</span>
+                            <span class="info-value">中国工商银行北京海淀支行</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">银行账号</span>
+                            <span class="info-value text-mono">6222 0212 0000 1234 567</span>
+                        </div>
+                        <div class="info-item info-full">
+                            <span class="info-label">开票地址</span>
+                            <span class="info-value">北京市海淀区中关村大街1号中关村大厦12层</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">开票电话</span>
+                            <span class="info-value">010-8888-6666</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">邮箱</span>
+                            <span class="info-value">finance@hxquality.com</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第二行：组织/人员信息 -->
+            <div class="card-section p-6">
+                <div class="section-header">
+                    <i class="fas fa-users text-[#2563eb] text-lg"></i>
+                    <h2 class="text-lg font-bold text-slate-800">组织/人员及其他认证信息</h2>
+                </div>
+                
+                <div class="bg-slate-50/60 rounded-xl p-6 border border-slate-100">
+                    <h3 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
+                        <i class="fas fa-user-friends text-[#2563eb]"></i>
+                        管理体系范围内人员数量情况
+                    </h3>
+                    
+                    <div class="grid grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white rounded-lg p-4 border border-slate-100">
+                            <p class="text-xs text-slate-500 mb-1">公司总人数</p>
+                            <p class="text-2xl font-bold text-slate-800">286</p>
+                            <p class="text-xs text-slate-400 mt-1">包含所有正式员工</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-slate-100">
+                            <p class="text-xs text-slate-500 mb-1">全职人员</p>
+                            <p class="text-2xl font-bold text-[#2563eb]">245</p>
+                            <p class="text-xs text-slate-400 mt-1">正式劳动合同员工</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-slate-100">
+                            <p class="text-xs text-slate-500 mb-1">兼职人员</p>
+                            <p class="text-2xl font-bold text-slate-700">41</p>
+                            <p class="text-xs text-slate-400 mt-1">非全职/派遣人员</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-slate-100">
+                            <p class="text-xs text-slate-500 mb-1">兼职工作时间</p>
+                            <p class="text-2xl font-bold text-slate-700">4 <span class="text-sm font-normal text-slate-500">小时/天</span></p>
+                            <p class="text-xs text-slate-400 mt-1">平均工作时长</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-8 text-sm border-t border-slate-200 pt-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">认证覆盖比例：</span>
+                            <span class="font-bold text-[#2563eb]">100%</span>
+                            <span class="text-slate-400 text-xs">(全公司纳入体系)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">管理人员：</span>
+                            <span class="font-bold text-slate-700">32人</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">技术人员：</span>
+                            <span class="font-bold text-slate-700">198人</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-500">行政人员：</span>
+                            <span class="font-bold text-slate-700">56人</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第三行：子场所列表（新增） -->
+            <div class="card-section p-6">
+                <div class="section-header flex justify-between items-center pr-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-map-marker-alt text-[#2563eb] text-lg"></i>
+                        <h2 class="text-lg font-bold text-slate-800">子场所列表</h2>
+                    </div>
+                    <span class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">共 3 个子场所</span>
+                </div>
+                
+                <div class="overflow-hidden">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">序号</th>
+                                <th>场所名称</th>
+                                <th>场所地址</th>
+                                <th>负责人</th>
+                                <th>联系电话</th>
+                                <th>员工人数</th>
+                                <th style="width: 100px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-slate-400 font-medium">01</td>
+                                <td class="font-semibold text-slate-800">北京总部</td>
+                                <td>北京市海淀区中关村大街1号中关村大厦12层</td>
+                                <td>张三</td>
+                                <td>138-0013-8000</td>
+                                <td>156人</td>
+                                <td>
+                                    <button onclick="openDrawer(0)" class="btn-text">
+                                        查看详情
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-slate-400 font-medium">02</td>
+                                <td class="font-semibold text-slate-800">上海分部</td>
+                                <td>上海市浦东新区张江高科技园区科苑路88号</td>
+                                <td>李四</td>
+                                <td>139-0014-9000</td>
+                                <td>85人</td>
+                                <td>
+                                    <button onclick="openDrawer(1)" class="btn-text">
+                                        查看详情
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-slate-400 font-medium">03</td>
+                                <td class="font-semibold text-slate-800">广州分部</td>
+                                <td>广州市天河区珠江新城华夏路30号富力盈通大厦15层</td>
+                                <td>王五</td>
+                                <td>137-0015-7000</td>
+                                <td>45人</td>
+                                <td>
+                                    <button onclick="openDrawer(2)" class="btn-text">
+                                        查看详情
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 p-3 bg-blue-50/50 rounded-lg border border-blue-100 flex items-center gap-2 text-sm text-blue-700">
+                    <i class="fas fa-info-circle"></i>
+                    <span>子场所的编辑与管理请前往「子场所管理」页面进行操作</span>
+                </div>
+            </div>
+
+            <!-- 第四行：营业执照信息 -->
+            <div class="card-section p-6">
+                <div class="section-header flex justify-between items-center pr-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-file-contract text-[#2563eb] text-lg"></i>
+                        <h2 class="text-lg font-bold text-slate-800">营业执照信息</h2>
+                    </div>
+                    <span class="status-tag success">
+                        <i class="fas fa-check-circle"></i>
+                        已上传
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-6 mb-6">
+                    <div class="info-item">
+                        <span class="info-label">营业执照注册号</span>
+                        <span class="info-value text-mono">91110108MA01M7B88C</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">发证机关</span>
+                        <span class="info-value">北京市海淀区市场监督管理局</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">有效期至</span>
+                        <span class="info-value">2049年03月14日</span>
+                    </div>
+                </div>
+
+                <div class="license-card">
+                    <div class="license-thumb">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%232563eb'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3E%3C/svg%3E" 
+                             alt="营业执照">
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-bold text-slate-800 mb-1">营业执照-正本.pdf</p>
+                        <p class="text-xs text-slate-400 mb-4">上传时间：2024-01-15 14:32:08 · 文件大小：2.4MB</p>
+                        <div class="flex gap-3">
+                            <button onclick="previewLicense()" class="btn-text text-base px-3 py-2 bg-blue-50">
+                                <i class="fas fa-eye mr-1"></i>
+                                查看大图
+                            </button>
+                            <button onclick="downloadLicense()" class="btn-text text-base px-3 py-2 bg-slate-50 text-slate-600">
+                                <i class="fas fa-download mr-1"></i>
+                                下载文件
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- 年检状态 -->
-                <div class="space-y-2">
-                    <label class="form-label text-sm">年报公示状态</label>
-                    <div class="flex items-center gap-2 p-2.5 rounded-lg bg-green-50 border border-green-200">
-                        <i class="fas fa-check-circle text-green-600"></i>
-                        <span class="text-sm font-medium text-green-800">2023年度报告已公示</span>
+                    <div class="flex flex-col items-end gap-2">
+                        <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm font-medium">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            2023年度报告已公示
+                        </div>
+                        <span class="text-xs text-slate-400">公示日期：2024-01-10</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-1">公示日期：2024-01-10</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========== 编辑模式（表单页） ========== -->
+    <div id="editMode" class="hidden animate-fade-in">
+        <!-- 页面头部 -->
+        <div class="max-w-[1848px] mx-auto mb-8 pt-6 px-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">编辑企业信息</h1>
+                    <p class="text-slate-500 mt-2 text-sm">修改企业基础信息及开票信息，保存后需重新审核</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="cancelEdit()" class="btn-secondary">
+                        <i class="fas fa-times"></i>
+                        取消
+                    </button>
+                    <button onclick="saveData()" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        保存
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- 保存提示（仅编辑模式显示） -->
-        <div class="hidden" id="saveTip">
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
+        <!-- 提示条 -->
+        <div class="max-w-[1848px] mx-auto px-6">
+            <div class="tip-bar">
                 <i class="fas fa-exclamation-circle text-yellow-600 mt-0.5"></i>
-                <div class="flex-1">
-                    <p class="text-sm font-medium text-yellow-800">提示</p>
+                <div>
+                    <p class="text-sm font-bold text-yellow-800">重要提示</p>
                     <p class="text-xs text-yellow-700 mt-1">修改企业信息后需要重新审核，审核通过前不能发起新的认证申请。请确保信息真实准确。</p>
                 </div>
             </div>
         </div>
 
+        <!-- 表单内容 -->
+        <div class="max-w-[1848px] mx-auto px-6 pb-12 space-y-6 mt-6">
+
+            <!-- 基本信息表单 -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-building text-[#2563eb]"></i>
+                    企业基础信息
+                </div>
+                <div class="grid grid-cols-3 gap-x-6 gap-y-5">
+                    <div>
+                        <label class="form-label required">企业名称</label>
+                        <input type="text" class="form-input" value="华夏质量认证有限公司">
+                    </div>
+                    <div>
+                        <label class="form-label required">统一社会信用代码</label>
+                        <input type="text" class="form-input" value="91110108MA01M7B88C" readonly>
+                    </div>
+                    <div>
+                        <label class="form-label required">企业类型</label>
+                        <select class="form-input">
+                            <option value="private" selected>有限责任公司</option>
+                            <option value="state">国有企业</option>
+                            <option value="joint">中外合资</option>
+                            <option value="foreign">外商独资</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label required">法定代表人</label>
+                        <input type="text" class="form-input" value="张三">
+                    </div>
+                    <div>
+                        <label class="form-label required">成立日期</label>
+                        <input type="date" class="form-input" value="2019-03-15">
+                    </div>
+                    <div>
+                        <label class="form-label required">注册资本（万元）</label>
+                        <input type="number" class="form-input" value="5000">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="form-label required">注册地址</label>
+                        <input type="text" class="form-input" value="北京市海淀区中关村大街1号中关村大厦12层1201-1208室">
+                    </div>
+                    <div>
+                        <label class="form-label">邮政编码</label>
+                        <input type="text" class="form-input" value="100080">
+                    </div>
+                    <div class="col-span-3">
+                        <label class="form-label required">经营范围</label>
+                        <textarea class="form-input" rows="3">质量管理体系认证、环境管理体系认证、职业健康安全管理体系认证；认证培训；企业管理咨询；技术服务等。</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 开票信息表单（新增） -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-file-invoice-dollar text-[#2563eb]"></i>
+                    开票信息
+                </div>
+                <div class="grid grid-cols-3 gap-x-6 gap-y-5">
+                    <div>
+                        <label class="form-label required">发票抬头</label>
+                        <input type="text" class="form-input" value="华夏质量认证有限公司">
+                    </div>
+                    <div>
+                        <label class="form-label required">纳税人识别号</label>
+                        <input type="text" class="form-input" value="91110108MA01M7B88C">
+                    </div>
+                    <div>
+                        <label class="form-label required">开户银行</label>
+                        <input type="text" class="form-input" value="中国工商银行北京海淀支行">
+                    </div>
+                    <div>
+                        <label class="form-label required">银行账号</label>
+                        <input type="text" class="form-input" value="6222021200001234567">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="form-label required">开票地址</label>
+                        <input type="text" class="form-input" value="北京市海淀区中关村大街1号中关村大厦12层">
+                    </div>
+                    <div>
+                        <label class="form-label required">开票电话</label>
+                        <input type="text" class="form-input" value="010-8888-6666">
+                    </div>
+                    <div>
+                        <label class="form-label">开票邮箱</label>
+                        <input type="email" class="form-input" value="finance@hxquality.com">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 子场所（仅提示，不可编辑） -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-map-marker-alt text-[#2563eb]"></i>
+                    子场所信息
+                </div>
+                <div class="bg-slate-50 rounded-lg p-5 border border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-[#2563eb]">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">当前共有 3 个子场所</p>
+                            <p class="text-xs text-slate-500 mt-0.5">子场所的维护不在此页面进行</p>
+                        </div>
+                    </div>
+                    <button class="btn-secondary text-sm" onclick="alert('即将跳转至子场所管理页面')">
+                        <i class="fas fa-external-link-alt"></i>
+                        前往子场所管理
+                    </button>
+                </div>
+            </div>
+
+            <!-- 人员信息表单 -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-users text-[#2563eb]"></i>
+                    组织/人员信息
+                </div>
+                <div class="grid grid-cols-4 gap-6">
+                    <div>
+                        <label class="form-label required">公司总人数</label>
+                        <input type="number" class="form-input" value="286" id="editTotalEmployees">
+                    </div>
+                    <div>
+                        <label class="form-label required">全职人员</label>
+                        <input type="number" class="form-input" value="245" id="editFullTime">
+                    </div>
+                    <div>
+                        <label class="form-label required">兼职人员</label>
+                        <input type="number" class="form-input" value="41" id="editPartTime">
+                    </div>
+                    <div>
+                        <label class="form-label">兼职工作时间(小时/天)</label>
+                        <input type="number" class="form-input" value="4">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 营业执照上传 -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-file-contract text-[#2563eb]"></i>
+                    营业执照信息
+                </div>
+                <div class="grid grid-cols-3 gap-x-6 gap-y-5 mb-5">
+                    <div>
+                        <label class="form-label required">营业执照注册号</label>
+                        <input type="text" class="form-input" value="91110108MA01M7B88C" readonly>
+                    </div>
+                    <div>
+                        <label class="form-label required">发证机关</label>
+                        <input type="text" class="form-input" value="北京市海淀区市场监督管理局">
+                    </div>
+                    <div>
+                        <label class="form-label required">有效期至</label>
+                        <input type="date" class="form-input" value="2049-03-14">
+                    </div>
+                </div>
+                
+                <div class="upload-box" onclick="alert('文件上传功能需要后端支持')">
+                    <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 mb-3"></i>
+                    <p class="text-sm text-slate-600 font-medium mb-1">点击上传或拖拽文件到此处</p>
+                    <p class="text-xs text-slate-400">支持 PDF、JPG、PNG，文件大小不超过 10MB</p>
+                    <p class="text-xs text-slate-400 mt-2">当前文件：营业执照-正本.pdf</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========== 侧拉抽屉：子场所详情 ========== -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <div>
+                <h3 class="text-lg font-bold text-slate-800" id="drawerTitle">子场所详情</h3>
+                <p class="text-sm text-slate-500 mt-1" id="drawerSubtitle">查看子场所完整信息</p>
+            </div>
+            <button class="drawer-close" onclick="closeDrawer()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="drawer-body">
+            <div class="detail-grid" id="drawerContent">
+                <!-- 动态填充 -->
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-slate-100">
+                <h4 class="text-sm font-bold text-slate-800 mb-3">职能说明</h4>
+                <p class="text-sm text-slate-600 leading-relaxed" id="drawerDesc">
+                    该场所主要负责华北地区的市场拓展与客户服务，承担体系认证咨询、现场审核协调及客户维护工作。
+                </p>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button class="btn-secondary text-sm" onclick="alert('即将跳转至子场所编辑页面')">
+                    <i class="fas fa-edit mr-1"></i>
+                    编辑此子场所
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 原始数据备份
-        let originalData = {};
-        
+        // 子场所模拟数据
+        const subSites = [
+            {
+                name: '北京总部',
+                address: '北京市海淀区中关村大街1号中关村大厦12层',
+                manager: '张三',
+                phone: '138-0013-8000',
+                email: 'zhangsan@hxquality.com',
+                employees: 156,
+                area: '2,800 平方米',
+                scope: '质量管理体系认证、环境管理体系认证、职业健康安全管理体系认证；认证培训；企业管理咨询；技术服务等。',
+                desc: '该场所为公司总部，负责全国业务统筹、体系研发、专家评审及行政管理。设有独立的培训教室和审核员办公区。'
+            },
+            {
+                name: '上海分部',
+                address: '上海市浦东新区张江高科技园区科苑路88号',
+                manager: '李四',
+                phone: '139-0014-9000',
+                email: 'lisi@hxquality.com',
+                employees: 85,
+                area: '1,500 平方米',
+                scope: '华东地区客户服务、现场审核实施、技术咨询。',
+                desc: '主要负责华东六省一市的客户开发与维护，配备8名专职审核员及3名客户服务专员，设有标准化审核会议室。'
+            },
+            {
+                name: '广州分部',
+                address: '广州市天河区珠江新城华夏路30号富力盈通大厦15层',
+                manager: '王五',
+                phone: '137-0015-7000',
+                email: 'wangwu@hxquality.com',
+                employees: 45,
+                area: '900 平方米',
+                scope: '华南地区客户服务、现场审核实施。',
+                desc: '负责华南地区（广东、广西、福建、海南）的业务拓展与审核服务，重点覆盖制造业与服务业客户。'
+            }
+        ];
+
         // 进入编辑模式
         function enterEditMode() {
-            const body = document.getElementById('pageBody');
-            body.classList.remove('view-mode');
-            body.classList.add('edit-mode');
-            
-            // 备份当前数据
-            backupData();
-            
-            // 移除readonly和disabled
-            document.querySelectorAll('input[readonly]').forEach(input => {
-                if(input.id !== 'creditCode' && input.id !== 'licenseNumber') { // 信用代码和执照号不允许编辑
-                    input.removeAttribute('readonly');
-                }
-            });
-            document.querySelectorAll('select[disabled]').forEach(select => {
-                select.removeAttribute('disabled');
-            });
-            document.querySelectorAll('textarea[readonly]').forEach(textarea => {
-                textarea.removeAttribute('readonly');
-            });
-            
-            // 切换按钮
-            document.getElementById('actionButtons').innerHTML = `
-                <button onclick="cancelEdit()" class="btn-secondary px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
-                    <i class="fas fa-times"></i>
-                    取消
-                </button>
-                <button onclick="saveData()" class="btn-primary px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
-                    <i class="fas fa-save"></i>
-                    保存
-                </button>
-            `;
-            
-            // 显示上传区域（编辑模式下）
-            document.getElementById('uploadArea').classList.remove('hidden');
-            document.getElementById('licensePreview').classList.add('hidden');
-            
-            // 显示提示
-            document.getElementById('saveTip').classList.remove('hidden');
+            document.getElementById('viewMode').classList.add('hidden');
+            document.getElementById('editMode').classList.remove('hidden');
+            document.body.classList.remove('view-mode');
+            document.body.classList.add('edit-mode');
+            window.scrollTo(0, 0);
         }
-        
+
         // 取消编辑
         function cancelEdit() {
-            const body = document.getElementById('pageBody');
-            body.classList.remove('edit-mode');
-            body.classList.add('view-mode');
-            
-            // 恢复readonly和disabled
-            document.querySelectorAll('input:not([readonly])').forEach(input => {
-                input.setAttribute('readonly', 'true');
-            });
-            document.querySelectorAll('select:not([disabled])').forEach(select => {
-                select.setAttribute('disabled', 'true');
-            });
-            document.querySelectorAll('textarea:not([readonly])').forEach(textarea => {
-                textarea.setAttribute('readonly', 'true');
-            });
-            
-            // 恢复按钮
-            document.getElementById('actionButtons').innerHTML = `
-                <button onclick="enterEditMode()" class="btn-primary px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
-                    <i class="fas fa-edit"></i>
-                    编辑信息
-                </button>
-            `;
-            
-            // 隐藏上传区域，显示预览
-            document.getElementById('uploadArea').classList.add('hidden');
-            document.getElementById('licensePreview').classList.remove('hidden');
-            
-            // 隐藏提示
-            document.getElementById('saveTip').classList.add('hidden');
-            
-            // 恢复数据
-            restoreData();
+            document.getElementById('editMode').classList.add('hidden');
+            document.getElementById('viewMode').classList.remove('hidden');
+            document.body.classList.remove('edit-mode');
+            document.body.classList.add('view-mode');
+            window.scrollTo(0, 0);
         }
-        
-        // 保存数据（模拟）
+
+        // 保存数据
         function saveData() {
-            // 这里可以添加表单验证逻辑
-            
-            const btn = document.querySelector('#actionButtons button:last-child');
+            const btn = event.target;
+            const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
             btn.disabled = true;
             
             setTimeout(() => {
                 alert('企业信息保存成功！');
-                cancelEdit(); // 切换回查看模式
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                cancelEdit();
             }, 1000);
         }
-        
-        // 备份数据
-        function backupData() {
-            const inputs = document.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                originalData[input.id] = input.value;
-            });
+
+        // 打开抽屉
+        function openDrawer(index) {
+            const site = subSites[index];
+            document.getElementById('drawerTitle').textContent = site.name;
+            document.getElementById('drawerSubtitle').textContent = site.address;
+            document.getElementById('drawerDesc').textContent = site.desc;
+            
+            const content = document.getElementById('drawerContent');
+            content.innerHTML = `
+                <div class="detail-item">
+                    <span class="detail-label">场所名称</span>
+                    <span class="detail-value">${site.name}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">负责人</span>
+                    <span class="detail-value">${site.manager}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">联系电话</span>
+                    <span class="detail-value">${site.phone}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">电子邮箱</span>
+                    <span class="detail-value">${site.email}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">员工人数</span>
+                    <span class="detail-value">${site.employees} 人</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">场所面积</span>
+                    <span class="detail-value">${site.area}</span>
+                </div>
+                <div class="detail-item info-full" style="grid-column: 1 / -1;">
+                    <span class="detail-label">场所地址</span>
+                    <span class="detail-value">${site.address}</span>
+                </div>
+                <div class="detail-item info-full" style="grid-column: 1 / -1;">
+                    <span class="detail-label">认证范围</span>
+                    <span class="detail-value text-sm font-normal text-slate-600">${site.scope}</span>
+                </div>
+            `;
+            
+            document.getElementById('drawerOverlay').classList.add('active');
+            document.getElementById('drawer').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
-        
-        // 恢复数据
-        function restoreData() {
-            Object.keys(originalData).forEach(id => {
-                const element = document.getElementById(id);
-                if(element) {
-                    element.value = originalData[id];
-                }
-            });
+
+        // 关闭抽屉
+        function closeDrawer() {
+            document.getElementById('drawerOverlay').classList.remove('active');
+            document.getElementById('drawer').classList.remove('active');
+            document.body.style.overflow = '';
         }
-        
-        // 查看营业执照大图
+
+        // 查看营业执照
         function previewLicense() {
             alert('此处应打开营业执照大图预览弹窗');
         }
-        
+
         // 下载营业执照
         function downloadLicense() {
             alert('开始下载营业执照文件...');
         }
-        
-        // 人员数量联动计算（编辑模式下）
-        document.getElementById('fullTimeEmployees')?.addEventListener('input', calculateTotal);
-        document.getElementById('partTimeEmployees')?.addEventListener('input', calculateTotal);
-        
-        function calculateTotal() {
-            const fullTime = parseInt(document.getElementById('fullTimeEmployees').value) || 0;
-            const partTime = parseInt(document.getElementById('partTimeEmployees').value) || 0;
-            document.getElementById('totalEmployees').value = fullTime + partTime;
-        }
-        
-        // 拖放上传效果
-        const uploadArea = document.getElementById('uploadArea');
-        if(uploadArea) {
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('active');
-            });
+
+        // 人员联动计算（编辑模式）
+        document.addEventListener('DOMContentLoaded', function() {
+            const fullTimeInput = document.getElementById('editFullTime');
+            const partTimeInput = document.getElementById('editPartTime');
+            const totalInput = document.getElementById('editTotalEmployees');
             
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('active');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('active');
-                alert('文件上传功能需要后端支持，此处仅为演示');
-            });
-        }
+            if(fullTimeInput && partTimeInput && totalInput) {
+                [fullTimeInput, partTimeInput].forEach(input => {
+                    input.addEventListener('input', function() {
+                        const ft = parseInt(fullTimeInput.value) || 0;
+                        const pt = parseInt(partTimeInput.value) || 0;
+                        totalInput.value = ft + pt;
+                    });
+                });
+            }
+        });
+
+        // ESC关闭抽屉
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'Escape') closeDrawer();
+        });
     </script>
 </body>
 </html>
