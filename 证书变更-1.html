@@ -1,0 +1,1963 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>证书变更申请表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: #f1f5f9;
+            padding-top: 120px;
+        }
+
+        .form-section {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            scroll-margin-top: 140px;
+            position: relative;
+        }
+
+        .form-section:hover {
+            box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        .conditional-field {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .conditional-field.active {
+            max-height: 2000px;
+            opacity: 1;
+            margin-top: 0.75rem;
+        }
+
+        /* 子条件区域（在conditional-field内部） */
+        .sub-conditional-field {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .sub-conditional-field.hidden {
+            display: none;
+        }
+
+        .nav-item {
+            position: relative;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-item.active {
+            color: #2563eb;
+            font-weight: 600;
+            border-bottom-color: #2563eb;
+        }
+
+        .nav-item:hover:not(.active) {
+            color: #2563eb;
+            border-bottom-color: #bfdbfe;
+        }
+
+        .sticky-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sticky-nav {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="month"],
+        select,
+        textarea {
+            min-height: 36px !important;
+            padding: 8px 12px !important;
+            font-size: 13px !important;
+            line-height: 20px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 6px !important;
+            background: white !important;
+            transition: all 0.2s !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+
+        input:read-only,
+        input:disabled,
+        select:disabled,
+        textarea:disabled {
+            background: #f3f4f6 !important;
+            cursor: not-allowed !important;
+            opacity: 0.7;
+        }
+
+        .required::after {
+            content: "*";
+            color: #ef4444;
+            margin-left: 4px;
+        }
+
+        .sub-section-title {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            margin: 20px 0 12px 0;
+            border-radius: 0 8px 8px 0;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .change-item-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .change-item-card:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        .ref-info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .ref-info-box .ref-label {
+            font-size: 12px;
+            color: #0369a1;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .ref-info-box .ref-content {
+            font-size: 13px;
+            color: #0c4a6e;
+            font-weight: 600;
+        }
+
+        .inner-attachment-card {
+            background: #ffffff;
+            border: 2px solid #fecaca;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .inner-attachment-card.has-files {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .inner-attachment-card .attachment-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .inner-attachment-card .attachment-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .inner-attachment-card .attachment-icon.pdf-icon {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .inner-attachment-card .attachment-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .inner-attachment-card .attachment-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .inner-attachment-card .attachment-title .title-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .inner-attachment-card .required-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background: #dc2626;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .inner-attachment-card .attachment-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .inner-attachment-card .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #ffffff;
+            border: 1px solid #dc2626;
+            border-radius: 6px;
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .inner-attachment-card .upload-btn:hover {
+            background: #fef2f2;
+            border-color: #b91c1c;
+            color: #b91c1c;
+        }
+
+        .inner-attachment-card .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            color: #9ca3af;
+        }
+
+        .inner-attachment-card .attachment-files {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .inner-attachment-card .attachment-files:empty {
+            display: none;
+        }
+
+        .attachment-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .attachment-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px -2px rgba(59, 130, 246, 0.15);
+        }
+
+        .attachment-card.has-files {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .attachment-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .attachment-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .attachment-icon.pdf-icon {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .attachment-icon.doc-icon {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .attachment-icon.img-icon {
+            background: #f0fdf4;
+            color: #059669;
+        }
+
+        .attachment-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .attachment-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .attachment-title .title-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .required-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 4px;
+            border: 1px solid #fecaca;
+        }
+
+        .optional-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+
+        .attachment-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .file-count {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .file-count.has-files {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #ffffff;
+            border: 1px solid #3b82f6;
+            border-radius: 6px;
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .upload-btn:hover {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f3f4f6;
+            border-color: #d1d5db;
+            color: #9ca3af;
+        }
+
+        .attachment-files {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .attachment-files:empty {
+            display: none;
+        }
+
+        .file-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #166534;
+            max-width: 100%;
+        }
+
+        .file-tag-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .file-tag-size {
+            color: #22c55e;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .file-tag-remove {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #16a34a;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .file-tag-remove:hover {
+            background: #bbf7d0;
+            color: #dc2626;
+        }
+
+        
+
+        
+
+        .lock-content {
+            text-align: center;
+            background: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e2e8f0;
+        }
+
+        .cert-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        @media (min-width: 1024px) {
+            .cert-info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1536px) {
+            .cert-info-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .cert-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cert-info-label {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .cert-info-value {
+            font-size: 14px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .cert-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .cert-modal.active {
+            display: flex;
+        }
+
+        .cert-modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .cert-modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+            border: none;
+            font-size: 20px;
+        }
+
+        .cert-modal-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: rotate(90deg);
+        }
+
+        #certCanvas {
+            max-width: 100%;
+            max-height: 85vh;
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            top: 140px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .cert-info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding-top: 100px;
+            }
+            
+            .sticky-nav {
+                top: 50px;
+            }
+            
+            .form-section {
+                scroll-margin-top: 120px;
+            }
+            
+            .toast {
+                top: 120px;
+            }
+        }
+    
+        /* 修复附件卡片文字换行问题 */
+        .attachment-card {
+            min-width: 280px;
+        }
+
+        .attachment-info {
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .attachment-title {
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        .title-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .attachment-meta {
+            white-space: nowrap;
+        }
+
+        /* 确保grid布局正确 */
+        #section-attachments .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        @media (min-width: 1280px) {
+            #section-attachments .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+</style>
+<base target="_blank">
+</head>
+<body class="text-slate-800 pb-32">
+
+    <!-- 顶部栏 -->
+    <header class="sticky-header">
+        <div class="w-full px-6">
+            <div class="flex items-center justify-between h-14 max-w-none">
+                <div class="flex items-center gap-4">
+                    <button class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
+                        <span class="text-sm font-medium">返回</span>
+                    </button>
+                    <div class="h-6 w-px bg-slate-300"></div>
+                    <h1 class="text-lg font-semibold text-slate-900">证书变更申请表</h1>
+                    <span id="statusBadge" class="px-3 py-1 bg-amber-100 text-amber-700 text-xs rounded-full font-medium border border-amber-200">待提交</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="saveDraft()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-2">
+                        <i class="fas fa-save"></i>
+                        <span>保存</span>
+                    </button>
+                    <button onclick="submitForm()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>提交</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 导航栏 -->
+    <nav class="sticky-nav">
+        <div class="w-full px-6">
+            <div class="flex items-center gap-1 -mb-px overflow-x-auto max-w-none">
+                <a href="#section-info" class="nav-item px-4 py-3 text-sm font-medium text-slate-600" data-section="section-info">
+                    原证书信息
+                </a>
+                <a href="#section-change" class="nav-item px-4 py-3 text-sm font-medium text-slate-600" data-section="section-change">
+                    变更项目
+                </a>
+                <a href="#section-attachments" class="nav-item px-4 py-3 text-sm font-medium text-slate-600" data-section="section-attachments">
+                    附件清单
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="w-full px-6 py-6 space-y-6 max-w-none">
+
+        <!-- 2. 原证书信息 -->
+        <div id="section-info" class="form-section bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+            
+
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold">2</div>
+                    <h3 class="font-semibold text-slate-900">原证书信息</h3>
+                    <span id="certStatusBadge" class="hidden px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded border border-green-200">已查询到证书</span>
+                </div>
+                <button onclick="previewCertificate()" class="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg border border-blue-200 transition-colors flex items-center gap-2">
+                    <i class="fas fa-eye"></i>
+                    预览证书
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="cert-info-grid" id="certInfoGrid">
+                    <div class="cert-info-item">
+                        <span class="cert-info-label">证书编号</span>
+                        <span class="cert-info-value" id="cert-no">-</span>
+                    </div>
+                    <div class="cert-info-item">
+                        <span class="cert-info-label">认证依据</span>
+                        <span class="cert-info-value" id="cert-standard">-</span>
+                    </div>
+                    <div class="cert-info-item">
+                        <span class="cert-info-label">企业名称</span>
+                        <span class="cert-info-value" id="cert-company">-</span>
+                    </div>
+                    <div class="cert-info-item">
+                        <span class="cert-info-label">有效期</span>
+                        <span class="cert-info-value" id="cert-validity">-</span>
+                    </div>
+                    <div class="cert-info-item">
+                        <span class="cert-info-label">统一社会信用代码</span>
+                        <span class="cert-info-value" id="cert-credit">-</span>
+                    </div>
+                    <div class="cert-info-item">
+                        <span class="cert-info-label">首次发证日期</span>
+                        <span class="cert-info-value" id="cert-firstdate">-</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-slate-100">
+                    <div class="cert-info-item mb-4">
+                        <span class="cert-info-label">认证范围</span>
+                        <p class="text-sm text-slate-700 mt-1 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100" id="cert-scope">-</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                        <div class="cert-info-item">
+                            <span class="cert-info-label">注册地址</span>
+                            <span class="cert-info-value text-sm font-normal text-slate-700" id="cert-regaddr">-</span>
+                        </div>
+                        <div class="cert-info-item">
+                            <span class="cert-info-label">运营地址</span>
+                            <span class="cert-info-value text-sm font-normal text-slate-700" id="cert-opaddr">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 证书变更申请表（变更项目） -->
+        <div id="section-change" class="form-section bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+            
+
+            <div class="p-6 space-y-4 transition-all duration-300" style="max-height: 4000px; overflow: visible;">
+                <!-- 表头信息 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4 border-b border-slate-100">
+                    <div class="form-field">
+                        <label class="text-xs font-medium text-slate-700 mb-1 block">客户名称</label>
+                        <input type="text" id="display-company" value="-" readonly>
+                    </div>
+                    <div class="form-field">
+                        <label class="text-xs font-medium text-slate-700 mb-1 block">认证领域</label>
+                        <input type="text" value="EMS" readonly>
+                    </div>
+                    <div class="form-field">
+                        <label class="text-xs font-medium text-slate-700 mb-1 block required">申请变更证书的编号</label>
+                        <div class="relative">
+                            <input type="text" id="certNo" value="00126E301110R701" readonly 
+                                   class="pr-10 bg-slate-50 cursor-not-allowed">
+                            <div id="certNoReadonlyIcon" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                                <i class="fas fa-lock text-sm"></i>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">当前证书编号（只读）</p>
+                    </div>
+                </div>
+
+                <!-- 变更项目列表 -->
+                <div class="space-y-3">
+                    
+                    <!-- 1. 产品和过程变更 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-product" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">证书中涉及产品和过程变更</span>
+                        </label>
+                        <div id="change-product" class="conditional-field space-y-3 pl-7">
+                            <div class="flex gap-4 mb-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="productChangeType" value="expand" class="text-blue-600" checked>
+                                    <span class="text-sm text-slate-700">扩大</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="productChangeType" value="shrink" class="text-blue-600">
+                                    <span class="text-sm text-slate-700">缩小</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="productChangeType" value="modify" class="text-blue-600">
+                                    <span class="text-sm text-slate-700">更改表述方式</span>
+                                </label>
+                            </div>
+                            
+                            <div class="ref-info-box">
+                                <div class="ref-label"><i class="fas fa-info-circle mr-1"></i>原认证范围（参考）</div>
+                                <div class="ref-content" id="ref-scope">数码相机的制造，摄像模组的制造（用于便携式电脑、手机），印刷电路板零组件的制造，医疗血糖仪的制造，车用用于辅助驾驶系统的摄像头制造，数码相机塑料件制造及相关成型配件的制造及相关管理活动</div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="text-xs font-medium text-slate-700 mb-1 block required">拟变更为</label>
+                                <textarea maxlength="500" class="w-full resize-none" rows="3" placeholder="请输入变更后的认证范围"></textarea>
+                            </div>
+                            <div class="flex items-center gap-4 flex-wrap">
+                                <span class="text-sm text-slate-600">范围变更后涉及到员工数量的变化：</span>
+                                <select class="w-32" onchange="toggleStaffChange(this.value)">
+                                    <option value="none">无变化</option>
+                                    <option value="increase">新增</option>
+                                    <option value="decrease">减少</option>
+                                </select>
+                                <input type="number" id="staffChangeCount" class="hidden w-32" placeholder="人员数量">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 认证标准变更 - 包含管理体系文件上传 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-standard" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">认证标准变更</span>
+                        </label>
+                        <div id="change-standard" class="conditional-field space-y-3 pl-7">
+                            <div class="ref-info-box">
+                                <div class="ref-label"><i class="fas fa-info-circle mr-1"></i>原认证标准（参考）</div>
+                                <div class="ref-content" id="ref-standard">GB/T 24001-2016 / ISO 14001:2015</div>
+                            </div>
+                            <div class="form-field">
+                                <label class="text-xs font-medium text-slate-700 mb-1 block required">拟变更为</label>
+                                <input type="text" maxlength="100" placeholder="请输入新标准">
+                            </div>
+
+                            <!-- 有效版本的管理体系文件上传（认证标准变更时必须） -->
+                            <div class="inner-attachment-card" id="card_management_system">
+                                <div class="attachment-main">
+                                    <div class="attachment-icon pdf-icon">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div class="attachment-info">
+                                        <div class="attachment-title">
+                                            <span class="title-text">有效版本的管理体系文件</span>
+                                            <span class="required-badge">变更此项必须上传</span>
+                                        </div>
+                                        <div class="attachment-meta">
+                                            <span class="file-count" id="meta_management_system">0 个文件</span>
+                                            <span class="text-slate-400 ml-2">请上传最新版质量手册、程序文件等</span>
+                                        </div>
+                                    </div>
+                                    <button class="upload-btn" onclick="document.getElementById('file_management_system').click()" id="btn_management_system">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>上传</span>
+                                    </button>
+                                </div>
+                                <div class="attachment-files" id="files_management_system"></div>
+                                <input type="file" id="file_management_system" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleChangeItemFileUpload(this, 'management_system')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 地址变更 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-address" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">地址变更（请附相关机构的证明文件）</span>
+                        </label>
+                        <div id="change-address" class="conditional-field space-y-3 pl-7">
+                            <select class="w-full md:w-1/3 mb-2">
+                                <option value="">请选择变更类型</option>
+                                <option value="move">组织搬迁</option>
+                                <option value="rename">地址名称变更</option>
+                            </select>
+                            
+                            <div class="ref-info-box">
+                                <div class="ref-label"><i class="fas fa-map-marker-alt mr-1"></i>原注册地址（参考）</div>
+                                <div class="ref-content" id="ref-regaddr">中国江苏省昆山综合保税区第三大道77号</div>
+                            </div>
+                            <div class="ref-info-box">
+                                <div class="ref-label"><i class="fas fa-building mr-1"></i>原运营地址（参考）</div>
+                                <div class="ref-content" id="ref-opaddr">中国江苏省昆山综合保税区第三大道77号</div>
+                            </div>
+
+                            <div class="form-field">
+                                <label class="text-xs font-medium text-slate-700 mb-1 block required">拟变为</label>
+                                <input type="text" maxlength="200" placeholder="请输入新地址">
+                            </div>
+
+                            <!-- 地址变更证明文件上传 -->
+                            <div class="inner-attachment-card" id="card_address_proof">
+                                <div class="attachment-main">
+                                    <div class="attachment-icon pdf-icon">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="attachment-info">
+                                        <div class="attachment-title">
+                                            <span class="title-text">地址变更证明文件</span>
+                                            <span class="required-badge">必填</span>
+                                        </div>
+                                        <div class="attachment-meta">
+                                            <span class="file-count" id="meta_address_proof">0 个文件</span>
+                                            <span class="text-slate-400 ml-2">请上传工商部门出具的变更证明等</span>
+                                        </div>
+                                    </div>
+                                    <button class="upload-btn" onclick="document.getElementById('file_address_proof').click()" id="btn_address_proof">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>上传</span>
+                                    </button>
+                                </div>
+                                <div class="attachment-files" id="files_address_proof"></div>
+                                <input type="file" id="file_address_proof" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleChangeItemFileUpload(this, 'address_proof')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 组织名称变更 - 可同时变更中文和英文 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-orgname" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">组织名称变更</span>
+                        </label>
+                        <div id="change-orgname" class="conditional-field space-y-3 pl-7">
+                            <!-- 选择变更类型 - 两个独立勾选，可同时选择 -->
+                            <div class="flex gap-6 mb-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="orgNameZhCheck" class="org-name-type-check rounded text-blue-600 w-4 h-4" onchange="toggleOrgNameZh(this.checked)">
+                                    <span class="text-sm font-medium text-slate-700">变更中文名称</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="orgNameEnCheck" class="org-name-type-check rounded text-blue-600 w-4 h-4" onchange="toggleOrgNameEn(this.checked)">
+                                    <span class="text-sm font-medium text-slate-700">变更英文名称</span>
+                                </label>
+                            </div>
+                            
+                            <!-- 中文名称变更区域 -->
+                            <div id="orgNameZhSection" class="sub-conditional-field hidden space-y-3">
+                                <div class="ref-info-box">
+                                    <div class="ref-label"><i class="fas fa-tag mr-1"></i>原中文名称（参考）</div>
+                                    <div class="ref-content" id="ref-company-zh">彩晶光电科技(昆山)有限公司</div>
+                                </div>
+                                <div class="form-field">
+                                    <label class="text-xs font-medium text-slate-700 mb-1 block required">拟变更中文名称为</label>
+                                    <input type="text" id="newOrgNameZh" maxlength="100" placeholder="请输入新的中文名称">
+                                </div>
+                            </div>
+
+                            <!-- 英文名称变更区域 -->
+                            <div id="orgNameEnSection" class="sub-conditional-field hidden space-y-3">
+                                <div class="ref-info-box">
+                                    <div class="ref-label"><i class="fas fa-globe mr-1"></i>原英文名称（参考）</div>
+                                    <div class="ref-content" id="ref-company-en">Color Crystal Optoelectronics Technology (Kunshan) Co., Ltd.</div>
+                                </div>
+                                <div class="form-field">
+                                    <label class="text-xs font-medium text-slate-700 mb-1 block required">拟变更英文名称为</label>
+                                    <input type="text" id="newOrgNameEn" maxlength="100" placeholder="请输入新的英文名称">
+                                </div>
+                            </div>
+
+                            <!-- 营业执照（副本）复印件或机构成立批文复印件（组织名称变更时必须） -->
+                            <div class="inner-attachment-card" id="card_business_license">
+                                <div class="attachment-main">
+                                    <div class="attachment-icon pdf-icon">
+                                        <i class="fas fa-file-contract"></i>
+                                    </div>
+                                    <div class="attachment-info">
+                                        <div class="attachment-title">
+                                            <span class="title-text">营业执照（副本）复印件或机构成立批文复印件</span>
+                                            <span class="required-badge">变更此项必须上传</span>
+                                        </div>
+                                        <div class="attachment-meta">
+                                            <span class="file-count" id="meta_business_license">0 个文件</span>
+                                            <span class="text-slate-400 ml-2">请上传最新的营业执照副本或批文</span>
+                                        </div>
+                                    </div>
+                                    <button class="upload-btn" onclick="document.getElementById('file_business_license').click()" id="btn_business_license">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <span>上传</span>
+                                    </button>
+                                </div>
+                                <div class="attachment-files" id="files_business_license"></div>
+                                <input type="file" id="file_business_license" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleChangeItemFileUpload(this, 'business_license')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. 新增或减少场所 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-location" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">新增场所或减少场所</span>
+                        </label>
+                        <div id="change-location" class="conditional-field space-y-3 pl-7">
+                            <!-- 选择操作类型 -->
+                            <div class="flex gap-6 mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="addLocationCheck" class="location-type-check rounded text-blue-600 w-4 h-4" onchange="toggleLocationSection('add', this.checked)">
+                                    <span class="text-sm font-medium text-slate-700">新增场所</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="removeLocationCheck" class="location-type-check rounded text-blue-600 w-4 h-4" onchange="toggleLocationSection('remove', this.checked)">
+                                    <span class="text-sm font-medium text-slate-700">减少场所</span>
+                                </label>
+                            </div>
+
+                            <!-- 新增场所区域 -->
+                            <div id="addLocationFields" class="hidden space-y-3">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-plus-circle text-green-500"></i>
+                                    <span class="text-sm font-semibold text-slate-700">新增场所信息</span>
+                                </div>
+                                <div id="addLocationList" class="space-y-3">
+                                    <!-- 默认第一条 -->
+                                    <div class="location-item flex gap-3 items-start p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                        <div class="flex-1 form-field">
+                                            <label class="text-xs font-medium text-slate-700 mb-1 block">场所名称</label>
+                                            <input type="text" maxlength="100" placeholder="请输入场所名称" class="location-name">
+                                        </div>
+                                        <div class="flex-1 form-field">
+                                            <label class="text-xs font-medium text-slate-700 mb-1 block">地址</label>
+                                            <input type="text" maxlength="200" placeholder="请输入地址" class="location-address">
+                                        </div>
+                                        <div class="flex-1 form-field">
+                                            <label class="text-xs font-medium text-slate-700 mb-1 block">产品/服务范围</label>
+                                            <input type="text" maxlength="200" placeholder="请输入产品/服务范围" class="location-scope">
+                                        </div>
+                                        <div class="w-28 form-field">
+                                            <label class="text-xs font-medium text-slate-700 mb-1 block">人数</label>
+                                            <input type="number" placeholder="0" class="location-staff">
+                                        </div>
+                                        <button onclick="removeLocationRow(this)" class="mt-6 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm transition-colors" title="删除此行">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button onclick="addLocationRow()" class="w-full py-2 border-2 border-dashed border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+                                    <i class="fas fa-plus"></i>
+                                    <span>添加场所</span>
+                                </button>
+                                <p class="text-xs text-slate-500">提示：可添加多条场所信息，点击右侧删除按钮可移除对应行</p>
+                            </div>
+
+                            <!-- 减少场所区域 -->
+                            <div id="removeLocationFields" class="hidden space-y-3 pt-4 border-t border-slate-200">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-minus-circle text-red-500"></i>
+                                    <span class="text-sm font-semibold text-slate-700">选择要减少的场所（可多选）</span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2" id="removeLocationList">
+                                    <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-red-300 hover:bg-red-50 cursor-pointer transition-all">
+                                        <input type="checkbox" name="removeLocation" value="loc1" class="mt-0.5 text-red-600 rounded">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-slate-700">北京总部</div>
+                                            <div class="text-xs text-slate-500">北京市朝阳区xxx路xxx号</div>
+                                            <div class="text-xs text-slate-400 mt-1">QMS、EMS认证范围</div>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-red-300 hover:bg-red-50 cursor-pointer transition-all">
+                                        <input type="checkbox" name="removeLocation" value="loc2" class="mt-0.5 text-red-600 rounded">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-slate-700">上海分公司</div>
+                                            <div class="text-xs text-slate-500">上海市浦东新区xxx路xxx号</div>
+                                            <div class="text-xs text-slate-400 mt-1">QMS认证范围</div>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-red-300 hover:bg-red-50 cursor-pointer transition-all">
+                                        <input type="checkbox" name="removeLocation" value="loc3" class="mt-0.5 text-red-600 rounded">
+                                        <div class="flex-1">
+                                            <div class="text-sm font-medium text-slate-700">广州研发中心</div>
+                                            <div class="text-xs text-slate-500">广州市天河区xxx路xxx号</div>
+                                            <div class="text-xs text-slate-400 mt-1">EMS认证范围</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button onclick="selectAllRemoveLocations(true)" class="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 hover:bg-blue-50 rounded">全选</button>
+                                    <span class="text-slate-300">|</span>
+                                    <button onclick="selectAllRemoveLocations(false)" class="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 hover:bg-blue-50 rounded">取消全选</button>
+                                </div>
+                                <div id="selectedRemoveLocations" class="hidden mt-2 p-2 bg-red-50 rounded border border-red-100">
+                                    <span class="text-xs text-red-600 font-medium">已选择 <span id="selectedCount">0</span> 个场所待删除</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. 组织人数变更 --><!-- 6. 组织人数变更 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-staff" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">组织人数变更</span>
+                        </label>
+                        <div id="change-staff" class="conditional-field pl-7">
+                            <div class="ref-info-box mb-3">
+                                <div class="ref-label"><i class="fas fa-users mr-1"></i>原组织人数（参考）</div>
+                                <div class="ref-content">150人</div>
+                            </div>
+                            <input type="number" class="w-full md:w-1/3" placeholder="请输入变更后的人数">
+                        </div>
+                    </div>
+
+                    <!-- 7. 其他原因变更 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-other" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">其他原因变更（请说明变更理由和变更要求）</span>
+                        </label>
+                        <div id="change-other" class="conditional-field pl-7">
+                            <textarea maxlength="500" class="w-full resize-none" rows="3" placeholder="请说明变更理由"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 8. 对认证的其他需求 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-requirement" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">对认证的其他需求（如：希望现场审核的日期、证书内容表述等）</span>
+                        </label>
+                        <div id="change-requirement" class="conditional-field pl-7">
+                            <textarea maxlength="500" class="w-full resize-none" rows="3" placeholder="请说明其他需求"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 9. 希望现场审核的时间 -->
+                    <div class="change-item-card">
+                        <label class="flex items-center gap-3 cursor-pointer mb-2">
+                            <input type="checkbox" class="change-item-check rounded text-blue-600 w-4 h-4" data-target="change-date" onchange="toggleChangeItem(this)">
+                            <span class="text-sm font-medium text-slate-700">希望现场审核的时间（适用于需要现场审核的情形）</span>
+                        </label>
+                        <div id="change-date" class="conditional-field pl-7">
+                            <input type="date" class="w-full md:w-1/3" min="2026-03-26">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 附件清单 -->
+        <id="section-attachments" class="form-section bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+            
+
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-100 transition-colors" onclick="toggleSection(this)">
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">4</div>
+                    <h3 class="font-semibold text-slate-900">附件清单</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs">可选</span>
+                    <i class="fas fa-chevron-down text-slate-400 transition-transform duration-300 text-xs"></i>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <p class="text-xs text-slate-500 mb-4">如下列文件发生变化，请提供（每个类型可上传多个文件）：</p>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <!-- 附件类型2：过程清单 -->
+                    <div class="attachment-card" id="card_process_list">
+                        <div class="attachment-main">
+                            <div class="attachment-icon doc-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-title">
+                                    <span class="title-text">过程清单（QES）</span>
+                                    <span class="optional-badge">选填</span>
+                                </div>
+                                <div class="attachment-meta">
+                                    <span class="file-count" id="meta_process_list">0 个文件</span>
+                                </div>
+                            </div>
+                            <button class="upload-btn" onclick="document.getElementById('file_process_list').click()" id="btn_process_list">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>上传</span>
+                            </button>
+                        </div>
+                        <div class="attachment-files" id="files_process_list"></div>
+                        <input type="file" id="file_process_list" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleAttachmentFileUpload(this, 'process_list')">
+                    </div>
+
+                    <!-- 附件类型3：环境因素清单 -->
+                    <div class="attachment-card" id="card_env_list">
+                        <div class="attachment-main">
+                            <div class="attachment-icon doc-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-title">
+                                    <span class="title-text">重要环境因素清单（E）</span>
+                                    <span class="optional-badge">选填</span>
+                                </div>
+                                <div class="attachment-meta">
+                                    <span class="file-count" id="meta_env_list">0 个文件</span>
+                                </div>
+                            </div>
+                            <button class="upload-btn" onclick="document.getElementById('file_env_list').click()" id="btn_env_list">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>上传</span>
+                            </button>
+                        </div>
+                        <div class="attachment-files" id="files_env_list"></div>
+                        <input type="file" id="file_env_list" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleAttachmentFileUpload(this, 'env_list')">
+                    </div>
+
+                    <!-- 附件类型4：危险源和风险 -->
+                    <div class="attachment-card" id="card_risk_list">
+                        <div class="attachment-main">
+                            <div class="attachment-icon doc-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-title">
+                                    <span class="title-text">主要危险源和OHS风险（S）</span>
+                                    <span class="optional-badge">选填</span>
+                                </div>
+                                <div class="attachment-meta">
+                                    <span class="file-count" id="meta_risk_list">0 个文件</span>
+                                </div>
+                            </div>
+                            <button class="upload-btn" onclick="document.getElementById('file_risk_list').click()" id="btn_risk_list">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>上传</span>
+                            </button>
+                        </div>
+                        <div class="attachment-files" id="files_risk_list"></div>
+                        <input type="file" id="file_risk_list" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleAttachmentFileUpload(this, 'risk_list')">
+                    </div>
+
+                    <!-- 附件类型6：相关资质文件 -->
+                    <div class="attachment-card" id="card_qualification">
+                        <div class="attachment-main">
+                            <div class="attachment-icon pdf-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-title">
+                                    <span class="title-text">相关资质文件复印件</span>
+                                    <span class="optional-badge">选填</span>
+                                </div>
+                                <div class="attachment-meta">
+                                    <span class="file-count" id="meta_qualification">0 个文件</span>
+                                </div>
+                            </div>
+                            <button class="upload-btn" onclick="document.getElementById('file_qualification').click()" id="btn_qualification">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>上传</span>
+                            </button>
+                        </div>
+                        <div class="attachment-files" id="files_qualification"></div>
+                        <input type="file" id="file_qualification" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleAttachmentFileUpload(this, 'qualification')">
+                    </div>
+
+                    <!-- 附件类型7：地理位置示意图 -->
+                    <div class="attachment-card" id="card_location_map">
+                        <div class="attachment-main">
+                            <div class="attachment-icon img-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-title">
+                                    <span class="title-text">地理位置示意图和厂区平面布置图</span>
+                                    <span class="optional-badge">选填</span>
+                                </div>
+                                <div class="attachment-meta">
+                                    <span class="file-count" id="meta_location_map">0 个文件</span>
+                                </div>
+                            </div>
+                            <button class="upload-btn" onclick="document.getElementById('file_location_map').click()" id="btn_location_map">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>上传</span>
+                            </button>
+                        </div>
+                        <div class="attachment-files" id="files_location_map"></div>
+                        <input type="file" id="file_location_map" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleAttachmentFileUpload(this, 'location_map')">
+                    </div>
+
+                    <!-- 附件类型8：工艺流程图 -->
+                    <div class="attachment-card" id="card_process_flow">
+                        <div class="attachment-main">
+                            <div class="attachment-icon img-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-title">
+                                    <span class="title-text">生产工艺流程图</span>
+                                    <span class="optional-badge">选填</span>
+                                </div>
+                                <div class="attachment-meta">
+                                    <span class="file-count" id="meta_process_flow">0 个文件</span>
+                                </div>
+                            </div>
+                            <button class="upload-btn" onclick="document.getElementById('file_process_flow').click()" id="btn_process_flow">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>上传</span>
+                            </button>
+                        </div>
+                        <div class="attachment-files" id="files_process_flow"></div>
+                        <input type="file" id="file_process_flow" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleAttachmentFileUpload(this, 'process_flow')">
+                    </div>
+
+                    <!-- 附件类型9：组织机构图 -->
+                    <div class="attachment-card" id="card_org_chart">
+                        <div class="attachment-main">
+                            <div class="attachment-icon doc-icon">
+                                <i class="fas fa-sitemap"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-title">
+                                    <span class="title-text">组织机构图</span>
+                                    <span class="optional-badge">选填</span>
+                                </div>
+                                <div class="attachment-meta">
+                                    <span class="file-count" id="meta_org_chart">0 个文件</span>
+                                </div>
+                            </div>
+                            <button class="upload-btn" onclick="document.getElementById('file_org_chart').click()" id="btn_org_chart">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>上传</span>
+                            </button>
+                        </div>
+                        <div class="attachment-files" id="files_org_chart"></div>
+                        <input type="file" id="file_org_chart" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleAttachmentFileUpload(this, 'org_chart')">
+                    </div>
+
+                    <!-- 附件类型10：认证场所清单 -->
+                    <div class="attachment-card" id="card_site_list">
+                        <div class="attachment-main">
+                            <div class="attachment-icon doc-icon">
+                                <i class="fas fa-list-alt"></i>
+                            </div>
+                            <div class="attachment-info">
+                                <div class="attachment-title">
+                                    <span class="title-text">认证场所清单（多场所适用）</span>
+                                    <span class="optional-badge">选填</span>
+                                </div>
+                                <div class="attachment-meta">
+                                    <span class="file-count" id="meta_site_list">0 个文件</span>
+                                </div>
+                            </div>
+                            <button class="upload-btn" onclick="document.getElementById('file_site_list').click()" id="btn_site_list">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>上传</span>
+                            </button>
+                        </div>
+                        <div class="attachment-files" id="files_site_list"></div>
+                        <input type="file" id="file_site_list" multiple class="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleAttachmentFileUpload(this, 'site_list')">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 证书预览模态框 -->
+    <div id="certModal" class="cert-modal">
+        <div class="cert-modal-content">
+            <button class="cert-modal-close" onclick="closeCertPreview()">
+                <i class="fas fa-times"></i>
+            </button>
+            <canvas id="certCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span id="toastMessage">操作成功</span>
+    </div>
+
+    <script>
+        // 全局状态
+        
+        
+        
+        // 存储企业名称信息
+        const companyNames = {
+            zh: '彩晶光电科技(昆山)有限公司',
+            en: 'Color Crystal Optoelectronics Technology (Kunshan) Co., Ltd.'
+        };
+        
+        // 文件存储对象
+        const changeItemFiles = {
+            management_system: [],
+            address_proof: [],
+            business_license: []
+        };
+        
+        const attachmentFiles = {
+            process_list: [],
+            env_list: [],
+            risk_list: [],
+            qualification: [],
+            location_map: [],
+            process_flow: [],
+            org_chart: [],
+            site_list: []
+        };
+
+        // 证书数据
+        const certificateDB = {
+            ['00126E301110R70']: {
+                number: "00126E301110R701",
+                companyName: "彩晶光电科技(昆山)有限公司",
+                companyNameEn: "Color Crystal Optoelectronics Technology (Kunshan) Co., Ltd.",
+                creditCode: "9132058372933702XR",
+                standard: "GB/T 24001-2016/ISO 14001:2015",
+                validFrom: "2026年04月09日",
+                validTo: "2029年04月08日",
+                firstDate: "2005年12月30日",
+                scope: "数码相机的制造，摄像模组的制造（用于便携式电脑、手机），印刷电路板零组件的制造，医疗血糖仪的制造，车用用于辅助驾驶系统的摄像头制造，数码相机塑料件制造及相关成型配件的制造及相关管理活动",
+                registeredAddress: "中国江苏省昆山综合保税区第三大道77号",
+                operatingAddress: "中国江苏省昆山综合保税区第三大道77号",
+                imageUrl: "https://mahongxiao.github.io/MyHtml/体系/申请/ScreenShot_2026-04-11_104428_732.png"
+            }
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initScrollSpy();
+
+            // 自动填充证书和客户模拟数据
+            const certData = certificateDB['00126E301110R70'];
+            if (certData) {
+                fillCertInfo(certData);
+                updateRefInfo(certData);
+            }
+        });
+
+        
+
+        // 执行查询
+        function performQuery(certNo) {
+            const certData = certificateDB[certNo];
+            
+            if (certData) {
+fillCertInfo(certData);
+document.getElementById('queryStatus').classList.remove('hidden');
+                document.getElementById('certStatusBadge').classList.remove('hidden');
+                document.getElementById('statusBadge').textContent = '编辑中';
+                document.getElementById('statusBadge').className = 'px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium border border-blue-200 ml-2';
+                
+                showToast('证书验证成功，已自动解锁所有编辑区域');
+            } else {
+                showToast('证书不存在', 'error');
+            }
+        }
+
+        
+
+        
+
+        
+
+        // 填充证书信息
+        function fillCertInfo(data) {
+            document.getElementById('cert-no').textContent = data.number;
+            document.getElementById('cert-company').textContent = data.companyName;
+            document.getElementById('cert-credit').textContent = data.creditCode;
+            document.getElementById('cert-standard').textContent = data.standard;
+            document.getElementById('cert-validity').textContent = `${data.validFrom} 至 ${data.validTo}`;
+            document.getElementById('cert-firstdate').textContent = data.firstDate;
+            document.getElementById('cert-scope').textContent = data.scope;
+            document.getElementById('cert-regaddr').textContent = data.registeredAddress;
+            document.getElementById('cert-opaddr').textContent = data.operatingAddress;
+            
+            document.getElementById('display-company').value = data.companyName;
+            
+            // 设置证书编号为当前证书编号（只读）
+            document.getElementById('certNo').value = data.number;
+        }
+
+        // 更新参考信息
+        function updateRefInfo(data) {
+            document.getElementById('ref-scope').textContent = data.scope;
+            document.getElementById('ref-standard').textContent = data.standard;
+            document.getElementById('ref-regaddr').textContent = data.registeredAddress;
+            document.getElementById('ref-opaddr').textContent = data.operatingAddress;
+            
+            // 更新中文和英文名称
+            document.getElementById('ref-company-zh').textContent = data.companyName;
+            document.getElementById('ref-company-en').textContent = data.companyNameEn || data.companyName;
+            
+            // 更新存储的企业名称
+            companyNames.zh = data.companyName;
+            companyNames.en = data.companyNameEn || data.companyName;
+        }
+
+        // 切换中文名称变更显示
+        function toggleOrgNameZh(checked) {
+            const section = document.getElementById('orgNameZhSection');
+            if (checked) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        // 切换英文名称变更显示
+        function toggleOrgNameEn(checked) {
+            const section = document.getElementById('orgNameEnSection');
+            if (checked) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
+            }
+        }
+
+        // 清空证书信息
+        function clearCertInfo() {
+            const fields = ['cert-no', 'cert-company', 'cert-credit', 'cert-standard', 'cert-validity', 'cert-firstdate', 'cert-scope', 'cert-regaddr', 'cert-opaddr'];
+            fields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '-';
+            });
+            document.getElementById('display-company').value = '-';
+            document.getElementById('certNo').value = '00126E301110R701';
+        }
+
+        // 预览证书
+        function previewCertificate() {
+const certData = certificateDB['00126E301110R70'];
+            if (!certData) return;
+
+            const modal = document.getElementById('certModal');
+            const canvas = document.getElementById('certCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                ctx.drawImage(img, 0, 0);
+                
+                ctx.save();
+                ctx.globalAlpha = 0.3;
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 48px Arial';
+                ctx.translate(canvas.width/2, canvas.height/2);
+                ctx.rotate(-Math.PI/6);
+                ctx.textAlign = 'center';
+                ctx.fillText('预览专用 - ' + certData.companyName, 0, 0);
+                
+                ctx.fillStyle = 'rgba(255,255,255,0.1)';
+                ctx.fillRect(-canvas.width, -canvas.height, canvas.width*2, canvas.height*2);
+                ctx.restore();
+                
+                modal.classList.add('active');
+            };
+            img.onerror = function() {
+                showToast('证书图片加载失败', 'error');
+            };
+            img.src = certData.imageUrl;
+        }
+
+        function closeCertPreview() {
+            document.getElementById('certModal').classList.remove('active');
+        }
+
+        document.getElementById('certModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCertPreview();
+        });
+
+        // 滚动监听
+        function initScrollSpy() {
+            const sections = document.querySelectorAll('.form-section[id]');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navItems.forEach(item => {
+                            item.classList.remove('active');
+                            if (item.getAttribute('data-section') === id) {
+                                item.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: '-20% 0px -80% 0px', threshold: 0 });
+
+            sections.forEach(section => observer.observe(section));
+
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-section');
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+
+        // 折叠展开
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.fa-chevron-down');
+            
+            if (content.style.maxHeight === '0px') {
+                content.style.maxHeight = '4000px';
+                content.style.overflow = 'visible';
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.style.maxHeight = '0px';
+                content.style.overflow = 'hidden';
+                if (icon) icon.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        // 切换变更项显示
+        function toggleChangeItem(checkbox) {
+            const targetId = checkbox.dataset.target;
+            const target = document.getElementById(targetId);
+            if (checkbox.checked) {
+                target.classList.add('active');
+            } else {
+                target.classList.remove('active');
+                // 如果取消勾选组织名称变更，重置中英文选择
+                if (targetId === 'change-orgname') {
+                    document.getElementById('orgNameZhCheck').checked = false;
+                    document.getElementById('orgNameEnCheck').checked = false;
+                    document.getElementById('orgNameZhSection').classList.add('hidden');
+                    document.getElementById('orgNameEnSection').classList.add('hidden');
+                }
+            }
+        }
+
+        // 切换人员数量变化
+        function toggleStaffChange(value) {
+            const input = document.getElementById('staffChangeCount');
+            if (value === 'none') {
+                input.classList.add('hidden');
+            } else {
+                input.classList.remove('hidden');
+                input.focus();
+            }
+        }
+
+        // 减少场所多选
+        function selectAllRemoveLocations(selectAll) {
+            const checkboxes = document.querySelectorAll('input[name="removeLocation"]');
+            checkboxes.forEach(cb => cb.checked = selectAll);
+            updateRemoveLocationSelection();
+        }
+
+        function updateRemoveLocationSelection() {
+            const checkboxes = document.querySelectorAll('input[name="removeLocation"]:checked');
+            const selectedDiv = document.getElementById('selectedRemoveLocations');
+            const selectedCount = document.getElementById('selectedCount');
+
+            if (checkboxes.length > 0) {
+                selectedDiv.classList.remove('hidden');
+                selectedCount.textContent = checkboxes.length;
+            } else {
+                selectedDiv.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('change', function(e) {
+            if (e.target.name === 'removeLocation') {
+                updateRemoveLocationSelection();
+            }
+        });
+
+        // 处理变更项内的文件上传
+        function handleChangeItemFileUpload(input, fileType) {
+            const files = Array.from(input.files);
+            if (files.length === 0) return;
+
+            changeItemFiles[fileType] = changeItemFiles[fileType].concat(files);
+            updateChangeItemFileUI(fileType);
+
+            const typeNames = {
+                'management_system': '管理体系文件',
+                'business_license': '营业执照（副本）复印件或机构成立批文复印件',
+                'address_proof': '地址变更证明文件'
+            };
+            
+            showToast(`已添加 ${files.length} 个文件到「${typeNames[fileType]}」`);
+        }
+
+        // 更新变更项内文件UI
+        function updateChangeItemFileUI(fileType) {
+            const filesContainer = document.getElementById(`files_${fileType}`);
+            const countSpan = document.getElementById(`meta_${fileType}`);
+            const card = document.getElementById(`card_${fileType}`);
+            const files = changeItemFiles[fileType];
+
+            if (files.length > 0) {
+                countSpan.textContent = `${files.length} 个文件`;
+                countSpan.classList.add('has-files');
+                if (card) card.classList.add('has-files');
+            } else {
+                countSpan.textContent = '0 个文件';
+                countSpan.classList.remove('has-files');
+                if (card) card.classList.remove('has-files');
+            }
+
+            filesContainer.innerHTML = files.map((file, index) => `
+                <div class="file-tag">
+                    <span class="file-tag-name" title="${file.name}">${file.name}</span>
+                    <span class="file-tag-size">${formatFileSize(file.size)}</span>
+                    <span class="file-tag-remove" onclick="removeChangeItemFile('${fileType}', ${index})" title="删除">
+                        <i class="fas fa-times"></i>
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // 删除变更项内文件
+        function removeChangeItemFile(fileType, index) {
+            changeItemFiles[fileType].splice(index, 1);
+            updateChangeItemFileUI(fileType);
+            showToast('已删除文件');
+        }
+
+        // 处理附件清单文件上传
+        function handleAttachmentFileUpload(input, fileType) {
+            const files = Array.from(input.files);
+            if (files.length === 0) return;
+
+            attachmentFiles[fileType] = attachmentFiles[fileType].concat(files);
+            updateAttachmentFileUI(fileType);
+
+            const typeNames = {
+                'process_list': '过程清单（QES）',
+                'env_list': '重要环境因素清单（E）',
+                'risk_list': '主要危险源和OHS风险（S）',
+                'qualification': '相关资质文件复印件',
+                'location_map': '地理位置示意图和厂区平面布置图',
+                'process_flow': '生产工艺流程图',
+                'org_chart': '组织机构图',
+                'site_list': '认证场所清单（多场所适用）'
+            };
+            
+            showToast(`已添加 ${files.length} 个文件到「${typeNames[fileType]}」`);
+        }
+
+        // 更新附件清单文件UI
+        function updateAttachmentFileUI(fileType) {
+            const filesContainer = document.getElementById(`files_${fileType}`);
+            const countSpan = document.getElementById(`meta_${fileType}`);
+            const card = document.getElementById(`card_${fileType}`);
+            const files = attachmentFiles[fileType];
+
+            if (files.length > 0) {
+                countSpan.textContent = `${files.length} 个文件`;
+                countSpan.classList.add('has-files');
+                if (card) card.classList.add('has-files');
+            } else {
+                countSpan.textContent = '0 个文件';
+                countSpan.classList.remove('has-files');
+                if (card) card.classList.remove('has-files');
+            }
+
+            filesContainer.innerHTML = files.map((file, index) => `
+                <div class="file-tag">
+                    <span class="file-tag-name" title="${file.name}">${file.name}</span>
+                    <span class="file-tag-size">${formatFileSize(file.size)}</span>
+                    <span class="file-tag-remove" onclick="removeAttachmentFile('${fileType}', ${index})" title="删除">
+                        <i class="fas fa-times"></i>
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        // 删除附件清单文件
+        function removeAttachmentFile(fileType, index) {
+            attachmentFiles[fileType].splice(index, 1);
+            updateAttachmentFileUI(fileType);
+            showToast('已删除文件');
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 保存草稿
+        function saveDraft() {
+// 检查已勾选变更项的必填附件
+            const checks = [
+                { checkbox: document.querySelector('[data-target="change-standard"]'), fileType: 'management_system', name: '认证标准变更' },
+                { checkbox: document.querySelector('[data-target="change-orgname"]'), fileType: 'business_license', name: '组织名称变更' },
+                { checkbox: document.querySelector('[data-target="change-address"]'), fileType: 'address_proof', name: '地址变更' }
+            ];
+            
+            let missingFiles = [];
+            checks.forEach(check => {
+                if (check.checkbox && check.checkbox.checked && changeItemFiles[check.fileType].length === 0) {
+                    missingFiles.push(check.name);
+                }
+            });
+            
+            if (missingFiles.length > 0) {
+                showToast(`您勾选了${missingFiles.join('、')}，但未上传必填附件`, 'warning');
+            } else {
+                showToast('草稿已保存');
+            }
+        }
+
+        // 提交表单
+        function submitForm() {
+// 验证必填附件
+            const checks = [
+                { checkbox: document.querySelector('[data-target="change-standard"]'), fileType: 'management_system', name: '认证标准变更' },
+                { checkbox: document.querySelector('[data-target="change-orgname"]'), fileType: 'business_license', name: '组织名称变更' },
+                { checkbox: document.querySelector('[data-target="change-address"]'), fileType: 'address_proof', name: '地址变更' }
+            ];
+            
+            let missingFiles = [];
+            checks.forEach(check => {
+                if (check.checkbox && check.checkbox.checked && changeItemFiles[check.fileType].length === 0) {
+                    missingFiles.push(check.name);
+                }
+            });
+            
+            if (missingFiles.length > 0) {
+                showToast(`提交失败：${missingFiles.join('、')}必须上传对应附件`, 'error');
+            } else {
+                showToast('申请已提交成功！');
+            }
+        }
+
+        // 切换场所变更区域显示（支持同时显示新增和减少）
+        function toggleLocationSection(type, isChecked) {
+            if (type === 'add') {
+                const addFields = document.getElementById('addLocationFields');
+                if (isChecked) {
+                    addFields.classList.remove('hidden');
+                } else {
+                    addFields.classList.add('hidden');
+                }
+            } else if (type === 'remove') {
+                const removeFields = document.getElementById('removeLocationFields');
+                if (isChecked) {
+                    removeFields.classList.remove('hidden');
+                } else {
+                    removeFields.classList.add('hidden');
+                }
+            }
+        }
+
+        // 添加新的场所行
+        function addLocationRow() {
+            const list = document.getElementById('addLocationList');
+            const newRow = document.createElement('div');
+            newRow.className = 'location-item flex gap-3 items-start p-3 bg-slate-50 rounded-lg border border-slate-200';
+            newRow.innerHTML = `
+                <div class="flex-1 form-field">
+                    <label class="text-xs font-medium text-slate-700 mb-1 block">场所名称</label>
+                    <input type="text" maxlength="100" placeholder="请输入场所名称" class="location-name">
+                </div>
+                <div class="flex-1 form-field">
+                    <label class="text-xs font-medium text-slate-700 mb-1 block">地址</label>
+                    <input type="text" maxlength="200" placeholder="请输入地址" class="location-address">
+                </div>
+                <div class="flex-1 form-field">
+                    <label class="text-xs font-medium text-slate-700 mb-1 block">产品/服务范围</label>
+                    <input type="text" maxlength="200" placeholder="请输入产品/服务范围" class="location-scope">
+                </div>
+                <div class="w-28 form-field">
+                    <label class="text-xs font-medium text-slate-700 mb-1 block">人数</label>
+                    <input type="number" placeholder="0" class="location-staff">
+                </div>
+                <button onclick="removeLocationRow(this)" class="mt-6 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg text-sm transition-colors" title="删除此行">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            `;
+            list.appendChild(newRow);
+
+            // 自动聚焦到新行的第一个输入框
+            newRow.querySelector('.location-name').focus();
+            showToast('已添加新场所行');
+        }
+
+        // 删除场所行
+        function removeLocationRow(btn) {
+            const row = btn.closest('.location-item');
+            const list = document.getElementById('addLocationList');
+
+            // 如果只剩一行，清空数据而不是删除
+            if (list.children.length <= 1) {
+                row.querySelectorAll('input').forEach(input => input.value = '');
+                showToast('已清空当前行数据');
+            } else {
+                row.remove();
+                showToast('已删除该场所行');
+            }
+        }
+
+        // 显示提示
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toastMessage');
+            const icon = toast.querySelector('i');
+            
+            msg.textContent = message;
+            
+            if (type === 'error') {
+                icon.className = 'fas fa-exclamation-circle text-red-400';
+            } else if (type === 'warning') {
+                icon.className = 'fas fa-exclamation-triangle text-yellow-400';
+            } else {
+                icon.className = 'fas fa-check-circle text-green-400';
+            }
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
