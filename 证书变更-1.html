@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -481,10 +480,6 @@
             color: #dc2626;
         }
 
-        
-
-        
-
         .lock-content {
             text-align: center;
             background: white;
@@ -667,7 +662,274 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        /* 证书选择弹窗样式 */
+        .cert-select-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .cert-select-modal.active {
+            display: flex;
+        }
+
+        .cert-select-panel {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 720px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .cert-select-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cert-select-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .cert-select-body {
+            padding: 16px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .cert-select-search {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .cert-select-search input {
+            width: 100%;
+            padding-left: 36px !important;
+        }
+
+        .cert-select-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .cert-select-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cert-select-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .cert-select-item:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+
+        .cert-select-item.selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+
+        .cert-select-radio {
+            margin-top: 2px;
+            width: 18px;
+            height: 18px;
+            accent-color: #2563eb;
+            flex-shrink: 0;
+        }
+
+        .cert-select-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cert-select-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .cert-select-meta {
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+        }
+
+        .cert-select-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cert-select-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .cert-select-badge.valid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .cert-select-badge.expired {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .cert-select-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #f8fafc;
+        }
+
+        .cert-select-btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .cert-select-btn.cancel {
+            border-color: #d1d5db;
+            color: #374151;
+            background: white;
+        }
+
+        .cert-select-btn.cancel:hover {
+            background: #f3f4f6;
+        }
+
+        .cert-select-btn.confirm {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .cert-select-btn.confirm:hover {
+            background: #1d4ed8;
+        }
+
+        .cert-select-btn.confirm:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .cert-current-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .cert-current-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cert-current-icon {
+            width: 32px;
+            height: 32px;
+            background: #dbeafe;
+            color: #2563eb;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .cert-current-text {
+            min-width: 0;
+        }
+
+        .cert-current-label {
+            font-size: 12px;
+            color: #0369a1;
+            margin-bottom: 2px;
+        }
+
+        .cert-current-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0c4a6e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cert-change-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: white;
+            border: 1px solid #3b82f6;
+            border-radius: 6px;
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+
+        .cert-change-btn:hover {
+            background: #eff6ff;
+        }
 </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body class="text-slate-800 pb-32">
@@ -736,6 +998,23 @@
             </div>
             
             <div class="p-6">
+                <!-- 当前证书选择栏 -->
+                <div class="cert-current-bar">
+                    <div class="cert-current-info">
+                        <div class="cert-current-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="cert-current-text">
+                            <div class="cert-current-label">当前选择证书</div>
+                            <div class="cert-current-value" id="currentCertDisplay">00126E301110R701 - 彩晶光电科技(昆山)有限公司</div>
+                        </div>
+                    </div>
+                    <button onclick="openCertSelector()" class="cert-change-btn">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>切换证书</span>
+                    </button>
+                </div>
+
                 <div class="cert-info-grid" id="certInfoGrid">
                     <div class="cert-info-item">
                         <span class="cert-info-label">证书编号</span>
@@ -1176,7 +1455,7 @@
         </div>
 
         <!-- 4. 附件清单 -->
-        <id="section-attachments" class="form-section bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+        <div id="section-attachments" class="form-section bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
             
 
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between cursor-pointer hover:bg-slate-100 transition-colors" onclick="toggleSection(this)">
@@ -1391,6 +1670,31 @@
 
     </main>
 
+    <!-- 证书选择弹窗 -->
+    <div id="certSelectModal" class="cert-select-modal">
+        <div class="cert-select-panel">
+            <div class="cert-select-header">
+                <h3><i class="fas fa-certificate text-blue-600 mr-2"></i>选择证书</h3>
+                <button onclick="closeCertSelector()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="cert-select-body">
+                <div class="cert-select-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="certSearchInput" placeholder="搜索证书编号或企业名称..." oninput="filterCertList()">
+                </div>
+                <div class="cert-select-list" id="certSelectList">
+                    <!-- 证书列表项由JS动态生成 -->
+                </div>
+            </div>
+            <div class="cert-select-footer">
+                <button onclick="closeCertSelector()" class="cert-select-btn cancel">取消</button>
+                <button onclick="confirmCertSelect()" class="cert-select-btn confirm" id="confirmCertBtn" disabled>确认选择</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 证书预览模态框 -->
     <div id="certModal" class="cert-modal">
         <div class="cert-modal-content">
@@ -1409,8 +1713,8 @@
 
     <script>
         // 全局状态
-        
-        
+        let currentCertKey = '00126E301110R70';
+        let selectedCertKey = null;
         
         // 存储企业名称信息
         const companyNames = {
@@ -1436,9 +1740,9 @@
             site_list: []
         };
 
-        // 证书数据
+        // 证书数据库 - 包含多条模拟数据
         const certificateDB = {
-            ['00126E301110R70']: {
+            '00126E301110R70': {
                 number: "00126E301110R701",
                 companyName: "彩晶光电科技(昆山)有限公司",
                 companyNameEn: "Color Crystal Optoelectronics Technology (Kunshan) Co., Ltd.",
@@ -1450,7 +1754,57 @@
                 scope: "数码相机的制造，摄像模组的制造（用于便携式电脑、手机），印刷电路板零组件的制造，医疗血糖仪的制造，车用用于辅助驾驶系统的摄像头制造，数码相机塑料件制造及相关成型配件的制造及相关管理活动",
                 registeredAddress: "中国江苏省昆山综合保税区第三大道77号",
                 operatingAddress: "中国江苏省昆山综合保税区第三大道77号",
-                imageUrl: "https://mahongxiao.github.io/MyHtml/体系/申请/ScreenShot_2026-04-11_104428_732.png"
+                imageUrl: "https://mahongxiao.github.io/MyHtml/体系/申请/ScreenShot_2026-04-11_104428_732.png",
+                status: "valid",
+                field: "EMS"
+            },
+            '00124Q301110R71': {
+                number: "00124Q301110R712",
+                companyName: "华通精密电子(深圳)有限公司",
+                companyNameEn: "Huatong Precision Electronics (Shenzhen) Co., Ltd.",
+                creditCode: "9144030019234567XA",
+                standard: "GB/T 19001-2016/ISO 9001:2015",
+                validFrom: "2025年08月15日",
+                validTo: "2028年08月14日",
+                firstDate: "2018年03月20日",
+                scope: "精密连接器的研发、生产和销售，柔性电路板的设计与制造，电子元器件的组装加工及相关管理活动",
+                registeredAddress: "中国广东省深圳市宝安区西乡街道华通工业园1栋",
+                operatingAddress: "中国广东省深圳市宝安区西乡街道华通工业园1栋",
+                imageUrl: "https://mahongxiao.github.io/MyHtml/体系/申请/ScreenShot_2026-04-11_104428_732.png",
+                status: "valid",
+                field: "QMS"
+            },
+            '00123S301110R72': {
+                number: "00123S301110R723",
+                companyName: "中建安工集团有限公司",
+                companyNameEn: "China Construction Engineering Group Co., Ltd.",
+                creditCode: "9111000010140001XA",
+                standard: "GB/T 45001-2020/ISO 45001:2018",
+                validFrom: "2025年11月01日",
+                validTo: "2028年10月31日",
+                firstDate: "2020年06月10日",
+                scope: "房屋建筑工程、市政公用工程、机电安装工程、钢结构工程、建筑装修装饰工程的施工及相关职业健康安全管理活动",
+                registeredAddress: "中国北京市海淀区三里河路9号",
+                operatingAddress: "中国北京市海淀区三里河路9号",
+                imageUrl: "https://mahongxiao.github.io/MyHtml/体系/申请/ScreenShot_2026-04-11_104428_732.png",
+                status: "valid",
+                field: "OHSMS"
+            },
+            '00122E301110R73': {
+                number: "00122E301110R734",
+                companyName: "绿源新能源科技有限公司",
+                companyNameEn: "Green Source New Energy Technology Co., Ltd.",
+                creditCode: "91350100M0001ABC5D",
+                standard: "GB/T 24001-2016/ISO 14001:2015",
+                validFrom: "2024年12月01日",
+                validTo: "2027年11月30日",
+                firstDate: "2019年09月05日",
+                scope: "太阳能电池组件的生产，风力发电设备的组装，新能源储能系统的研发与制造，光伏发电工程的施工及相关管理活动",
+                registeredAddress: "中国福建省厦门市集美区软件园三期绿源大厦",
+                operatingAddress: "中国福建省厦门市集美区软件园三期绿源大厦",
+                imageUrl: "https://mahongxiao.github.io/MyHtml/体系/申请/ScreenShot_2026-04-11_104428_732.png",
+                status: "expired",
+                field: "EMS"
             }
         };
 
@@ -1459,22 +1813,158 @@
             initScrollSpy();
 
             // 自动填充证书和客户模拟数据
-            const certData = certificateDB['00126E301110R70'];
+            const certData = certificateDB[currentCertKey];
             if (certData) {
                 fillCertInfo(certData);
                 updateRefInfo(certData);
+                updateCurrentCertDisplay();
             }
         });
 
-        
+        // 更新当前证书显示栏
+        function updateCurrentCertDisplay() {
+            const certData = certificateDB[currentCertKey];
+            if (certData) {
+                document.getElementById('currentCertDisplay').textContent = 
+                    `${certData.number} - ${certData.companyName}`;
+            }
+        }
+
+        // 打开证书选择器
+        function openCertSelector() {
+            selectedCertKey = null;
+            renderCertList();
+            document.getElementById('certSelectModal').classList.add('active');
+            document.getElementById('certSearchInput').value = '';
+            document.getElementById('confirmCertBtn').disabled = true;
+        }
+
+        // 关闭证书选择器
+        function closeCertSelector() {
+            document.getElementById('certSelectModal').classList.remove('active');
+            selectedCertKey = null;
+        }
+
+        // 渲染证书列表
+        function renderCertList(filterText = '') {
+            const listContainer = document.getElementById('certSelectList');
+            listContainer.innerHTML = '';
+
+            const certs = Object.entries(certificateDB);
+            let hasResult = false;
+
+            certs.forEach(([key, cert]) => {
+                // 过滤逻辑
+                if (filterText) {
+                    const searchLower = filterText.toLowerCase();
+                    const matchNumber = cert.number.toLowerCase().includes(searchLower);
+                    const matchCompany = cert.companyName.toLowerCase().includes(searchLower);
+                    if (!matchNumber && !matchCompany) return;
+                }
+
+                hasResult = true;
+                const isSelected = selectedCertKey === key;
+                const isCurrent = currentCertKey === key;
+
+                const item = document.createElement('div');
+                item.className = `cert-select-item ${isSelected ? 'selected' : ''}`;
+                item.onclick = () => selectCertItem(key);
+
+                const statusBadge = cert.status === 'valid' 
+                    ? '<span class="cert-select-badge valid">有效</span>' 
+                    : '<span class="cert-select-badge expired">已过期</span>';
+
+                item.innerHTML = `
+                    <input type="radio" name="certSelectRadio" class="cert-select-radio" ${isSelected ? 'checked' : ''}>
+                    <div class="cert-select-info">
+                        <div class="cert-select-title">${cert.number} ${statusBadge}</div>
+                        <div class="cert-select-meta">
+                            <span><i class="fas fa-building"></i> ${cert.companyName}</span>
+                            <span><i class="fas fa-shield-alt"></i> ${cert.standard}</span>
+                            <span><i class="fas fa-calendar-alt"></i> 有效期至 ${cert.validTo}</span>
+                            <span><i class="fas fa-tag"></i> ${cert.field}</span>
+                        </div>
+                    </div>
+                    ${isCurrent ? '<span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded font-medium ml-2 flex-shrink-0">当前</span>' : ''}
+                `;
+
+                listContainer.appendChild(item);
+            });
+
+            if (!hasResult) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-8 text-slate-400">
+                        <i class="fas fa-search mb-2 text-2xl"></i>
+                        <p class="text-sm">未找到匹配的证书</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 选择证书项
+        function selectCertItem(key) {
+            selectedCertKey = key;
+            renderCertList(document.getElementById('certSearchInput').value);
+            document.getElementById('confirmCertBtn').disabled = false;
+        }
+
+        // 过滤证书列表
+        function filterCertList() {
+            const filterText = document.getElementById('certSearchInput').value.trim();
+            renderCertList(filterText);
+        }
+
+        // 确认选择证书
+        function confirmCertSelect() {
+            if (!selectedCertKey || !certificateDB[selectedCertKey]) return;
+
+            // 如果选择的是当前证书，直接关闭
+            if (selectedCertKey === currentCertKey) {
+                closeCertSelector();
+                return;
+            }
+
+            currentCertKey = selectedCertKey;
+            const certData = certificateDB[currentCertKey];
+
+            // 更新所有证书相关信息
+            fillCertInfo(certData);
+            updateRefInfo(certData);
+            updateCurrentCertDisplay();
+
+            // 更新认证领域显示
+            const fieldInput = document.querySelector('#section-change input[value="EMS"]');
+            if (fieldInput && certData.field) {
+                fieldInput.value = certData.field;
+            }
+
+            // 清空已勾选的变更项（避免数据混乱）
+            document.querySelectorAll('.change-item-check').forEach(cb => {
+                if (cb.checked) {
+                    cb.checked = false;
+                    const targetId = cb.dataset.target;
+                    const target = document.getElementById(targetId);
+                    if (target) target.classList.remove('active');
+                }
+            });
+
+            // 重置组织名称子选项
+            document.getElementById('orgNameZhCheck').checked = false;
+            document.getElementById('orgNameEnCheck').checked = false;
+            document.getElementById('orgNameZhSection').classList.add('hidden');
+            document.getElementById('orgNameEnSection').classList.add('hidden');
+
+            closeCertSelector();
+            showToast(`已切换至证书：${certData.number}`);
+        }
 
         // 执行查询
         function performQuery(certNo) {
             const certData = certificateDB[certNo];
             
             if (certData) {
-fillCertInfo(certData);
-document.getElementById('queryStatus').classList.remove('hidden');
+                fillCertInfo(certData);
+                document.getElementById('queryStatus').classList.remove('hidden');
                 document.getElementById('certStatusBadge').classList.remove('hidden');
                 document.getElementById('statusBadge').textContent = '编辑中';
                 document.getElementById('statusBadge').className = 'px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium border border-blue-200 ml-2';
@@ -1484,12 +1974,6 @@ document.getElementById('queryStatus').classList.remove('hidden');
                 showToast('证书不存在', 'error');
             }
         }
-
-        
-
-        
-
-        
 
         // 填充证书信息
         function fillCertInfo(data) {
@@ -1558,7 +2042,7 @@ document.getElementById('queryStatus').classList.remove('hidden');
 
         // 预览证书
         function previewCertificate() {
-const certData = certificateDB['00126E301110R70'];
+            const certData = certificateDB[currentCertKey];
             if (!certData) return;
 
             const modal = document.getElementById('certModal');
@@ -1600,6 +2084,11 @@ const certData = certificateDB['00126E301110R70'];
 
         document.getElementById('certModal').addEventListener('click', function(e) {
             if (e.target === this) closeCertPreview();
+        });
+
+        // 点击证书选择弹窗背景关闭
+        document.getElementById('certSelectModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCertSelector();
         });
 
         // 滚动监听
@@ -1826,7 +2315,7 @@ const certData = certificateDB['00126E301110R70'];
 
         // 保存草稿
         function saveDraft() {
-// 检查已勾选变更项的必填附件
+            // 检查已勾选变更项的必填附件
             const checks = [
                 { checkbox: document.querySelector('[data-target="change-standard"]'), fileType: 'management_system', name: '认证标准变更' },
                 { checkbox: document.querySelector('[data-target="change-orgname"]'), fileType: 'business_license', name: '组织名称变更' },
@@ -1849,7 +2338,7 @@ const certData = certificateDB['00126E301110R70'];
 
         // 提交表单
         function submitForm() {
-// 验证必填附件
+            // 验证必填附件
             const checks = [
                 { checkbox: document.querySelector('[data-target="change-standard"]'), fileType: 'management_system', name: '认证标准变更' },
                 { checkbox: document.querySelector('[data-target="change-orgname"]'), fileType: 'business_license', name: '组织名称变更' },
