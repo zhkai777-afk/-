@@ -1433,6 +1433,17 @@
             color: #fff;
         }
 
+        .table-header-btn.ignored {
+            background: #f0f0f0;
+            color: #666;
+            border-color: #f0f0f0;
+        }
+
+        .table-header-btn.ignored:hover {
+            background: #666;
+            color: #fff;
+        }
+
         /* 问题清单录入表单样式 */
         .issue-form-overlay {
             display: none;
@@ -1833,6 +1844,7 @@
             font-size: 40px;
         }
     </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -2349,6 +2361,9 @@
             { id: 6, type: '登记问题', description: 'FSMS视角：HACCP计划中关键控制点监控频次不符合标准要求', systems: ['F'], submitter: '管理员', status: '待确认', action: '', reason: '', expert: '李华' }
         ]
     };
+
+    // 已忽略问题数据存储
+    let ignoredIssuesData = [];
 
     // 历史问题数据（模拟数据）
     const historyIssuesData = [
@@ -3059,9 +3074,9 @@
                 materialName = materialsData[issue.materialId].title;
             }
 
-            // 操作按钮：只显示删除按钮
+            // 操作按钮：只显示忽略按钮
             let actionButtons = `
-                <button class="t-button btn-outline btn-small" onclick="deleteIssue(${issue.id})" style="color: var(--reject-color); border-color: var(--reject-color);">删除</button>
+                <button class="t-button btn-outline btn-small" onclick="ignoreIssue(${issue.id})" style="color: var(--reject-color); border-color: var(--reject-color);">忽略</button>
             `;
 
             // 评审专家显示
@@ -3115,6 +3130,13 @@
                                 <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
                             历史问题清单
+                        </button>
+                        <button class="table-header-btn ignored" onclick="toggleIgnoredIssues(this)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            已忽略问题${ignoredIssuesData.length > 0 ? '(' + ignoredIssuesData.length + ')' : ''}
                         </button>
                     </div>
                 </div>
@@ -3258,6 +3280,156 @@
             issuesData['all'].splice(index, 1);
             renderAllMaterialsView();
             updatePassTaskButton();
+        }
+    }
+
+    // 忽略问题
+    function ignoreIssue(issueId) {
+        const reason = prompt('请填写忽略原因：');
+        if (reason !== null && reason.trim() !== '') {
+            const index = issuesData['all'].findIndex(item => item.id === issueId);
+            if (index > -1) {
+                const issue = issuesData['all'][index];
+                issue.ignoreReason = reason.trim();
+                ignoredIssuesData.push(issue);
+                issuesData['all'].splice(index, 1);
+                renderAllMaterialsView();
+                updatePassTaskButton();
+            }
+        } else if (reason !== null) {
+            alert('忽略原因不能为空，请重新操作。');
+        }
+    }
+
+    // 恢复已忽略问题
+    function restoreIssue(issueId) {
+        const index = ignoredIssuesData.findIndex(item => item.id === issueId);
+        if (index > -1) {
+            const issue = ignoredIssuesData[index];
+            delete issue.ignoreReason;
+            issuesData['all'].push(issue);
+            ignoredIssuesData.splice(index, 1);
+            if (currentMaterialId === 'all') {
+                renderAllMaterialsView();
+            } else {
+                renderMaterialDetail(currentMaterialId);
+            }
+            updatePassTaskButton();
+        }
+    }
+
+    // 切换已忽略问题显示
+    function toggleIgnoredIssues(btnElement) {
+        let container = document.getElementById('ignored-issues-container');
+
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'ignored-issues-container';
+            container.className = 'history-issues-container';
+
+            const ignoredRowsHtml = ignoredIssuesData.map((issue) => {
+                const style = issueTypeStyles[issue.type] || { color: '#666', bg: '#f0f0f0' };
+                const systemsHtml = issue.systems.map(s => 
+                    `<span class="system-badge-table ${s}">${s}</span>`
+                ).join('');
+
+                return `
+                    <tr>
+                        <td><span style="color: ${style.color}; font-weight: 600; background: ${style.bg}; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${issue.type}</span></td>
+                        <td>${issue.description}</td>
+                        <td>${systemsHtml}</td>
+                        <td>${issue.ignoreReason || '-'}</td>
+                        <td>
+                            <button class="t-button btn-outline btn-small" onclick="restoreIssue(${issue.id})" style="color: var(--pass-color); border-color: var(--pass-color);">恢复</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="history-content">
+                    <div class="history-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                        已忽略问题清单（${ignoredIssuesData.length}条记录）
+                    </div>
+                    <table class="material-data-table" style="border: 1px solid #e7e7e7; border-radius: 6px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 12%;">问题类型</th>
+                                <th style="width: 30%;">问题描述</th>
+                                <th style="width: 12%;">涉及领域</th>
+                                <th style="width: 30%;">忽略原因</th>
+                                <th style="width: 16%;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${ignoredRowsHtml || '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #999;">暂无已忽略的问题记录</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            const tableContainer = document.querySelector('.material-table-container');
+            if (tableContainer) {
+                tableContainer.parentNode.insertBefore(container, tableContainer.nextSibling);
+            }
+
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+            container.classList.add('expanded');
+            container.style.maxHeight = '500px';
+        } else {
+            if (container.classList.contains('expanded')) {
+                container.classList.remove('expanded');
+                container.style.maxHeight = '0';
+                if (btnElement) {
+                    btnElement.classList.remove('active');
+                }
+            } else {
+                const ignoredRowsHtml = ignoredIssuesData.map((issue) => {
+                    const style = issueTypeStyles[issue.type] || { color: '#666', bg: '#f0f0f0' };
+                    const systemsHtml = issue.systems.map(s => 
+                        `<span class="system-badge-table ${s}">${s}</span>`
+                    ).join('');
+
+                    return `
+                        <tr>
+                            <td><span style="color: ${style.color}; font-weight: 600; background: ${style.bg}; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${issue.type}</span></td>
+                            <td>${issue.description}</td>
+                            <td>${systemsHtml}</td>
+                            <td>${issue.ignoreReason || '-'}</td>
+                            <td>
+                                <button class="t-button btn-outline btn-small" onclick="restoreIssue(${issue.id})" style="color: var(--pass-color); border-color: var(--pass-color);">恢复</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                const tbody = container.querySelector('tbody');
+                const titleDiv = container.querySelector('.history-title');
+                if (titleDiv) {
+                    titleDiv.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                        已忽略问题清单（${ignoredIssuesData.length}条记录）
+                    `;
+                }
+                if (tbody) {
+                    tbody.innerHTML = ignoredRowsHtml || '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #999;">暂无已忽略的问题记录</td></tr>';
+                }
+
+                container.classList.add('expanded');
+                container.style.maxHeight = '500px';
+                if (btnElement) {
+                    btnElement.classList.add('active');
+                }
+            }
         }
     }
 
@@ -3437,9 +3609,9 @@
                     `<span class="system-badge-table ${s}">${s}</span>`
                 ).join('');
 
-                // 操作按钮：只显示删除按钮
+                // 操作按钮：只显示忽略按钮
                 let actionButtons = `
-                    <button class="t-button btn-outline btn-small" onclick="deleteIssue(${issue.id})" style="color: var(--reject-color); border-color: var(--reject-color);">删除</button>
+                    <button class="t-button btn-outline btn-small" onclick="ignoreIssue(${issue.id})" style="color: var(--reject-color); border-color: var(--reject-color);">忽略</button>
                 `;
 
                 // 评审专家显示
@@ -3471,6 +3643,13 @@
                                     <polyline points="12 6 12 12 16 14"></polyline>
                                 </svg>
                                 历史问题
+                            </button>
+                            <button class="history-toggle-btn" onclick="toggleIgnoredIssues(this)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                                已忽略问题${ignoredIssuesData.length > 0 ? '(' + ignoredIssuesData.length + ')' : ''}
                             </button>
                             <button class="t-button btn-danger btn-small" onclick="showIssueForm('登记问题')">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
