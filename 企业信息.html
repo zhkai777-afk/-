@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #f8fafc;
         }
-        
+
         /* 查看模式样式 - 信息卡片 */
         .view-mode .card-section {
             background: #ffffff;
@@ -21,7 +21,7 @@
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
             border: 1px solid #f1f5f9;
         }
-        
+
         .view-mode .section-header {
             border-left: 4px solid #2563eb;
             background: linear-gradient(to right, #eff6ff, #ffffff);
@@ -32,26 +32,26 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .view-mode .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px 32px;
         }
-        
+
         .view-mode .info-item {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
-        
+
         .view-mode .info-label {
             font-size: 13px;
             color: #64748b;
             font-weight: 500;
             letter-spacing: 0.3px;
         }
-        
+
         .view-mode .info-value {
             font-size: 14px;
             color: #1e293b;
@@ -59,7 +59,7 @@
             line-height: 1.5;
             word-break: break-all;
         }
-        
+
         .view-mode .info-value.text-mono {
             font-family: 'Courier New', monospace;
             font-weight: 500;
@@ -70,11 +70,11 @@
             display: inline-block;
             font-size: 13px;
         }
-        
+
         .view-mode .info-full {
             grid-column: 1 / -1;
         }
-        
+
         /* 编辑模式样式 - 标准表单 */
         .edit-mode .form-section {
             background: #ffffff;
@@ -83,7 +83,7 @@
             border: 1px solid #e2e8f0;
             padding: 32px;
         }
-        
+
         .edit-mode .form-section-title {
             font-size: 16px;
             font-weight: 700;
@@ -95,7 +95,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .edit-mode .form-label {
             display: block;
             font-size: 14px;
@@ -103,12 +103,12 @@
             color: #334155;
             margin-bottom: 8px;
         }
-        
+
         .edit-mode .form-label.required::after {
             content: " *";
             color: #dc2626;
         }
-        
+
         .edit-mode .form-input {
             width: 100%;
             padding: 10px 14px;
@@ -120,19 +120,19 @@
             transition: all 0.2s;
             outline: none;
         }
-        
+
         .edit-mode .form-input:focus {
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
-        
+
         .edit-mode .form-input:disabled,
         .edit-mode .form-input[readonly] {
             background-color: #f3f4f6;
             color: #6b7280;
             cursor: not-allowed;
         }
-        
+
         .edit-mode select.form-input {
             appearance: none;
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -141,7 +141,7 @@
             background-size: 1.5em 1.5em;
             padding-right: 2.5rem;
         }
-        
+
         /* 按钮样式 */
         .btn-primary {
             background-color: #2563eb;
@@ -157,12 +157,12 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .btn-primary:hover {
             background-color: #1d4ed8;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
-        
+
         .btn-secondary {
             background-color: #ffffff;
             color: #475569;
@@ -177,12 +177,12 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .btn-secondary:hover {
             background-color: #f8fafc;
             border-color: #cbd5e1;
         }
-        
+
         .btn-text {
             color: #2563eb;
             font-size: 13px;
@@ -194,18 +194,18 @@
             border-radius: 4px;
             transition: all 0.2s;
         }
-        
+
         .btn-text:hover {
             background-color: #eff6ff;
         }
-        
+
         /* 表格样式 - 查看模式 */
         .data-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
         }
-        
+
         .data-table th {
             background-color: #f8fafc;
             padding: 12px 16px;
@@ -216,22 +216,22 @@
             border-bottom: 1px solid #e2e8f0;
             white-space: nowrap;
         }
-        
+
         .data-table td {
             padding: 14px 16px;
             font-size: 14px;
             color: #334155;
             border-bottom: 1px solid #f1f5f9;
         }
-        
+
         .data-table tr:hover td {
             background-color: #f8fafc;
         }
-        
+
         .data-table tr:last-child td {
             border-bottom: none;
         }
-        
+
         /* 侧拉抽屉 */
         .drawer-overlay {
             position: fixed;
@@ -246,12 +246,12 @@
             visibility: hidden;
             transition: all 0.3s ease;
         }
-        
+
         .drawer-overlay.active {
             opacity: 1;
             visibility: visible;
         }
-        
+
         .drawer {
             position: fixed;
             top: 0;
@@ -265,11 +265,11 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
         }
-        
+
         .drawer.active {
             transform: translateX(0);
         }
-        
+
         .drawer-header {
             padding: 24px 32px;
             border-bottom: 1px solid #f1f5f9;
@@ -282,11 +282,11 @@
             backdrop-filter: blur(8px);
             z-index: 2;
         }
-        
+
         .drawer-body {
             padding: 32px;
         }
-        
+
         .drawer-close {
             width: 36px;
             height: 36px;
@@ -300,13 +300,13 @@
             justify-content: center;
             transition: all 0.2s;
         }
-        
+
         .drawer-close:hover {
             background: #f8fafc;
             color: #1e293b;
             border-color: #cbd5e1;
         }
-        
+
         /* 标签 */
         .status-tag {
             display: inline-flex;
@@ -317,13 +317,13 @@
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         .status-tag.success {
             background-color: #dcfce7;
             color: #166534;
             border: 1px solid #86efac;
         }
-        
+
         /* 营业执照预览 */
         .license-card {
             background: #f8fafc;
@@ -334,7 +334,7 @@
             gap: 20px;
             align-items: flex-start;
         }
-        
+
         .license-thumb {
             width: 120px;
             height: 160px;
@@ -347,14 +347,14 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-        
+
         .license-thumb img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             padding: 8px;
         }
-        
+
         /* 编辑模式上传区域 */
         .upload-box {
             border: 2px dashed #cbd5e1;
@@ -364,12 +364,12 @@
             transition: all 0.2s;
             cursor: pointer;
         }
-        
+
         .upload-box:hover {
             border-color: #2563eb;
             background-color: #eff6ff;
         }
-        
+
         /* 提示条 */
         .tip-bar {
             background: #fffbeb;
@@ -380,47 +380,40 @@
             gap: 12px;
             align-items: flex-start;
         }
-        
+
         .edit-mode .tip-bar {
             margin-bottom: 24px;
         }
-        
-        /* 响应式微调 */
-        @media (max-width: 1848px) {
-            .max-w-[1848px] {
-                max-width: 100%;
-            }
-        }
-        
+
         /* 动画 */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .animate-fade-in {
             animation: fadeIn 0.4s ease-out;
         }
-        
+
         /* 子场所详情信息网格 */
         .detail-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 24px;
         }
-        
+
         .detail-item {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
-        
+
         .detail-label {
             font-size: 13px;
             color: #64748b;
             font-weight: 500;
         }
-        
+
         .detail-value {
             font-size: 15px;
             color: #1e293b;
@@ -428,13 +421,14 @@
         }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body class="view-mode" id="pageBody">
 
     <!-- ========== 查看模式（详情页） ========== -->
     <div id="viewMode" class="animate-fade-in">
         <!-- 页面头部 -->
-        <div class="max-w-[1848px] mx-auto mb-8 pt-6 px-6">
+        <div class="w-full mx-auto mb-8 pt-6 px-6">
             <div class="flex justify-between items-start">
                 <div>
                     <h1 class="text-2xl font-bold text-slate-800 tracking-tight">企业信息管理</h1>
@@ -448,18 +442,18 @@
         </div>
 
         <!-- 主内容区 -->
-        <div class="max-w-[1848px] mx-auto px-6 pb-12 space-y-6">
+        <div class="w-full mx-auto px-6 pb-12 space-y-6">
 
             <!-- 第一行：企业基本信息 + 开票信息 -->
             <div class="grid grid-cols-2 gap-6">
-                
+
                 <!-- 企业基本信息 -->
                 <div class="card-section p-6">
                     <div class="section-header">
                         <i class="fas fa-building text-[#2563eb] text-lg"></i>
                         <h2 class="text-lg font-bold text-slate-800">企业基础信息</h2>
                     </div>
-                    
+
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">企业名称</span>
@@ -502,7 +496,7 @@
                         <i class="fas fa-file-invoice-dollar text-[#2563eb] text-lg"></i>
                         <h2 class="text-lg font-bold text-slate-800">开票信息</h2>
                     </div>
-                    
+
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">发票抬头</span>
@@ -542,13 +536,13 @@
                     <i class="fas fa-users text-[#2563eb] text-lg"></i>
                     <h2 class="text-lg font-bold text-slate-800">组织/人员及其他认证信息</h2>
                 </div>
-                
+
                 <div class="bg-slate-50/60 rounded-xl p-6 border border-slate-100">
                     <h3 class="text-base font-bold text-slate-800 mb-5 flex items-center gap-2">
                         <i class="fas fa-user-friends text-[#2563eb]"></i>
                         管理体系范围内人员数量情况
                     </h3>
-                    
+
                     <div class="grid grid-cols-4 gap-6 mb-6">
                         <div class="bg-white rounded-lg p-4 border border-slate-100">
                             <p class="text-xs text-slate-500 mb-1">公司总人数</p>
@@ -603,7 +597,7 @@
                     </div>
                     <span class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">共 3 个子场所</span>
                 </div>
-                
+
                 <div class="overflow-hidden">
                     <table class="data-table">
                         <thead>
@@ -678,7 +672,7 @@
                         已上传
                     </span>
                 </div>
-                
+
                 <div class="grid grid-cols-3 gap-6 mb-6">
                     <div class="info-item">
                         <span class="info-label">营业执照注册号</span>
@@ -729,7 +723,7 @@
     <!-- ========== 编辑模式（表单页） ========== -->
     <div id="editMode" class="hidden animate-fade-in">
         <!-- 页面头部 -->
-        <div class="max-w-[1848px] mx-auto mb-8 pt-6 px-6">
+        <div class="w-full mx-auto mb-8 pt-6 px-6">
             <div class="flex justify-between items-start">
                 <div>
                     <h1 class="text-2xl font-bold text-slate-800 tracking-tight">编辑企业信息</h1>
@@ -749,7 +743,7 @@
         </div>
 
         <!-- 提示条 -->
-        <div class="max-w-[1848px] mx-auto px-6">
+        <div class="w-full mx-auto px-6">
             <div class="tip-bar">
                 <i class="fas fa-exclamation-circle text-yellow-600 mt-0.5"></i>
                 <div>
@@ -760,7 +754,7 @@
         </div>
 
         <!-- 表单内容 -->
-        <div class="max-w-[1848px] mx-auto px-6 pb-12 space-y-6 mt-6">
+        <div class="w-full mx-auto px-6 pb-12 space-y-6 mt-6">
 
             <!-- 基本信息表单 -->
             <div class="form-section">
@@ -921,7 +915,7 @@
                         <input type="date" class="form-input" value="2049-03-14">
                     </div>
                 </div>
-                
+
                 <div class="upload-box" onclick="alert('文件上传功能需要后端支持')">
                     <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 mb-3"></i>
                     <p class="text-sm text-slate-600 font-medium mb-1">点击上传或拖拽文件到此处</p>
@@ -949,7 +943,7 @@
             <div class="detail-grid" id="drawerContent">
                 <!-- 动态填充 -->
             </div>
-            
+
             <div class="mt-8 pt-6 border-t border-slate-100">
                 <h4 class="text-sm font-bold text-slate-800 mb-3">职能说明</h4>
                 <p class="text-sm text-slate-600 leading-relaxed" id="drawerDesc">
@@ -1028,7 +1022,7 @@
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
             btn.disabled = true;
-            
+
             setTimeout(() => {
                 alert('企业信息保存成功！');
                 btn.innerHTML = originalHTML;
@@ -1043,7 +1037,7 @@
             document.getElementById('drawerTitle').textContent = site.name;
             document.getElementById('drawerSubtitle').textContent = site.address;
             document.getElementById('drawerDesc').textContent = site.desc;
-            
+
             const content = document.getElementById('drawerContent');
             content.innerHTML = `
                 <div class="detail-item">
@@ -1079,7 +1073,7 @@
                     <span class="detail-value text-sm font-normal text-slate-600">${site.scope}</span>
                 </div>
             `;
-            
+
             document.getElementById('drawerOverlay').classList.add('active');
             document.getElementById('drawer').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1107,7 +1101,7 @@
             const fullTimeInput = document.getElementById('editFullTime');
             const partTimeInput = document.getElementById('editPartTime');
             const totalInput = document.getElementById('editTotalEmployees');
-            
+
             if(fullTimeInput && partTimeInput && totalInput) {
                 [fullTimeInput, partTimeInput].forEach(input => {
                     input.addEventListener('input', function() {
