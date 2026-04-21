@@ -1,0 +1,1727 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审核任务详情 - 组长视图</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f7fa;
+            min-width: 1800px;
+        }
+        
+        .container-fixed {
+            width: 1808px;
+            margin: 0 auto;
+        }
+        
+        .project-header {
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid;
+        }
+        
+        .badge-processing {
+            background: #e6f7ff;
+            color: #1890ff;
+            border-color: #1890ff;
+        }
+        
+        .badge-success {
+            background: #f6ffed;
+            color: #52c41a;
+            border-color: #52c41a;
+        }
+        
+        .badge-warning {
+            background: #fff7e6;
+            color: #fa8c16;
+            border-color: #ffa940;
+        }
+        
+        .timeline-section {
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            padding: 20px 0;
+        }
+        
+        .process-steps {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            position: relative;
+            padding: 20px 0 10px;
+        }
+        
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+            z-index: 2;
+            cursor: pointer;
+        }
+        
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #d9d9d9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #d9d9d9;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .step-item.pending .step-circle {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: #fff;
+        }
+        
+        .step-item.active .step-circle {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: white;
+        }
+        
+        .step-item.completed .step-circle {
+            background: #52c41a;
+            border-color: #52c41a;
+            color: white;
+        }
+        
+        .step-line {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            right: -50%;
+            height: 2px;
+            background: #e8e8e8;
+            z-index: 1;
+        }
+        
+        .step-item.completed .step-line {
+            background: #52c41a;
+        }
+        
+        .step-item.active .step-line {
+            background: linear-gradient(to right, #52c41a 50%, #e8e8e8 50%);
+        }
+        
+        .step-item:last-child .step-line {
+            display: none;
+        }
+        
+        .step-title {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #595959;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .step-item.active .step-title,
+        .step-item.pending .step-title {
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .step-item.completed .step-title {
+            color: #52c41a;
+        }
+        
+        .step-date {
+            font-size: 12px;
+            color: #8c8c8c;
+            margin-top: 4px;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 2px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 16px;
+        }
+        
+        .card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafafa;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        .data-table th {
+            background: #fafafa;
+            color: #262626;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e8e8e8;
+            color: #595959;
+        }
+        
+        .data-table tr:hover {
+            background: #e6f7ff;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            transition: all 0.3s;
+            background: white;
+            height: 32px;
+        }
+        
+        .form-input:hover {
+            border-color: #40a9ff;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+        }
+        
+        .form-input:disabled, .form-input[readonly] {
+            background: #f5f5f5;
+            color: #8c8c8c;
+            cursor: not-allowed;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .btn-default {
+            background: white;
+            border-color: #d9d9d9;
+            color: #595959;
+        }
+        
+        .btn-default:hover {
+            color: #40a9ff;
+            border-color: #40a9ff;
+        }
+        
+        .btn-success {
+            color: #52c41a;
+            background: white;
+            border-color: #52c41a;
+        }
+        
+        .btn-success:hover {
+            background: #52c41a;
+            color: white;
+        }
+        
+        .btn-danger {
+            color: #ff4d4f;
+            background: white;
+            border-color: #ff4d4f;
+        }
+        
+        .btn-danger:hover {
+            background: #ff4d4f;
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+            height: 28px;
+        }
+        
+        .site-card {
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            background: white;
+            margin-bottom: 16px;
+        }
+        
+        .site-card-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            background: #fafafa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .site-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+        
+        .site-tag-main {
+            background: #f6ffed;
+            color: #52c41a;
+            border-color: #b7eb8f;
+        }
+        
+        .compact-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .compact-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .compact-row-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .hidden-section {
+            display: none !important;
+        }
+        
+        .summary-card {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        
+        .summary-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #52c41a;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #b7eb8f;
+            padding-bottom: 8px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        
+        .summary-value {
+            color: #52c41a;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .personnel-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        
+        .tag-fulltime { background: #f9f0ff; color: #722ed1; }
+        .tag-parttime { background: #fff0f6; color: #eb2f96; }
+        .tag-qms { background: #e6f7ff; color: #1890ff; }
+        .tag-ems { background: #f6ffed; color: #52c41a; }
+        .tag-ohs { background: #fff7e6; color: #fa8c16; }
+        
+        .status-confirm {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #52c41a;
+            font-weight: 500;
+        }
+        
+        .status-reject {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #ff4d4f;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #fa8c16;
+            font-weight: 500;
+        }
+        
+        .member-confirm-card {
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .member-confirm-card.confirmed {
+            border-left: 3px solid #52c41a;
+        }
+        
+        .member-confirm-card.rejected {
+            border-left: 3px solid #ff4d4f;
+        }
+        
+        .member-confirm-card.pending {
+            border-left: 3px solid #fa8c16;
+        }
+        
+        .member-info-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 200px;
+        }
+        
+        .member-details-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            font-size: 13px;
+            color: #595959;
+        }
+        
+        .member-action-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 200px;
+            justify-content: flex-end;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .detail-label {
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+        
+        .detail-value {
+            color: #262626;
+            font-weight: 500;
+        }
+        
+        .timeline-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 40px;
+        }
+        
+        .timeline-main {
+            flex: 1;
+        }
+        
+        .readonly-field {
+            background: #f5f5f5 !important;
+            color: #8c8c8c !important;
+            cursor: not-allowed;
+        }
+        
+        /* Plan Modal Styles */
+        .plan-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        
+        .plan-modal.show {
+            display: flex;
+        }
+        
+        .plan-modal-content {
+            background: white;
+            border-radius: 4px;
+            width: 1200px;
+            max-width: 95vw;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .plan-header {
+            background: #fafafa;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .plan-body {
+            padding: 24px;
+        }
+        
+        .plan-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .form-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .form-label {
+            font-size: 13px;
+            color: #262626;
+            margin-bottom: 6px;
+            display: block;
+            font-weight: 500;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background: #1890ff;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        
+        .alert-info {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            color: #1890ff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        
+        /* Tab Styles */
+        .plan-tab-btn {
+            transition: all 0.3s;
+        }
+        
+        .plan-tab-btn:hover {
+            color: #1890ff;
+        }
+        
+        /* 锚点导航样式 - 在时间轴下方置顶显示 */
+        .anchor-nav {
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+        
+        .anchor-list {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .anchor-item {
+            cursor: pointer;
+            font-size: 14px;
+            color: #595959;
+            padding: 8px 0;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .anchor-item:hover {
+            color: #1890ff;
+        }
+        
+        .anchor-item.active {
+            color: #1890ff;
+            font-weight: 600;
+        }
+        
+        .anchor-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #1890ff;
+        }
+        
+        /* 视角切换按钮 */
+        .view-switcher {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f5f5f5;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #d9d9d9;
+        }
+        
+        .view-switcher-btn {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #595959;
+            transition: all 0.3s;
+        }
+        
+        .view-switcher-btn.active {
+            background: #1890ff;
+            color: white;
+        }
+        
+        /* 确认弹窗样式 */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .confirm-modal.show {
+            display: flex;
+        }
+        
+        .confirm-modal-content {
+            background: white;
+            border-radius: 8px;
+            width: 480px;
+            max-width: 90vw;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .confirm-modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .confirm-modal-body {
+            padding: 20px 24px;
+        }
+        
+        .confirm-modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 主内容区 -->
+    <main class="container-fixed">
+        
+
+            <!-- 关联审核项目 -->
+            <div id="section-project" class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-link text-blue-500"></i>
+                        关联审核项目
+                        <span class="text-xs text-gray-400 font-normal ml-2">（只读）</span>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px">序号</th>
+                                <th>项目编号</th>
+                                <th>客户名称</th>
+                                <th>项目类型</th>
+                                <th>认证领域+认证范围+认可机构</th>
+                                <th>认证标准</th>
+                                <th>风险等级</th>
+                                <th>有效人数</th>
+                                <th>审核类型</th>
+                                <th>审核阶段</th>
+                                <th>是否现场</th>
+                                <th style="width: 120px">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>PRJ-2024-00189-01</td>
+                                <td>北京市地铁运营有限公司</td>
+                                <td>初次认证</td>
+                                <td>QMS+轨道交通运营服务+CNAS</td>
+                                <td>GB/T 19001-2016</td>
+                                <td>中</td>
+                                <td>200</td>
+                                <td>初审</td>
+                                <td>二阶段</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>PRJ-2024-00189-02</td>
+                                <td>北京市地铁运营有限公司</td>
+                                <td>初次认证</td>
+                                <td>EMS+城市轨道交通运营环境管理+UKAS</td>
+                                <td>GB/T 24001-2016</td>
+                                <td>高</td>
+                                <td>180</td>
+                                <td>初审</td>
+                                <td>二阶段</td>
+                                <td>是</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>PRJ-2024-00189-03</td>
+                                <td>北京市地铁运营有限公司</td>
+                                <td>初次认证</td>
+                                <td>OHSMS+轨道交通职业健康安全管理+CNAS</td>
+                                <td>GB/T 45001-2020</td>
+                                <td>高</td>
+                                <td>200</td>
+                                <td>初审</td>
+                                <td>二阶段</td>
+                                <td>是</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 审核组分配设置 -->
+            <div id="section-team" class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-users-cog text-blue-500"></i>
+                        审核组分配设置
+                        <span class="text-xs text-gray-400 font-normal ml-2">（只读）</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">按场所安排审核组：</span>
+                        <span class="status-badge badge-success">已开启</span>
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    <!-- 全局设置 -->
+                    <div class="compact-row-3 mb-6" id="globalSettings">
+                        <div class="form-row mb-0">
+                            <label class="form-label">审核组长</label>
+                            <input type="text" class="form-input readonly-field" value="武荣刚 (CQC21458)" readonly>
+                        </div>
+                        <div class="form-row mb-0">
+                            <label class="form-label">计划审核开始时间</label>
+                            <input type="text" class="form-input readonly-field" value="2024-04-15" readonly>
+                        </div>
+                        <div class="form-row mb-0">
+                            <label class="form-label">计划审核结束时间</label>
+                            <input type="text" class="form-input readonly-field" value="2024-04-18" readonly>
+                        </div>
+                    </div>
+
+                    <!-- 场所分配详情 -->
+                    <div class="mb-4">
+                        <h3 class="text-sm font-semibold text-gray-800 mb-3" id="siteAllocationTitle">场所审核组分配详情</h3>
+                        
+                        <!-- 场所1：总部 -->
+                        <div class="site-card mb-4 site-allocation" data-site="总部" data-members="武荣刚,王洪伟,周志兴" id="site-headquarters">
+                            <div class="site-card-header">
+                                <div class="flex items-center gap-2">
+                                    <span class="site-tag site-tag-main">总部</span>
+                                    <span class="font-semibold text-gray-800">北京市地铁运营有限公司（总部）</span>
+                                </div>
+                                <span class="text-sm text-gray-500">有效人数：200人</span>
+                            </div>
+                            <div class="p-4">
+                                <div class="compact-row-4 mb-4">
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">场所地址</label>
+                                        <input type="text" class="form-input readonly-field" value="北京市西城区北礼士路甲38号" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">认证体系</label>
+                                        <input type="text" class="form-input readonly-field" value="质量管理体系(QMS)" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">审核日期区间</label>
+                                        <input type="text" class="form-input readonly-field" value="2024-04-15 至 2024-04-16" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">审核人天</label>
+                                        <input type="text" class="form-input readonly-field" value="4.0 天" readonly>
+                                    </div>
+                                </div>
+                                
+                                <table class="data-table border border-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px">序号</th>
+                                            <th>姓名</th>
+                                            <th style="width: 100px">组内身份</th>
+                                            <th>资格及注册编号</th>
+                                            <th style="width: 100px">CQC编号</th>
+                                            <th>联系电话</th>
+                                            <th style="width: 100px">专兼职</th>
+                                            <th style="width: 180px">审核日期区间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="member-row" data-member="武荣刚">
+                                            <td>1</td>
+                                            <td class="font-medium text-gray-900">武荣刚</td>
+                                            <td><span class="personnel-tag tag-qms">组长</span></td>
+                                            <td>Q审核员(2022-N1QMS-6028373)</td>
+                                            <td class="font-mono text-xs">CQC21458</td>
+                                            <td>13661227694</td>
+                                            <td><span class="personnel-tag tag-fulltime">专职</span></td>
+                                            <td>2024-04-15 至 2024-04-18</td>
+                                        </tr>
+                                        <tr class="member-row" data-member="王洪伟">
+                                            <td>2</td>
+                                            <td class="font-medium text-gray-900">王洪伟</td>
+                                            <td><span class="personnel-tag tag-ems">组员</span></td>
+                                            <td>Q高级审核员(2021-N1QMS-5012345)</td>
+                                            <td class="font-mono text-xs">CQC10852</td>
+                                            <td>13800138001</td>
+                                            <td><span class="personnel-tag tag-parttime">兼职</span></td>
+                                            <td>2024-04-15 至 2024-04-16</td>
+                                        </tr>
+                                        <tr class="member-row" data-member="周志兴">
+                                            <td>3</td>
+                                            <td class="font-medium text-gray-900">周志兴</td>
+                                            <td><span class="personnel-tag tag-qms">组员</span></td>
+                                            <td>Q审核员(2023-N1QMS-7015678)</td>
+                                            <td class="font-mono text-xs">CQC10923</td>
+                                            <td>13800138002</td>
+                                            <td><span class="personnel-tag tag-fulltime">专职</span></td>
+                                            <td>2024-04-15 至 2024-04-16</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 场所2：运营一分公司 -->
+                        <div class="site-card mb-4 site-allocation" data-site="运营一分公司" data-members="武荣刚,张爱兵" id="site-branch1">
+                            <div class="site-card-header">
+                                <div class="flex items-center gap-2">
+                                    <span class="site-tag">场所</span>
+                                    <span class="font-semibold text-gray-800">北京市地铁运营有限公司运营一分公司</span>
+                                </div>
+                                <span class="text-sm text-gray-500">有效人数：180人</span>
+                            </div>
+                            <div class="p-4">
+                                <div class="compact-row-4 mb-4">
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">场所地址</label>
+                                        <input type="text" class="form-input readonly-field" value="北京市东城区建国门南大街5号" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">认证体系</label>
+                                        <input type="text" class="form-input readonly-field" value="质量管理体系(QMS)" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">审核日期区间</label>
+                                        <input type="text" class="form-input readonly-field" value="2024-04-17 至 2024-04-17" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">审核人天</label>
+                                        <input type="text" class="form-input readonly-field" value="2.0 天" readonly>
+                                    </div>
+                                </div>
+                                
+                                <table class="data-table border border-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px">序号</th>
+                                            <th>姓名</th>
+                                            <th style="width: 100px">组内身份</th>
+                                            <th>资格及注册编号</th>
+                                            <th style="width: 100px">CQC编号</th>
+                                            <th>联系电话</th>
+                                            <th style="width: 100px">专兼职</th>
+                                            <th style="width: 180px">审核日期区间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="member-row" data-member="武荣刚">
+                                            <td>1</td>
+                                            <td class="font-medium text-gray-900">武荣刚</td>
+                                            <td><span class="personnel-tag tag-qms">组长</span></td>
+                                            <td>Q审核员(2022-N1QMS-6028373)</td>
+                                            <td class="font-mono text-xs">CQC21458</td>
+                                            <td>13661227694</td>
+                                            <td><span class="personnel-tag tag-fulltime">专职</span></td>
+                                            <td>2024-04-17 至 2024-04-17</td>
+                                        </tr>
+                                        <tr class="member-row" data-member="张爱兵">
+                                            <td>2</td>
+                                            <td class="font-medium text-gray-900">张爱兵</td>
+                                            <td><span class="personnel-tag tag-ems">组员</span></td>
+                                            <td>Q/EMS审核员</td>
+                                            <td class="font-mono text-xs">CQC11045</td>
+                                            <td>13800138003</td>
+                                            <td><span class="personnel-tag tag-parttime">兼职</span></td>
+                                            <td>2024-04-17 至 2024-04-17</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 场所3：运营二分公司 -->
+                        <div class="site-card mb-4 site-allocation" data-site="运营二分公司" data-members="武荣刚,沈书华" id="site-branch2">
+                            <div class="site-card-header">
+                                <div class="flex items-center gap-2">
+                                    <span class="site-tag">场所</span>
+                                    <span class="font-semibold text-gray-800">北京市地铁运营有限公司运营二分公司</span>
+                                </div>
+                                <span class="text-sm text-gray-500">有效人数：160人</span>
+                            </div>
+                            <div class="p-4">
+                                <div class="compact-row-4 mb-4">
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">场所地址</label>
+                                        <input type="text" class="form-input readonly-field" value="北京市朝阳区望京北路9号" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">认证体系</label>
+                                        <input type="text" class="form-input readonly-field" value="质量管理体系(QMS)" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">审核日期区间</label>
+                                        <input type="text" class="form-input readonly-field" value="2024-04-18 至 2024-04-18" readonly>
+                                    </div>
+                                    <div class="form-row mb-0">
+                                        <label class="form-label">审核人天</label>
+                                        <input type="text" class="form-input readonly-field" value="1.5 天" readonly>
+                                    </div>
+                                </div>
+                                
+                                <table class="data-table border border-gray-200">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px">序号</th>
+                                            <th>姓名</th>
+                                            <th style="width: 100px">组内身份</th>
+                                            <th>资格及注册编号</th>
+                                            <th style="width: 100px">CQC编号</th>
+                                            <th>联系电话</th>
+                                            <th style="width: 100px">专兼职</th>
+                                            <th style="width: 180px">审核日期区间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="member-row" data-member="武荣刚">
+                                            <td>1</td>
+                                            <td class="font-medium text-gray-900">武荣刚</td>
+                                            <td><span class="personnel-tag tag-qms">组长</span></td>
+                                            <td>Q审核员(2022-N1QMS-6028373)</td>
+                                            <td class="font-mono text-xs">CQC21458</td>
+                                            <td>13661227694</td>
+                                            <td><span class="personnel-tag tag-fulltime">专职</span></td>
+                                            <td>2024-04-18 至 2024-04-18</td>
+                                        </tr>
+                                        <tr class="member-row" data-member="沈书华">
+                                            <td>2</td>
+                                            <td class="font-medium text-gray-900">沈书华</td>
+                                            <td><span class="personnel-tag tag-qms">组员</span></td>
+                                            <td>Q审核员(2024-N1QMS-7012900)</td>
+                                            <td class="font-mono text-xs">CQC08017</td>
+                                            <td>13683124756</td>
+                                            <td><span class="personnel-tag tag-fulltime">专职</span></td>
+                                            <td>2024-04-18 至 2024-04-18</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 节点2：编制计划 -->
+        <div id="node-plan-confirm" class="node-content hidden-section">
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-file-alt text-blue-500"></i>
+                        编制计划
+                    </div>
+                </div>
+                <div class="p-8 text-center text-gray-400">
+                    <i class="fas fa-clipboard-list text-5xl mb-4"></i>
+                    <p>审核计划编制中，等待组员确认...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 节点3：审核任务中 -->
+        <div id="node-audit-progress" class="node-content hidden-section">
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-tasks text-blue-500"></i>
+                        审核任务中
+                    </div>
+                </div>
+                <div class="p-8 text-center text-gray-400">
+                    <i class="fas fa-spinner text-5xl mb-4"></i>
+                    <p>审核任务尚未开始</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 节点4：审核完结 -->
+        <div id="node-completed" class="node-content hidden-section">
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-flag-checkered text-blue-500"></i>
+                        审核完结
+                    </div>
+                </div>
+                <div class="p-8 text-center text-gray-400">
+                    <i class="fas fa-check-double text-5xl mb-4"></i>
+                    <p>审核任务尚未完成</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 查看策划方案弹窗 -->
+    <div class="plan-modal" id="planModal">
+        <div class="plan-modal-content">
+            <div class="plan-header">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-lg font-semibold text-gray-900">场所抽样与审核策划</h3>
+                    <span class="text-sm text-gray-500" id="planProjectNo">项目编号：PRJ-2024-00189-01</span>
+                </div>
+                <button onclick="closePlanModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="plan-body">
+                <!-- Tab导航 -->
+                <div class="flex border-b border-gray-200 mb-6">
+                    <button class="plan-tab-btn active px-6 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600 bg-blue-50" data-tab="plan-tab-1" onclick="switchPlanTab('plan-tab-1')">
+                        场所抽样与审核策划
+                    </button>
+                    <button class="plan-tab-btn px-6 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700" data-tab="plan-tab-2" onclick="switchPlanTab('plan-tab-2')">
+                        管理体系过程清单
+                    </button>
+                </div>
+                
+                <!-- Tab 1: 场所抽样与审核策划 -->
+                <div id="plan-tab-1" class="plan-tab-content">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="plan-section-title mb-0">场所抽样方案及实施情况</div>
+                    <div class="alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        根据抽样规则，本次策划需要选择全部场所（共3个场所）
+                    </div>
+                </div>
+
+                <!-- 总部信息 -->
+                <div class="mb-6 border border-gray-200 rounded">
+                    <div class="bg-blue-50 px-4 py-2 border-b border-gray-200 flex items-center gap-2">
+                        <span class="tag">总部</span>
+                        <span class="font-medium text-gray-800">运营地址（中心职能）</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="form-grid-4 mb-4">
+                            <div>
+                                <label class="form-label">计划审核时间</label>
+                                <input type="text" class="form-input readonly-field" value="2024年04月" readonly>
+                            </div>
+                            <div>
+                                <label class="form-label">实际审核时间</label>
+                                <input type="text" class="form-input readonly-field" value="----年--月" readonly>
+                            </div>
+                            <div>
+                                <label class="form-label">班次信息</label>
+                                <div class="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+                                    <span>班次：1，08:00-17:30</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">联系人/电话</label>
+                                <input type="text" class="form-input readonly-field" value="张先生/13800138000" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid-4 mb-4">
+                            <div>
+                                <label class="form-label">地址</label>
+                                <input type="text" class="form-input readonly-field" value="北京市西城区北礼士路甲38号" readonly>
+                            </div>
+                            <div>
+                                <label class="form-label">涉及产品/过程/活动</label>
+                                <input type="text" class="form-input readonly-field" value="轨道交通运营管理" readonly>
+                            </div>
+                            <div>
+                                <label class="form-label">专业代码</label>
+                                <div class="flex gap-2">
+                                    <span class="px-2 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded text-xs">Q01</span>
+                                    <span class="px-2 py-1 bg-green-50 text-green-600 border border-green-200 rounded text-xs">CNAS</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">人数(含承包方)</label>
+                                <input type="text" class="form-input readonly-field" value="200" readonly>
+                            </div>
+                        </div>
+
+                        <!-- 人天计算 -->
+                        <div class="border-t border-gray-200 pt-4 mt-4">
+                            <label class="form-label font-semibold">人天计算（AI底座）</label>
+                            <div class="form-grid-4 mb-2">
+                                <div>
+                                    <label class="form-label text-xs text-gray-500">审核准备</label>
+                                    <input type="text" class="form-input readonly-field" value="1.5" readonly>
+                                </div>
+                                <div>
+                                    <label class="form-label text-xs text-gray-500">第一阶段</label>
+                                    <input type="text" class="form-input readonly-field" value="1.0" readonly>
+                                </div>
+                                <div>
+                                    <label class="form-label text-xs text-gray-500">二阶段现场</label>
+                                    <input type="text" class="form-input readonly-field" value="4.0" readonly>
+                                </div>
+                                <div>
+                                    <label class="form-label text-xs text-gray-500">调整比例</label>
+                                    <input type="text" class="form-input readonly-field" value="1.0" readonly>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded flex justify-between items-center">
+                                <span class="text-sm text-gray-600">调整后</span>
+                                <span class="text-xl font-bold text-blue-600">6.5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 过程审核策划 -->
+                <div class="mt-6">
+                    <div class="plan-section-title">过程审核策划</div>
+                    <table class="data-table border border-gray-200">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px">序号</th>
+                                <th>过程名称</th>
+                                <th>主责部门</th>
+                                <th>相关部门</th>
+                                <th>涉及标准条款</th>
+                                <th>绩效参数/文件</th>
+                                <th style="width: 80px">拟审核</th>
+                                <th style="width: 80px">已审核</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>组织环境</td>
+                                <td>管理层</td>
+                                <td>各部门</td>
+                                <td>4.1,4.2,4.3,4.4</td>
+                                <td>《组织环境分析表》</td>
+                                <td class="text-center"><i class="fas fa-check-square text-blue-600"></i></td>
+                                <td class="text-center"><span class="text-gray-400">待审核</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>领导作用</td>
+                                <td>总经理</td>
+                                <td>管理层</td>
+                                <td>5.1,5.2,5.3</td>
+                                <td>质量方针、目标</td>
+                                <td class="text-center"><i class="fas fa-check-square text-blue-600"></i></td>
+                                <td class="text-center"><span class="text-gray-400">待审核</span></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>策划</td>
+                                <td>质量部</td>
+                                <td>各部门</td>
+                                <td>6.1,6.2,6.3</td>
+                                <td>风险机遇清单、目标方案</td>
+                                <td class="text-center"><i class="fas fa-check-square text-blue-600"></i></td>
+                                <td class="text-center"><span class="text-gray-400">待审核</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                
+                <!-- Tab 2: 管理体系过程清单 -->
+                <div id="plan-tab-2" class="plan-tab-content hidden-section">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-list-alt text-blue-500"></i>
+                            <span class="font-semibold text-gray-800">管理体系过程清单</span>
+                            <span class="text-xs text-gray-500">适用于初次认证、监督、再认证</span>
+                        </div>
+                        <button onclick="addProcessRow()" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus mr-1"></i>新增过程
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto border border-gray-200 rounded">
+                        <table class="data-table w-full" id="processListTable">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 border-b w-16">序号</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 border-b">过程名称</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 border-b">主责部门</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 border-b">相关部门</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 border-b">涉及标准条款</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 border-b">绩效参数或相关文件</th>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 border-b w-24">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="processListBody">
+                                <tr data-row-id="1">
+                                    <td class="px-4 py-2 border-b text-sm text-gray-600">1</td>
+                                    <td class="px-4 py-2 border-b">
+                                        <input type="text" class="form-input w-full text-sm py-1" value="组织环境理解" placeholder="过程名称">
+                                    </td>
+                                    <td class="px-4 py-2 border-b">
+                                        <input type="text" class="form-input w-full text-sm py-1" value="管理层" placeholder="主责部门">
+                                    </td>
+                                    <td class="px-4 py-2 border-b">
+                                        <input type="text" class="form-input w-full text-sm py-1" value="各部门" placeholder="相关部门">
+                                    </td>
+                                    <td class="px-4 py-2 border-b">
+                                        <input type="text" class="form-input w-full text-sm py-1" value="4.1-4.4" placeholder="涉及标准条款">
+                                    </td>
+                                    <td class="px-4 py-2 border-b">
+                                        <input type="text" class="form-input w-full text-sm py-1" value="环境因素识别表" placeholder="绩效参数或相关文件">
+                                    </td>
+                                    <td class="px-4 py-2 border-b text-center">
+                                        <button onclick="deleteProcessRow(this)" class="text-red-500 hover:text-red-700" title="删除">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="plan-header border-t">
+                <div></div>
+                <button onclick="closePlanModal()" class="btn btn-default">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 接受任务确认弹窗 -->
+    <div class="confirm-modal" id="acceptModal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <h3 class="text-lg font-semibold text-gray-900">确认接受任务</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <p class="text-gray-600">确定接受该审核任务吗？接受后将正式加入审核组并进入后续流程。</p>
+            </div>
+            <div class="confirm-modal-footer">
+                <button class="btn btn-default" onclick="closeAcceptModal()">取消</button>
+                <button class="btn btn-success" onclick="confirmAccept()">确认接受</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 退回任务确认弹窗 -->
+    <div class="confirm-modal" id="rejectModal">
+        <div class="confirm-modal-content">
+            <div class="confirm-modal-header">
+                <h3 class="text-lg font-semibold text-gray-900">退回任务</h3>
+            </div>
+            <div class="confirm-modal-body">
+                <div class="mb-4">
+                    <label class="form-label">退回原因 <span class="text-red-500">*</span></label>
+                    <textarea class="form-textarea" id="rejectReason" placeholder="请填写退回原因（必填）"></textarea>
+                </div>
+            </div>
+            <div class="confirm-modal-footer">
+                <button class="btn btn-default" onclick="closeRejectModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmReject()">确认退回</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 当前节点索引
+        let currentNodeIndex = 0;
+        
+        // 当前视角（leader/member）
+        let currentView = 'leader';
+        
+        // 节点配置（修改为4个节点）
+        const nodes = [
+            { id: 'node-task-confirm', name: '组内确认' },
+            { id: 'node-plan-confirm', name: '编制计划' },
+            { id: 'node-audit-progress', name: '审核任务中' },
+            { id: 'node-completed', name: '审核完结' }
+        ];
+        
+        // 切换节点
+        function switchNode(index) {
+            currentNodeIndex = index;
+            
+            // 更新步骤条样式
+            const stepItems = document.querySelectorAll('.step-item');
+            stepItems.forEach((item, idx) => {
+                item.classList.remove('active', 'completed', 'pending');
+                if (idx < index) {
+                    item.classList.add('completed');
+                } else if (idx === index) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.add('pending');
+                }
+            });
+            
+            // 隐藏所有节点内容
+            document.querySelectorAll('.node-content').forEach(el => {
+                el.classList.add('hidden-section');
+            });
+            
+            // 显示当前节点内容
+            document.getElementById(nodes[index].id).classList.remove('hidden-section');
+            
+            // 更新页面标题状态
+            const statusBadge = document.getElementById('headerStatusBadge');
+            
+            if (index === 0) {
+                statusBadge.textContent = '组内确认中';
+                statusBadge.className = 'status-badge badge-processing';
+            } else if (index === 1) {
+                statusBadge.textContent = '编制计划中';
+                statusBadge.className = 'status-badge badge-processing';
+            } else if (index === 2) {
+                statusBadge.textContent = '审核任务中';
+                statusBadge.className = 'status-badge badge-warning';
+            } else if (index === 3) {
+                statusBadge.textContent = '审核完结';
+                statusBadge.className = 'status-badge badge-success';
+            }
+        }
+        
+        // 切换视角
+        function switchView(view) {
+            currentView = view;
+            
+            // 更新按钮样式
+            document.querySelectorAll('.view-switcher-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(view + 'ViewBtn').classList.add('active');
+            
+            // 更新组员确认情况标签
+            const memberViewLabel = document.getElementById('memberViewLabel');
+            if (memberViewLabel) {
+                memberViewLabel.textContent = view === 'leader' ? '（组长视角）' : '（组员视角）';
+            }
+            
+            // 组长视角显示全部，组员视角只显示相关内容
+            if (view === 'leader') {
+                // 显示节点进度栏（时间轴）
+                document.getElementById('timelineSection').style.display = 'block';
+                
+                // 显示组员确认情况卡片
+                document.getElementById('section-member').style.display = 'block';
+                
+                // 显示所有成员卡片
+                document.querySelectorAll('.member-confirm-card').forEach(card => {
+                    card.style.display = 'flex';
+                });
+                // 显示所有场所分配
+                document.querySelectorAll('.site-allocation').forEach(site => {
+                    site.style.display = 'block';
+                });
+                // 显示提醒按钮
+                document.querySelectorAll('.leader-only-btn').forEach(btn => {
+                    btn.style.display = 'inline-flex';
+                });
+                // 显示场所内所有成员行
+                document.querySelectorAll('.member-row').forEach(row => {
+                    row.style.display = 'table-row';
+                });
+                // 显示统计信息
+                document.getElementById('memberStats').style.display = 'flex';
+                // 隐藏组员自视视图
+                document.getElementById('memberSelfView').classList.add('hidden-section');
+                // 显示完整成员列表容器
+                document.getElementById('memberListContainer').classList.remove('hidden-section');
+                // 显示标题
+                document.getElementById('siteAllocationTitle').textContent = '场所审核组分配详情';
+                // 显示全局设置
+                document.getElementById('globalSettings').style.display = 'grid';
+                
+                // 显示锚点导航中的"组员确认情况"
+                document.getElementById('anchor-member').style.display = 'block';
+                document.getElementById('anchorNav').style.display = 'block';
+            } else {
+                // 组员视角 - 删除组员确认情况和节点进度栏
+                
+                // 隐藏节点进度栏（时间轴）
+                document.getElementById('timelineSection').style.display = 'none';
+                
+                // 隐藏组员确认情况卡片
+                document.getElementById('section-member').style.display = 'none';
+                
+                // 隐藏锚点导航中的"组员确认情况"
+                document.getElementById('anchor-member').style.display = 'none';
+                
+                // 只显示一个场所（总部）
+                const currentMember = '王洪伟';
+                
+                // 只显示总部场所（假设当前组员分配到总部）
+                document.querySelectorAll('.site-allocation').forEach(site => {
+                    if (site.id === 'site-headquarters') {
+                        site.style.display = 'block';
+                        // 在该场所内，只显示组长和当前组员
+                        site.querySelectorAll('.member-row').forEach(row => {
+                            const rowMember = row.getAttribute('data-member');
+                            if (rowMember === '武荣刚' || rowMember === currentMember) {
+                                row.style.display = 'table-row';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    } else {
+                        site.style.display = 'none';
+                    }
+                });
+                
+                // 隐藏其他场所
+                document.getElementById('site-branch1').style.display = 'none';
+                document.getElementById('site-branch2').style.display = 'none';
+                
+                // 修改标题
+                document.getElementById('siteAllocationTitle').textContent = '我的审核任务';
+                
+                // 隐藏全局设置中的组长和结束时间，只保留开始时间
+                document.getElementById('globalSettings').style.display = 'none';
+            }
+        }
+        
+        // 查看策划方案
+        function viewPlan(projectNo) {
+            document.getElementById('planProjectNo').textContent = '项目编号：' + projectNo;
+            document.getElementById('planModal').classList.add('show');
+        }
+        
+        function closePlanModal() {
+            document.getElementById('planModal').classList.remove('show');
+        }
+        
+        // 重新分配成员
+        function reassignMember(memberName) {
+            alert(`正在为 ${memberName} 重新分配审核任务...`);
+        }
+        
+        // 发送提醒
+        function sendReminder() {
+            alert('已向待确认组员发送提醒通知！');
+        }
+        
+        // 显示接受任务弹窗
+        function showAcceptModal() {
+            document.getElementById('acceptModal').classList.add('show');
+        }
+        
+        // 关闭接受任务弹窗
+        function closeAcceptModal() {
+            document.getElementById('acceptModal').classList.remove('show');
+        }
+        
+        // 确认接受任务
+        function confirmAccept() {
+            alert('任务接受成功！您已正式加入审核组。');
+            closeAcceptModal();
+            // 可以在这里添加后续逻辑，比如切换状态等
+        }
+        
+        // 显示退回任务弹窗
+        function showRejectModal() {
+            document.getElementById('rejectModal').classList.add('show');
+        }
+        
+        // 关闭退回任务弹窗
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.remove('show');
+            // 清空原因
+            document.getElementById('rejectReason').value = '';
+        }
+        
+        // 确认退回任务
+        function confirmReject() {
+            const reason = document.getElementById('rejectReason').value.trim();
+            if (!reason) {
+                alert('请填写退回原因！');
+                return;
+            }
+            alert(`任务已退回，原因：${reason}`);
+            closeRejectModal();
+            // 可以在这里添加后续逻辑，比如返回列表页等
+        }
+        
+        // 返回
+        function goBack() {
+            if (confirm('确定返回列表页？')) {
+                console.log('返回列表页');
+            }
+        }
+        
+        // Tab切换功能
+        function switchPlanTab(tabId) {
+            // 隐藏所有tab内容
+            document.querySelectorAll('.plan-tab-content').forEach(el => {
+                el.classList.add('hidden-section');
+            });
+            // 显示选中的tab
+            document.getElementById(tabId).classList.remove('hidden-section');
+            
+            // 更新按钮样式
+            document.querySelectorAll('.plan-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-blue-600', 'border-blue-600', 'bg-blue-50');
+                btn.classList.add('text-gray-500', 'border-transparent');
+            });
+            event.target.classList.add('active', 'text-blue-600', 'border-blue-600', 'bg-blue-50');
+            event.target.classList.remove('text-gray-500', 'border-transparent');
+        }
+        
+        // 新增过程行
+        function addProcessRow() {
+            const tbody = document.getElementById('processListBody');
+            const rowCount = tbody.children.length + 1;
+            
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('data-row-id', rowCount);
+            newRow.innerHTML = `
+                <td class="px-4 py-2 border-b text-sm text-gray-600">${rowCount}</td>
+                <td class="px-4 py-2 border-b">
+                    <input type="text" class="form-input w-full text-sm py-1" value="" placeholder="过程名称">
+                </td>
+                <td class="px-4 py-2 border-b">
+                    <input type="text" class="form-input w-full text-sm py-1" value="" placeholder="主责部门">
+                </td>
+                <td class="px-4 py-2 border-b">
+                    <input type="text" class="form-input w-full text-sm py-1" value="" placeholder="相关部门">
+                </td>
+                <td class="px-4 py-2 border-b">
+                    <input type="text" class="form-input w-full text-sm py-1" value="" placeholder="涉及标准条款">
+                </td>
+                <td class="px-4 py-2 border-b">
+                    <input type="text" class="form-input w-full text-sm py-1" value="" placeholder="绩效参数或相关文件">
+                </td>
+                <td class="px-4 py-2 border-b text-center">
+                    <button onclick="deleteProcessRow(this)" class="text-red-500 hover:text-red-700" title="删除">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            `;
+            
+            tbody.appendChild(newRow);
+            renumberProcessRows();
+        }
+        
+        // 删除过程行
+        function deleteProcessRow(btn) {
+            const row = btn.closest('tr');
+            row.remove();
+            renumberProcessRows();
+        }
+        
+        // 重新编号
+        function renumberProcessRows() {
+            const rows = document.querySelectorAll('#processListBody tr');
+            rows.forEach((row, index) => {
+                row.setAttribute('data-row-id', index + 1);
+                row.cells[0].textContent = index + 1;
+            });
+        }
+        
+        // 锚点导航滚动功能
+        function scrollToSection(sectionId, element) {
+            // 移除所有锚点的高亮状态
+            document.querySelectorAll('.anchor-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // 给当前点击的锚点添加高亮状态
+            element.classList.add('active');
+            
+            // 滚动到对应区域
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                const offsetTop = targetSection.offsetTop - 200; // 预留顶部空间
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        // 监听滚动事件，自动更新锚点高亮状态
+        window.addEventListener('scroll', function() {
+            const sections = ['section-member', 'section-project', 'section-team'];
+            const scrollPosition = window.scrollY + 250;
+            
+            sections.forEach((sectionId, index) => {
+                const section = document.getElementById(sectionId);
+                if (section && section.style.display !== 'none') {
+                    const sectionTop = section.offsetTop;
+                    const sectionBottom = sectionTop + section.offsetHeight;
+                    
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                        document.querySelectorAll('.anchor-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        const anchorItems = document.querySelectorAll('.anchor-item');
+                        if (anchorItems[index]) {
+                            anchorItems[index].classList.add('active');
+                        }
+                    }
+                }
+            });
+        });
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            switchNode(0);
+        });
+    </script>
+</body>
+</html>
