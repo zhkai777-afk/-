@@ -1271,6 +1271,7 @@
         }
 </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -1567,6 +1568,44 @@
     </div>
 </div>
 
+<!-- 忽略原因输入弹窗 -->
+<div class="modal-overlay" id="ignoreReasonModal">
+    <div class="modal-content" style="width: 520px;">
+        <div class="modal-header">
+            <span>忽略问题</span>
+            <span class="modal-close" onclick="closeIgnoreModal()">✕</span>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom: 12px; font-size: 13px; color: #666;">请填写忽略此问题的原因：</div>
+            <textarea class="form-textarea" id="ignoreReasonInput" 
+                      placeholder="请输入忽略原因（至少5个字）..." 
+                      style="min-height: 100px; width: 100%; background: #fff;"
+                      oninput="validateIgnoreModalInput()"></textarea>
+            <div style="text-align: right; font-size: 12px; color: #999; margin-top: 4px;" id="ignoreModalCharCount">0字</div>
+        </div>
+        <div class="modal-footer">
+            <button class="t-button btn-outline" onclick="closeIgnoreModal()">取消</button>
+            <button class="t-button" id="confirmIgnoreBtn" style="background: #999; color: #fff; border-color: #999;" onclick="executeIgnore()" disabled>确认忽略</button>
+        </div>
+    </div>
+</div>
+
+<!-- 已忽略问题列表弹窗 -->
+<div class="modal-overlay" id="ignoredIssuesModal">
+    <div class="modal-content" style="width: 960px;">
+        <div class="modal-header">
+            <span>已忽略问题列表</span>
+            <span class="modal-close" onclick="closeIgnoredIssuesModal()">✕</span>
+        </div>
+        <div class="modal-body" id="ignoredIssuesBody">
+            <div style="text-align: center; color: #999; padding: 40px;">暂无已忽略的问题</div>
+        </div>
+        <div class="modal-footer">
+            <button class="t-button btn-outline" onclick="closeIgnoredIssuesModal()">关闭</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // 全局状态
     let selectedSystems = new Set();
@@ -1630,20 +1669,20 @@
 // 问题清单数据
 const issuesData = {
     'all': [
-        { id: 1, type: '登记问题', description: '认证范围描述不够具体，建议补充详细的业务流程说明', systems: ['Q', 'E'], submitter: '刘建国', materialId: '3' },
-        { id: 2, type: '补充材料', description: '需要补充Q体系认证范围描述及相关证明文件', systems: ['Q'], submitter: '张明', materialId: '3' },
-        { id: 3, type: '补充审核', description: '营业执照地址与实际生产地址不一致，需核实补充租赁合同', systems: ['E', 'S'], submitter: '张明', materialId: '9' },
-        { id: 4, type: '登记问题', description: '环境目标指标未量化，不符合EMS要求', systems: ['E'], submitter: '张明', materialId: '12' }
+        { id: 1, type: '登记问题', description: '认证范围描述不够具体，建议补充详细的业务流程说明', systems: ['Q', 'E'], submitter: '刘建国', materialId: '3', ignored: false, ignoreReason: '' },
+        { id: 2, type: '补充材料', description: '需要补充Q体系认证范围描述及相关证明文件', systems: ['Q'], submitter: '张明', materialId: '3', ignored: false, ignoreReason: '' },
+        { id: 3, type: '补充审核', description: '营业执照地址与实际生产地址不一致，需核实补充租赁合同', systems: ['E', 'S'], submitter: '张明', materialId: '9', ignored: false, ignoreReason: '' },
+        { id: 4, type: '登记问题', description: '环境目标指标未量化，不符合EMS要求', systems: ['E'], submitter: '张明', materialId: '12', ignored: false, ignoreReason: '' }
     ],
     '3': [
-        { id: 1, type: '登记问题', description: '认证范围描述不够具体，建议补充详细的业务流程说明', systems: ['Q', 'E'], submitter: '刘建国' },
-        { id: 2, type: '补充材料', description: '需要补充Q体系认证范围描述及相关证明文件', systems: ['Q'], submitter: '张明' }
+        { id: 1, type: '登记问题', description: '认证范围描述不够具体，建议补充详细的业务流程说明', systems: ['Q', 'E'], submitter: '刘建国', ignored: false, ignoreReason: '' },
+        { id: 2, type: '补充材料', description: '需要补充Q体系认证范围描述及相关证明文件', systems: ['Q'], submitter: '张明', ignored: false, ignoreReason: '' }
     ],
     '9': [
-        { id: 3, type: '补充审核', description: '营业执照地址与实际生产地址不一致，需核实补充租赁合同', systems: ['E', 'S'], submitter: '张明' }
+        { id: 3, type: '补充审核', description: '营业执照地址与实际生产地址不一致，需核实补充租赁合同', systems: ['E', 'S'], submitter: '张明', ignored: false, ignoreReason: '' }
     ],
     '12': [
-        { id: 4, type: '登记问题', description: '环境目标指标未量化，不符合EMS要求', systems: ['E'], submitter: '张明' }
+        { id: 4, type: '登记问题', description: '环境目标指标未量化，不符合EMS要求', systems: ['E'], submitter: '张明', ignored: false, ignoreReason: '' }
     ],
     '15': []
 };
@@ -2225,6 +2264,9 @@ let currentSystemFilter = 'all';
             issues = issues.filter(issue => issue.systems.includes(system));
         }
 
+        // 过滤已忽略的问题
+        issues = issues.filter(issue => !issue.ignored);
+
         // 如果当前有类型筛选
         if (currentIssueFilter !== 'all') {
             issues = issues.filter(issue => issue.type === currentIssueFilter);
@@ -2250,8 +2292,8 @@ let currentSystemFilter = 'all';
                     <td>${systemsHtml}</td>
                     <td>${issue.submitter}</td>
                     <td>
-                        <button class="t-button btn-danger btn-small" onclick="deleteIssueFromAllView(${issue.id})">
-                            删除
+                        <button class="t-button btn-outline btn-small" onclick="openIgnoreModal(${issue.id})" style="color: #999; border-color: #dcdcdc;">
+                            忽略
                         </button>
                     </td>
                 </tr>
@@ -2287,6 +2329,9 @@ let currentSystemFilter = 'all';
                                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                             </svg>
                             补充审核
+                        </button>
+                        <button class="t-button btn-outline btn-small" onclick="showIgnoredIssuesModal()" style="color: #666; border-color: #dcdcdc;">
+                            忽略问题(<span class="ignored-count-badge">0</span>)
                         </button>
                     </div>
                 </div>
@@ -2368,8 +2413,8 @@ let currentSystemFilter = 'all';
         `;
         document.getElementById('contentSubtitle').textContent = data.subtitle;
 
-        // 获取该材料的问题清单
-        const materialIssues = issuesData[materialId] || [];
+        // 获取该材料的问题清单（过滤已忽略）
+        const materialIssues = (issuesData[materialId] || []).filter(issue => !issue.ignored);
 
         // 渲染问题清单部分
         let issuesSectionHtml = '';
@@ -2388,8 +2433,8 @@ let currentSystemFilter = 'all';
                         <td>${systemsHtml}</td>
                         <td>${issue.submitter}</td>
                         <td>
-                            <button class="t-button btn-danger btn-small" onclick="deleteMaterialIssue('${materialId}', ${issue.id})">
-                                删除
+                            <button class="t-button btn-outline btn-small" onclick="openIgnoreModal(${issue.id}, '${materialId}')" style="color: #999; border-color: #dcdcdc;">
+                                忽略
                             </button>
                         </td>
                     </tr>
@@ -2424,6 +2469,9 @@ let currentSystemFilter = 'all';
                                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                                 </svg>
                                 补充审核
+                            </button>
+                            <button class="t-button btn-outline btn-small" onclick="showIgnoredIssuesModal()" style="color: #666; border-color: #dcdcdc;">
+                                忽略问题(<span class="ignored-count-badge">0</span>)
                             </button>
                         </div>
                     </div>
@@ -2606,46 +2654,14 @@ let currentSystemFilter = 'all';
         renderMaterialDetail(materialId);
     }
 
-    // 删除材料问题
+    // 删除材料问题（兼容旧调用，实际走忽略逻辑）
     function deleteMaterialIssue(materialId, issueId) {
-        if (!confirm('确定删除此问题记录吗？')) return;
-
-        const list = issuesData[materialId];
-        const index = list.findIndex(item => item.id === issueId);
-        if (index > -1) {
-            const issue = list[index];
-            list.splice(index, 1);
-
-            // 同时从全局清单中删除
-            const globalIndex = issuesData['all'].findIndex(item => item.id === issueId);
-            if (globalIndex > -1) {
-                issuesData['all'].splice(globalIndex, 1);
-            }
-
-            renderMaterialDetail(materialId);
-        }
+        openIgnoreModal(issueId, materialId);
     }
 
-    // 从全部视图删除问题
+    // 从全部视图忽略问题
     function deleteIssueFromAllView(issueId) {
-        if (!confirm('确定删除此问题记录吗？')) return;
-
-        const globalIndex = issuesData['all'].findIndex(item => item.id === issueId);
-        if (globalIndex > -1) {
-            const issue = issuesData['all'][globalIndex];
-            issuesData['all'].splice(globalIndex, 1);
-
-            // 同时从材料特定的问题清单中删除
-            if (issue.materialId && issuesData[issue.materialId]) {
-                const materialIndex = issuesData[issue.materialId].findIndex(item => item.id === issueId);
-                if (materialIndex > -1) {
-                    issuesData[issue.materialId].splice(materialIndex, 1);
-                }
-            }
-
-            // 重新渲染全部材料视图
-            renderAllMaterialsView();
-        }
+        openIgnoreModal(issueId);
     }
 // 选择通过（可重新修改，仅改变按钮状态，不显示已通过提示）
     // 旧版审核功能已整合到问题清单中\n\n    // 预览文件
@@ -2894,6 +2910,188 @@ let currentSystemFilter = 'all';
         closeExpertModal();
     }
 
+    // ========== 忽略问题功能 ==========
+    let pendingIgnoreIssueId = null;
+    let pendingIgnoreMaterialId = null;
+
+    // 获取已忽略问题数量
+    function getIgnoredCount() {
+        return (issuesData['all'] || []).filter(i => i.ignored).length;
+    }
+
+    // 更新所有忽略问题计数显示
+    function updateIgnoredCount() {
+        const count = getIgnoredCount();
+        document.querySelectorAll('.ignored-count-badge').forEach(el => {
+            el.textContent = count;
+        });
+    }
+
+    // 打开忽略原因弹窗
+    function openIgnoreModal(issueId, materialId) {
+        pendingIgnoreIssueId = issueId;
+        pendingIgnoreMaterialId = materialId || null;
+        document.getElementById('ignoreReasonInput').value = '';
+        document.getElementById('ignoreModalCharCount').textContent = '0字';
+        document.getElementById('confirmIgnoreBtn').disabled = true;
+        document.getElementById('ignoreReasonModal').classList.add('active');
+    }
+
+    // 关闭忽略原因弹窗
+    function closeIgnoreModal() {
+        document.getElementById('ignoreReasonModal').classList.remove('active');
+        pendingIgnoreIssueId = null;
+        pendingIgnoreMaterialId = null;
+    }
+
+    // 验证忽略原因输入
+    function validateIgnoreModalInput() {
+        const val = document.getElementById('ignoreReasonInput').value;
+        const len = val.length;
+        document.getElementById('ignoreModalCharCount').textContent = len + '字';
+        const confirmBtn = document.getElementById('confirmIgnoreBtn');
+        if (len < 5) {
+            document.getElementById('ignoreModalCharCount').style.color = 'var(--reject-color)';
+            confirmBtn.disabled = true;
+        } else {
+            document.getElementById('ignoreModalCharCount').style.color = '#999';
+            confirmBtn.disabled = false;
+        }
+    }
+
+    // 执行忽略操作
+    function executeIgnore() {
+        const reason = document.getElementById('ignoreReasonInput').value.trim();
+        if (reason.length < 5) {
+            alert('忽略原因至少需要5个字');
+            return;
+        }
+
+        // 在全局清单中标记忽略
+        const issue = issuesData['all'].find(i => i.id === pendingIgnoreIssueId);
+        if (issue) {
+            issue.ignored = true;
+            issue.ignoreReason = reason;
+
+            // 同步到材料特定的问题清单
+            if (issue.materialId && issuesData[issue.materialId]) {
+                const mIssue = issuesData[issue.materialId].find(i => i.id === pendingIgnoreIssueId);
+                if (mIssue) {
+                    mIssue.ignored = true;
+                    mIssue.ignoreReason = reason;
+                }
+            }
+        }
+
+        closeIgnoreModal();
+        updateIgnoredCount();
+
+        // 刷新当前视图
+        if (currentMaterialId === 'all') {
+            renderAllMaterialsView();
+        } else {
+            renderMaterialDetail(currentMaterialId);
+        }
+    }
+
+    // 打开已忽略问题列表弹窗
+    function showIgnoredIssuesModal() {
+        renderIgnoredIssuesList();
+        document.getElementById('ignoredIssuesModal').classList.add('active');
+    }
+
+    // 关闭已忽略问题列表弹窗
+    function closeIgnoredIssuesModal() {
+        document.getElementById('ignoredIssuesModal').classList.remove('active');
+    }
+
+    // 渲染已忽略问题列表
+    function renderIgnoredIssuesList() {
+        const ignoredIssues = (issuesData['all'] || []).filter(i => i.ignored);
+        const container = document.getElementById('ignoredIssuesBody');
+
+        if (ignoredIssues.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">暂无已忽略的问题</div>';
+            return;
+        }
+
+        const rowsHtml = ignoredIssues.map(issue => {
+            const style = issueTypeStyles[issue.type] || { color: '#666', bg: '#f0f0f0' };
+            const systemsHtml = issue.systems.map(s =>
+                `<span class="system-badge-table ${s}">${s}</span>`
+            ).join('');
+
+            let materialName = '-';
+            if (issue.materialId && materialsData[issue.materialId]) {
+                materialName = materialsData[issue.materialId].title;
+            }
+
+            return `
+                <tr>
+                    <td><span style="color: ${style.color}; font-weight: 600;">${issue.type}</span></td>
+                    <td>${issue.description}</td>
+                    <td>${materialName}</td>
+                    <td>${systemsHtml}</td>
+                    <td>${issue.submitter}</td>
+                    <td style="max-width: 180px; word-break: break-all; color: #666; font-size: 12px;">${issue.ignoreReason}</td>
+                    <td>
+                        <button class="t-button btn-primary btn-small" onclick="restoreIssue(${issue.id})">恢复</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <table class="material-data-table" style="border: none;">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">问题类型</th>
+                        <th style="width: 24%;">问题描述</th>
+                        <th style="width: 14%;">所属材料分类</th>
+                        <th style="width: 10%;">涉及领域</th>
+                        <th style="width: 10%;">提交人</th>
+                        <th style="width: 18%;">忽略原因</th>
+                        <th style="width: 10%;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rowsHtml}
+                </tbody>
+            </table>
+        `;
+    }
+
+    // 恢复已忽略的问题
+    function restoreIssue(issueId) {
+        if (!confirm('确定恢复此问题吗？恢复后将重新显示在问题清单中。')) return;
+
+        // 在全局清单中恢复
+        const issue = issuesData['all'].find(i => i.id === issueId);
+        if (issue) {
+            issue.ignored = false;
+            issue.ignoreReason = '';
+
+            // 同步到材料特定的问题清单
+            if (issue.materialId && issuesData[issue.materialId]) {
+                const mIssue = issuesData[issue.materialId].find(i => i.id === issueId);
+                if (mIssue) {
+                    mIssue.ignored = false;
+                    mIssue.ignoreReason = '';
+                }
+            }
+        }
+
+        updateIgnoredCount();
+        renderIgnoredIssuesList();
+
+        // 刷新当前视图
+        if (currentMaterialId === 'all') {
+            renderAllMaterialsView();
+        } else {
+            renderMaterialDetail(currentMaterialId);
+        }
+    }
+
     // 初始化
     document.addEventListener('DOMContentLoaded', function() {
         const today = new Date().toISOString().split('T')[0];
@@ -2903,6 +3101,7 @@ let currentSystemFilter = 'all';
 
         renderAllMaterialsView();
         renderExpertList();
+        updateIgnoredCount();
     });
 </script>
 
