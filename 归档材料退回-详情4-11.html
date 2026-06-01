@@ -12,20 +12,25 @@
             box-sizing: border-box;
         }
         
+        html,
+        body {
+            height: 100%;
+        }
+
         body {
             font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
             background-color: #f5f5f5;
             color: rgba(0, 0, 0, 0.9);
             overflow-x: auto;
-            min-width: 1200px; /* 自适应调整 */
+            overflow-y: hidden;
+            min-width: 1848px;
         }
         
         :root {
             --qms-color: #0052D9;
             --ems-color: #00A870;
             --ohsms-color: #FF7D00;
-            --its-color: #7B4DFE;
-            --fsms-color: #E34D59;
+            --fsms-color: #7B4DFE;
             --error-color: #E34D59;
             --error-bg: #FFF0F0;
             --error-border: #FFD6D6;
@@ -35,35 +40,39 @@
         }
         
         .page-container {
-            width: 100%; max-width: 1920px; /* 自适应 */
+            width: 1848px;
+            height: 100vh;
             margin: 0 auto;
             background-color: #f5f5f5;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         
         /* 顶部警示条 - 退回专用 */
         .alert-banner {
-            background: linear-gradient(135deg, #E34D59 0%, #FF7875 100%);
-            color: #fff;
-            padding: 12px 24px;
+            background: #fff7f7;
+            color: rgba(0,0,0,0.9);
+            padding: 10px 24px;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 14px;
-            box-shadow: 0 2px 8px rgba(227, 77, 89, 0.2);
+            font-size: 13px;
+            border-bottom: 1px solid #ffd6d6;
+            flex-shrink: 0;
         }
         
         .alert-icon {
             width: 20px;
             height: 20px;
-            background: rgba(255,255,255,0.2);
+            background: #fff0f0;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            color: #e34d59;
+            border: 1px solid #ffd6d6;
         }
         
         .alert-content {
@@ -71,7 +80,7 @@
         }
         
         .alert-meta {
-            opacity: 0.9;
+            color: rgba(0,0,0,0.6);
             font-size: 13px;
             margin-left: 8px;
         }
@@ -148,7 +157,8 @@
         .main-layout {
             flex: 1;
             display: flex;
-            height: calc(100vh - 64px - 44px);
+            flex: 1 1 auto;
+            min-height: 0;
             overflow: hidden;
         }
         
@@ -222,7 +232,7 @@
         .filter-tag.system-Q.active { background: var(--qms-color); border-color: var(--qms-color); }
         .filter-tag.system-E.active { background: var(--ems-color); border-color: var(--ems-color); }
         .filter-tag.system-S.active { background: var(--ohsms-color); border-color: var(--ohsms-color); }
-        .filter-tag.system-IT.active { background: var(--its-color); border-color: var(--its-color); }
+        .filter-tag.system-F.active { background: var(--fsms-color); border-color: var(--fsms-color); }
         
         .filter-stats {
             font-size: 11px;
@@ -343,6 +353,12 @@
             color: var(--success-color);
             border: 1px solid #B5F5EC;
         }
+
+        .item-status-badge.neutral {
+            background: #f2f3f5;
+            color: rgba(0,0,0,0.55);
+            border: 1px solid #dcdde1;
+        }
         
         .item-meta {
             display: flex;
@@ -402,7 +418,6 @@
         .item-system-tag.Q { background: var(--qms-color); }
         .item-system-tag.E { background: var(--ems-color); }
         .item-system-tag.S { background: var(--ohsms-color); }
-        .item-system-tag.IT { background: var(--its-color); }
         .item-system-tag.F { background: var(--fsms-color); }
         
         /* 左侧展开更多按钮 */
@@ -458,7 +473,7 @@
             background: #fafafa;
         }
         
-        /* 新增：问题清单和文件清单区域样式 */
+        /* 新增：问题清单和材料明细表区域样式 */
         .problem-list-section {
             background: #fff;
             border-radius: 8px;
@@ -539,6 +554,53 @@
         .data-table tr:hover td {
             background: #fafafa;
         }
+
+        .data-table tr.problem-row-pending td {
+            background: #fffafa;
+        }
+
+        .data-table tr.problem-row-handled td {
+            color: rgba(0,0,0,0.62);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .status-pill.pending {
+            background: #FFF1F0;
+            color: #E34D59;
+            border-color: #FFD6D6;
+        }
+
+        .status-pill.solved {
+            background: #E6F7F1;
+            color: #00875A;
+            border-color: #B8E8D7;
+        }
+
+        .status-pill.skipped {
+            background: #FFF3E5;
+            color: #C46000;
+            border-color: #FFD5A8;
+        }
+
+        .skip-reason {
+            display: block;
+            max-width: 120px;
+            margin-top: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+        }
         
         .problem-type-tag {
             display: inline-flex;
@@ -587,7 +649,6 @@
         .sys-tag-inline.Q { background: var(--qms-color); }
         .sys-tag-inline.E { background: var(--ems-color); }
         .sys-tag-inline.S { background: var(--ohsms-color); }
-        .sys-tag-inline.IT { background: var(--its-color); }
         .sys-tag-inline.F { background: var(--fsms-color); }
         
         .action-btns {
@@ -821,7 +882,7 @@
         
         /* 右栏：退回统计 - 保留原有 */
         .sidebar-right {
-            width: 253px; /* 调整为原宽度的2/3 (~380*2/3) */
+            width: 368px;
             background: #fff;
             border-left: 1px solid #e7e7e7;
             display: flex;
@@ -877,6 +938,7 @@
         
         .fill-returned { background: #E34D59; }
         .fill-passed { background: #00A870; }
+        .fill-handled { background: #0052D9; }
         
         .stat-grid {
             display: grid;
@@ -974,15 +1036,386 @@
             color: #FF7D00;
             border: 1px solid #FFE8B3;
         }
+
+        .t-tag--success {
+            background: #E6F7F1;
+            color: #00875A;
+            border: 1px solid #B8E8D7;
+        }
+
+        /* 统一规范覆盖 */
+        .sidebar-header {
+            background: #fff;
+            padding: 14px 16px;
+        }
+
+        .sidebar-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-stats {
+            font-size: 12px;
+            color: rgba(0,0,0,0.55);
+            margin-bottom: 14px;
+        }
+
+        .filter-label-icon {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #0052D9;
+            display: inline-block;
+        }
+
+        .quick-filter-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            margin-bottom: 12px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 32px;
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            border-color: #0052D9;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(0,0,0,0.4);
+        }
+
+        .group-title {
+            padding: 10px 16px;
+            background: #f7f8fa;
+            border-bottom: 1px solid #eef0f3;
+            font-size: 13px;
+        }
+
+        .group-title-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .group-title-meta {
+            color: rgba(0,0,0,0.45);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .material-item {
+            padding: 12px 16px;
+            gap: 7px;
+            border-left: 3px solid transparent;
+            background: #fff;
+        }
+
+        .material-item.active {
+            background: #f2f7ff;
+            border-left-color: #0052D9;
+        }
+
+        .material-item.returned,
+        .material-item.passed {
+            background: #fff;
+        }
+
+        .material-item.returned.active,
+        .material-item.passed.active {
+            background: #f2f7ff;
+        }
+
+        .item-header {
+            display: block;
+        }
+
+        .item-name {
+            font-size: 13px;
+            line-height: 1.45;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .item-status-badge {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            margin-top: 7px;
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 999px;
+        }
+
+        .item-system-tags {
+            gap: 4px;
+            margin-top: 0;
+        }
+
+        .item-system-tag,
+        .sys-tag-inline {
+            min-width: 24px;
+            height: 18px;
+            line-height: 16px;
+            text-align: center;
+            padding: 0 6px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            color: inherit;
+            font-size: 11px;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .item-system-tag.Q,
+        .sys-tag-inline.Q { background: #E8F1FF; border-color: #B7D3FF; color: #0052D9; }
+        .item-system-tag.E,
+        .sys-tag-inline.E { background: #E6F7F1; border-color: #B8E8D7; color: #00875A; }
+        .item-system-tag.S,
+        .sys-tag-inline.S { background: #FFF3E5; border-color: #FFD5A8; color: #C46000; }
+        .item-system-tag.F,
+        .sys-tag-inline.F { background: #F1EDFF; border-color: #D6CAFF; color: #6339D8; }
+
+        .item-system-tag.dimmed {
+            opacity: 1;
+            filter: none;
+            background: #F2F3F5 !important;
+            border-color: #DCDDE1 !important;
+            color: #9CA3AF !important;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+        }
+
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+        }
+
+        .file-count-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 7px;
+            border-radius: 999px;
+            background: #f7f8fa;
+            border: 1px solid #e7e7e7;
+            color: rgba(0,0,0,0.55);
+            white-space: nowrap;
+        }
+
+        .material-item.has-issue .item-name {
+            color: rgba(0,0,0,0.9);
+        }
+
+        .content-main {
+            background: #f5f5f5;
+        }
+
+        .content-header {
+            padding: 16px 24px;
+            background: #fff;
+        }
+
+        .page-title {
+            font-size: 18px;
+        }
+
+        .content-body {
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .problem-list-section,
+        .file-list-section {
+            border-color: #dfe7f2;
+            margin-bottom: 20px;
+        }
+
+        .file-list-section .section-title {
+            min-height: 56px;
+        }
+
+        .section-title-meta {
+            color: #64748B;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .file-list-section .data-table td {
+            height: 78px;
+            vertical-align: middle;
+            border-bottom-color: #edf1f5;
+        }
+
+        .file-name-cell {
+            color: rgba(0,0,0,0.9);
+            font-weight: 600;
+            align-items: flex-start;
+        }
+
+        .file-sub-meta {
+            margin-top: 4px;
+            color: #64748B;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .btn-mini {
+            min-height: 32px;
+        }
+
+        .btn-mini-primary {
+            background: #0052D9;
+            border-color: #0052D9;
+        }
+
+        .problem-list-section .btn-mini-primary {
+            background: #0052D9;
+            border-color: #0052D9;
+            color: #fff;
+        }
+
+        .problem-list-section .btn-mini-primary:hover,
+        .problem-list-section .btn-mini-primary:focus-visible {
+            background: #003CAB;
+            border-color: #003CAB;
+            color: #fff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0,82,217,0.12);
+        }
+
+        .problem-list-section .btn-mini-outline {
+            background: #fff;
+            border-color: #dfe7f2;
+            color: rgba(0,0,0,0.72);
+        }
+
+        .problem-list-section .btn-mini-outline:hover,
+        .problem-list-section .btn-mini-outline:focus-visible {
+            background: #fafafa;
+            border-color: #bfc7d5;
+            color: rgba(0,0,0,0.86);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(100,116,139,0.10);
+        }
+
+        .sidebar-right {
+            background: #fff;
+        }
+
+        .stat-card {
+            border-radius: 6px;
+        }
+
+        .toast-stack {
+            position: fixed;
+            right: 24px;
+            top: 82px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast-item {
+            min-width: 260px;
+            max-width: 360px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            background: #fff;
+            border: 1px solid #dfe7f2;
+            box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+            font-size: 13px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1800;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 460px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e7e7e7;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.16);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e7e7e7;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 20px;
+            font-size: 13px;
+            color: rgba(0,0,0,0.75);
+            line-height: 1.6;
+        }
+
+        .modal-body textarea {
+            width: 100%;
+            min-height: 92px;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border: 1px solid #dfe7f2;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .modal-body textarea:focus {
+            border-color: #0052D9;
+        }
+
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid #e7e7e7;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
     </style>
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
 
@@ -1005,7 +1438,7 @@
         </div>
         <div class="header-right">
             <button class="t-button t-button--outline" onclick="saveDraft()">保存草稿</button>
-            <button class="t-button t-button--danger" id="headerResubmitBtn" disabled onclick="headerResubmit()">重新提交审核</button>
+            <button class="t-button t-button--primary" id="headerResubmitBtn" disabled onclick="headerResubmit()">重新提交初次评定</button>
         </div>
     </header>
 
@@ -1024,10 +1457,12 @@
         <aside class="sidebar-left">
             <!-- 从归档材料提交页面复制的完整筛选区域 - 开始 -->
             <div class="sidebar-header">
+                <div class="sidebar-title">归档材料清单</div>
+                <div class="sidebar-stats" id="returnStats">MSF11-20 共 48 项 | 4 项有问题 | 6 个待处理问题</div>
                 <!-- 认证领域筛选 -->
                 <div class="filter-section">
                     <div class="filter-label">
-                        <span>🏷️</span>
+                        <span class="filter-label-icon"></span>
                         <span>认证领域（多选）</span>
                         <span class="filter-stats" id="systemFilterStats">已选：全部</span>
                     </div>
@@ -1035,802 +1470,39 @@
                         <span class="filter-tag system-Q" data-value="Q" onclick="toggleSystemFilter('Q')">质量管理体系(Q)</span>
                         <span class="filter-tag system-E" data-value="E" onclick="toggleSystemFilter('E')">环境管理体系(E)</span>
                         <span class="filter-tag system-S" data-value="S" onclick="toggleSystemFilter('S')">职业健康安全(S)</span>
-                        <span class="filter-tag system-IT" data-value="IT" onclick="toggleSystemFilter('IT')">信息安全体系(IT)</span>
+                        <span class="filter-tag system-F" data-value="F" onclick="toggleSystemFilter('F')">食品安全体系(F)</span>
                     </div>
                 </div>
                 
-                <!-- 认证类型筛选 -->
-                <div class="filter-section">
+                <div>
                     <div class="filter-label">
-                        <span>📋</span>
-                        <span>认证类型（多选）</span>
-                        <span class="filter-stats" id="auditFilterStats">已选：全部</span>
+                        <span class="filter-label-icon"></span>
+                        <span>快速筛选</span>
+                        <span class="filter-stats">显示 <span id="filteredCount">48</span> / <span id="totalCount">48</span> 项</span>
                     </div>
-                    <div class="filter-tags" id="auditTypeFilters">
-                        <span class="filter-tag" data-value="Initial" onclick="toggleAuditTypeFilter('Initial')">初次认证</span>
-                        <span class="filter-tag" data-value="Surveillance1" onclick="toggleAuditTypeFilter('Surveillance1')">监督一</span>
-                        <span class="filter-tag" data-value="Surveillance2" onclick="toggleAuditTypeFilter('Surveillance2')">监督二</span>
-                        <span class="filter-tag" data-value="Recertification" onclick="toggleAuditTypeFilter('Recertification')">再认证</span>
-                    </div>
-                </div>
-                
-                <!-- 快速筛选 - 已移除"全部"、"仅看缺失"、"适用时"按钮，保留搜索框和统计 -->
-                <div style="margin-bottom: 12px;">
-                    <div style="font-weight: 600; margin-bottom: 4px; font-size: 13px;">快速筛选</div>
-                    <div style="font-size: 12px; color: rgba(0,0,0,0.4); margin-bottom: 8px;">
-                        共 <span id="totalCount">44</span> 项材料 | 显示 <span id="filteredCount">44</span> 项
-                    </div>
-                    
-                    <div style="margin-bottom: 12px; position: relative;">
+
+                    <div class="search-box">
                         <input type="text" id="materialSearch" placeholder="搜索材料名称..." 
-                               style="width: 100%; padding: 8px 12px; padding-left: 32px; border: 1px solid #e7e7e7; border-radius: 4px; font-size: 13px; outline: none;"
+                               class="search-input"
                                oninput="filterMaterials(this.value)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.4)" stroke-width="2" 
-                             style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);">
+                             class="search-icon">
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="M21 21l-4.35-4.35"></path>
                         </svg>
+                    </div>
+                    <div class="quick-filter-row">
+                        <span class="filter-tag active" data-status-filter="all" onclick="filterByStatus('all', this)">全部</span>
+                        <span class="filter-tag" data-status-filter="pending" onclick="filterByStatus('pending', this)">仅看待处理</span>
+                        <span class="filter-tag" data-status-filter="handled" onclick="filterByStatus('handled', this)">已处理</span>
+                        <span class="filter-tag" data-status-filter="issue" onclick="filterByStatus('issue', this)">有退回问题</span>
                     </div>
                 </div>
             </div>
             <!-- 从归档材料提交页面复制的完整筛选区域 - 结束 -->
             
             <div class="material-nav">
-                <!-- 需修正文件组 -->
-                <div class="material-group" data-group="returned">
-                    <div class="group-title" onclick="toggleGroup(this)">
-                        <span>⚠️ 退回待处理（共 <span class="group-count">6</span>项）</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <div class="group-items">
-                        <div class="empty-filter-tip" data-empty="returned">无匹配的需修正文件</div>
-                        
-                        <div class="material-item returned active" 
-                             data-id="audit-report"
-                             data-systems="Q,E,S,IT" 
-                             data-cert-type="初次认证"
-                             onclick="switchMaterial('audit-report', this)">
-                            <div class="item-header">
-                                <div class="item-name">审核报告</div>
-                                <span class="item-status-badge error">需修正</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                            </div>
-                        </div>
-                        
-                        <div class="material-item returned" 
-                             data-id="recommendation"
-                             data-systems="Q,E,F" 
-                             data-cert-type="初次认证"
-                             onclick="switchMaterial('recommendation', this)">
-                            <div class="item-header">
-                                <div class="item-name">认证发证推荐表</div>
-                                <span class="item-status-badge error">需修正</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                        </div>
-                        
-                        <div class="material-item returned" 
-                             data-id="supplement-material"
-                             data-systems="E,S" 
-                             data-cert-type="初次认证"
-                             onclick="switchMaterial('supplement-material', this)">
-                            <div class="item-header">
-                                <div class="item-name">环境影响评价报告</div>
-                                <span class="item-status-badge error">待补充材料</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                            </div>
-                        </div>
-                        
-                        <div class="material-item returned" 
-                             data-id="supplement-audit"
-                             data-systems="Q,E,S" 
-                             data-cert-type="初次认证"
-                             onclick="switchMaterial('supplement-audit', this)">
-                            <div class="item-header">
-                                <div class="item-name">第一阶段审核记录</div>
-                                <span class="item-status-badge error">待补充审核</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 保留文件组 - 默认只展示前10条 -->
-                <div class="material-group" data-group="passed">
-                    <div class="group-title collapsed" onclick="toggleGroup(this)">
-                        <span>✅ 保留文件（已通过 <span class="group-count">42</span>项）</span>
-                        <span class="arrow">▼</span>
-                    </div>
-                    <div class="group-items collapsed" id="passed-files-container">
-                        <div class="empty-filter-tip" data-empty="passed">无匹配的已通过文件</div>
-                        
-                        <!-- 前10条默认可见 -->
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S,IT,F" 
-                             data-cert-type="初次认证">
-                            <div class="item-header">
-                                <div class="item-name">认证申请表</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                            <div class="item-meta">在线表单 | 信息完整</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S,IT,F" 
-                             data-cert-type="初次认证">
-                            <div class="item-header">
-                                <div class="item-name">获证方情况调查表</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                            <div class="item-meta">PDF | 调查完整</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S,IT,F" 
-                             data-cert-type="监督一">
-                            <div class="item-header">
-                                <div class="item-name">证书变更申请表</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                            <div class="item-meta">变更时 | 已确认</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S,IT,F" 
-                             data-cert-type="监督二">
-                            <div class="item-header">
-                                <div class="item-name">认证周期绩效评价表</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                            <div class="item-meta">通用 | 评价完整</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S,IT,F" 
-                             data-cert-type="初次认证">
-                            <div class="item-header">
-                                <div class="item-name">认证申请评审表</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                            <div class="item-meta">通用 | 评审通过</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S,IT,F" 
-                             data-cert-type="初次认证">
-                            <div class="item-header">
-                                <div class="item-name">法律地位证明文件复印件</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                            <div class="item-meta">多文件材料 | 3个文件</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S,IT,F" 
-                             data-cert-type="监督一">
-                            <div class="item-header">
-                                <div class="item-name">相关资质证明原件复印件</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                            <div class="item-meta">适用时 | 资质有效</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S" 
-                             data-cert-type="初次认证">
-                            <div class="item-header">
-                                <div class="item-name">生产工艺/服务流程图</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                            </div>
-                            <div class="item-meta">适用时 | 流程清晰</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S" 
-                             data-cert-type="再认证">
-                            <div class="item-header">
-                                <div class="item-name">管理体系过程清单</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                            </div>
-                            <div class="item-meta">Q/E/S分别上传 | 清单完整</div>
-                        </div>
-                        
-                        <div class="material-item passed" 
-                             data-systems="Q,E,S,IT,F" 
-                             data-cert-type="再认证">
-                            <div class="item-header">
-                                <div class="item-name">组织机构图</div>
-                                <span class="item-status-badge success">已通过</span>
-                            </div>
-                            <div class="item-system-tags">
-                                <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                <span class="item-system-tag E" data-sys="E">E</span>
-                                <span class="item-system-tag S" data-sys="S">S</span>
-                                <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                <span class="item-system-tag F" data-sys="F">F</span>
-                            </div>
-                            <div class="item-meta">通用 | 架构清晰</div>
-                        </div>
-                        
-                        <!-- 剩余32条默认隐藏 -->
-                        <div class="hidden-files" style="display: none;">
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="监督一">
-                                <div class="item-header">
-                                    <div class="item-name">认证场所清单</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">适用时 | 场所明确</div>
-                            </div>
-                            
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="监督二">
-                                <div class="item-header">
-                                    <div class="item-name">审核项目推进表</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 进度合理</div>
-                            </div>
-                            
-                            <div class="material-item passed" 
-                                 data-systems="E,S" 
-                                 data-cert-type="再认证">
-                                <div class="item-header">
-                                    <div class="item-name">地理位置示意图和厂区平面布置图</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">E/S专用 | 图示清晰</div>
-                            </div>
-                            
-                            <div class="material-item passed" 
-                                 data-systems="Q" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">组织适用的产品或服务质量标准清单</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                </div>
-                                <div class="item-meta">QMS专用 | 标准有效</div>
-                            </div>
-                            
-                            <div class="material-item passed" 
-                                 data-systems="E,S" 
-                                 data-cert-type="监督一">
-                                <div class="item-header">
-                                    <div class="item-name">组织适用的法律法规、标准清单</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">E/S专用 | 法规齐全</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="监督二">
-                                <div class="item-header">
-                                    <div class="item-name">内审和管理评审资料</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 资料完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="E,S" 
-                                 data-cert-type="再认证">
-                                <div class="item-header">
-                                    <div class="item-name">环境影响评价/安评批复</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">E/S专用 | 批复有效</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">主要设备清单</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">Q/E/S适用 | 清单准确</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="E,S" 
-                                 data-cert-type="监督一">
-                                <div class="item-header">
-                                    <div class="item-name">环境监测/职业危害因素检测报告</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">E/S专用 | 报告有效</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="监督二">
-                                <div class="item-header">
-                                    <div class="item-name">特种作业人员资质证书</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">适用时 | 资质有效</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">产品检验报告</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                </div>
-                                <div class="item-meta">QMS专用 | 报告合格</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="E,S" 
-                                 data-cert-type="再认证">
-                                <div class="item-header">
-                                    <div class="item-name">排污许可证/安全生产许可证</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">E/S专用 | 许可证有效</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="监督一">
-                                <div class="item-header">
-                                    <div class="item-name">供应商名录及评价记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="IT" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">信息服务管理流程文档</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                </div>
-                                <div class="item-meta">ITS专用 | 文档规范</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="F" 
-                                 data-cert-type="监督二">
-                                <div class="item-header">
-                                    <div class="item-name">食品安全管理体系文件</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">FSMS专用 | 文件完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="再认证">
-                                <div class="item-header">
-                                    <div class="item-name">客户满意度调查报告</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 调查报告有效</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">关键过程控制记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">Q/E/S适用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="E,S" 
-                                 data-cert-type="监督一">
-                                <div class="item-header">
-                                    <div class="item-name">应急预案及演练记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">E/S专用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="监督二">
-                                <div class="item-header">
-                                    <div class="item-name">纠正和预防措施记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="再认证">
-                                <div class="item-header">
-                                    <div class="item-name">监视和测量设备校准证书</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 证书有效</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="E" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">能源消耗统计报表</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                </div>
-                                <div class="item-meta">EMS专用 | 报表准确</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="S" 
-                                 data-cert-type="监督一">
-                                <div class="item-header">
-                                    <div class="item-name">职业病体检报告</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">OHSMS专用 | 报告有效</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,F" 
-                                 data-cert-type="监督二">
-                                <div class="item-header">
-                                    <div class="item-name">HACCP计划及验证记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">Q/FSMS适用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="IT" 
-                                 data-cert-type="再认证">
-                                <div class="item-header">
-                                    <div class="item-name">IT服务级别协议(SLA)</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                </div>
-                                <div class="item-meta">ITS专用 | 协议有效</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">质量/环境/安全目标分解表</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 分解合理</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="E,S" 
-                                 data-cert-type="监督一">
-                                <div class="item-header">
-                                    <div class="item-name">合规性评价记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">E/S专用 | 评价合格</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="监督二">
-                                <div class="item-header">
-                                    <div class="item-name">培训计划和实施记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q" 
-                                 data-cert-type="再认证">
-                                <div class="item-header">
-                                    <div class="item-name">产品设计开发输入输出记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                </div>
-                                <div class="item-meta">QMS专用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="E,S" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">危险化学品清单及MSDS</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">E/S专用 | 清单完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S,IT,F" 
-                                 data-cert-type="监督一">
-                                <div class="item-header">
-                                    <div class="item-name">顾客投诉处理记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">通用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="F" 
-                                 data-cert-type="监督二">
-                                <div class="item-header">
-                                    <div class="item-name">食品召回演练记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag F" data-sys="F">F</span>
-                                </div>
-                                <div class="item-meta">FSMS专用 | 记录完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="IT" 
-                                 data-cert-type="再认证">
-                                <div class="item-header">
-                                    <div class="item-name">信息安全风险评估报告</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag IT" data-sys="IT">IT</span>
-                                </div>
-                                <div class="item-meta">ITS专用 | 报告完整</div>
-                            </div>
-
-                            <div class="material-item passed" 
-                                 data-systems="Q,E,S" 
-                                 data-cert-type="初次认证">
-                                <div class="item-header">
-                                    <div class="item-name">外包过程控制记录</div>
-                                    <span class="item-status-badge success">已通过</span>
-                                </div>
-                                <div class="item-system-tags">
-                                    <span class="item-system-tag Q" data-sys="Q">Q</span>
-                                    <span class="item-system-tag E" data-sys="E">E</span>
-                                    <span class="item-system-tag S" data-sys="S">S</span>
-                                </div>
-                                <div class="item-meta">Q/E/S适用 | 记录完整</div>
-                            </div>
-                            
-                            <div class="material-item passed" style="justify-content: center; color: rgba(0,0,0,0.4); font-size: 12px; cursor: default;">
-                                ... 还有 2 项已通过材料 ...
-                            </div>
-                        </div>
-                        
-                        <!-- 展开更多按钮 -->
-                        <div class="show-more-btn" onclick="toggleHiddenFiles(this)">
-                            <span>查看剩余 32 项已通过材料</span>
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 4px; vertical-align: middle;">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+                <!-- 页面加载时根据 MSF11-20 权威清单渲染 48 项材料树 -->
             </div>
         </aside>
 
@@ -1838,10 +1510,10 @@
         <main class="content-main">
             <div class="content-header">
                 <div class="page-title">
-                    <span id="current-material-title">审核报告</span>
+                    <span id="current-material-title">认证发证推荐表</span>
                     <span class="t-tag t-tag--error" id="current-material-tag">2个待处理问题</span>
                 </div>
-                <div class="page-subtitle">查看该材料分类下的问题清单与文件清单，处理完成后点击"解决"标记状态</div>
+                <div class="page-subtitle">查看该材料清单项下的问题与文件证据；问题可标记为已解决，或填写说明后标记为无需解决。</div>
             </div>
             
             <div class="content-body">
@@ -1869,10 +1541,11 @@
                     </table>
                 </div>
 
-                <!-- 文件清单区域（底部） -->
+                <!-- 材料明细表区域（底部） -->
                 <div class="file-list-section">
                     <div class="section-title">
-                        <div class="section-title-left">文件清单</div>
+                        <div class="section-title-left">材料明细表</div>
+                        <div class="section-title-meta" id="file-section-meta">当前显示 0 个具体文件，来自 1 项材料</div>
                         <div class="section-title-actions">
                             <button class="btn-mini btn-mini-outline" onclick="uploadLocalNew()">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
@@ -1892,12 +1565,9 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>文件名称</th>
-                                <th style="width: 80px;">文件类型</th>
-                                <th style="width: 100px;">带入环节</th>
-                                <th style="width: 120px;">上传日期</th>
-                                <th style="width: 120px;">覆盖体系</th>
-                                <th style="width: 200px;">操作</th>
+                                <th>具体文件名称</th>
+                                <th style="width: 150px;">适用体系</th>
+                                <th style="width: 140px;">操作</th>
                             </tr>
                         </thead>
                         <tbody id="file-table-body">
@@ -1907,7 +1577,7 @@
                 </div>
 
                 <!-- 保留原有的材料详情sections，但用于数据存储而非展示 -->
-                <div id="content-audit-report" class="material-detail-section active" data-problems='[{"id":1,"type":"登记问题","description":"QMS视角：缺少末页审核组长签字（第8页），请补充手写签名或电子签章；审核完成日期（2026-03-28）早于首次会议日期（2026-03-30），请修正时间线确保逻辑合理","systems":"Q","submitter":"张经理"},{"id":2,"type":"登记问题","description":"QMS视角：第一阶段审核记录缺少审核范围描述，需补充质量管理体系审核的具体范围界定","systems":"Q","submitter":"张经理"}]' data-files='[{"id":"file1","name":"第二阶段审核报告.pdf","type":"PDF","stage":"初审","uploadDate":"2026-03-30","systems":["Q","E","S","IT"],"size":"2.4MB"},{"id":"file2","name":"第一阶段审核记录.pdf","type":"PDF","stage":"初审","uploadDate":"2026-03-28","systems":["Q"],"size":"1.8MB"}]'></div>
+                <div id="content-audit-report" class="material-detail-section" data-problems='[{"id":1,"type":"登记问题","description":"QMS视角：缺少末页审核组长签字（第8页），请补充手写签名或电子签章；审核完成日期（2026-03-28）早于首次会议日期（2026-03-30），请修正时间线确保逻辑合理","systems":"Q","submitter":"张经理"},{"id":2,"type":"登记问题","description":"QMS视角：第一阶段审核记录缺少审核范围描述，需补充质量管理体系审核的具体范围界定","systems":"Q","submitter":"张经理"}]' data-files='[{"id":"file1","name":"第二阶段审核报告.pdf","type":"PDF","stage":"初审","uploadDate":"2026-03-30","systems":["Q","E","S","F"],"size":"2.4MB"},{"id":"file2","name":"第一阶段审核记录.pdf","type":"PDF","stage":"初审","uploadDate":"2026-03-28","systems":["Q"],"size":"1.8MB"}]'></div>
                 
                 <div id="content-recommendation" class="material-detail-section" data-problems='[{"id":3,"type":"登记问题","description":"QMS视角：证书有效期已截止（2025-12-31），请上传最新续签版本；缺少证书内容确认件的PDF附件","systems":"Q","submitter":"张经理"},{"id":4,"type":"登记问题","description":"QMS视角：证书确认件格式不符合要求，需使用最新版模板，请重新下载模板填写后上传","systems":"Q","submitter":"张经理"}]' data-files='[{"id":"file3","name":"认证发证推荐表.pdf","type":"PDF","stage":"初审","uploadDate":"2026-03-29","systems":["Q","E","F"],"size":"856KB"},{"id":"file4","name":"证书确认件.pdf","type":"PDF","stage":"初审","uploadDate":"2026-03-29","systems":["Q"],"size":"1.2MB"}]'></div>
                 
@@ -1924,9 +1594,9 @@
                     <button class="t-button t-button--outline" onclick="saveDraft()">保存草稿</button>
                 </div>
                 <div class="action-right">
-                    <span class="status-hint" id="submitHint">待完成 4 个文件的处理后可重新提交</span>
-                    <button class="t-button t-button--danger" id="resubmitBtn" disabled onclick="resubmitAudit()">
-                        重新提交审核
+                    <span class="status-hint" id="submitHint">仍有 6 个问题待处理，全部处理后可重新提交</span>
+                    <button class="t-button t-button--primary" id="resubmitBtn" disabled onclick="resubmitAudit()">
+                        重新提交初次评定
                     </button>
                 </div>
             </div>
@@ -1942,27 +1612,27 @@
                 <div class="progress-list">
                     <div class="progress-item">
                         <div class="progress-header">
-                            <span style="color: #E34D59; font-weight: 500;">待处理问题</span>
-                            <span style="color: #E34D59; font-weight: 600;" id="pending-count">6/6</span>
+                            <span style="color: #E34D59; font-weight: 500;">问题处理进度</span>
+                            <span style="color: #E34D59; font-weight: 600;" id="pending-count">0/6</span>
                         </div>
                         <div class="progress-bar-bg">
-                            <div class="progress-bar-fill fill-returned" id="pending-progress" style="width: 0%"></div>
+                            <div class="progress-bar-fill fill-handled" id="pending-progress" style="width: 0%"></div>
                         </div>
                         <div style="font-size: 12px; color: rgba(0,0,0,0.5); margin-top: 4px;">
-                            当前正在处理：<span id="current-processing">审核报告</span>
+                            当前正在处理：<span id="current-processing">认证发证推荐表</span>
                         </div>
                     </div>
                     
                     <div class="progress-item">
                         <div class="progress-header">
-                            <span style="color: #00A870; font-weight: 500;">已通过文件</span>
-                            <span style="color: #00A870; font-weight: 600;">42项</span>
+                            <span style="color: #00A870; font-weight: 500;">未退回材料</span>
+                            <span style="color: #00A870; font-weight: 600;">44项</span>
                         </div>
                         <div class="progress-bar-bg">
                             <div class="progress-bar-fill fill-passed" style="width: 100%"></div>
                         </div>
                         <div style="font-size: 12px; color: rgba(0,0,0,0.5); margin-top: 4px;">
-                            无需修改，将自动保留
+                            未被退回的问题材料将随本次重新提交保留
                         </div>
                     </div>
                 </div>
@@ -1973,16 +1643,16 @@
                         <div class="stat-label">待处理</div>
                     </div>
                     <div class="stat-card success">
-                        <div class="stat-value" style="color: #00A870;">42</div>
-                        <div class="stat-label">已通过</div>
+                        <div class="stat-value" style="color: #00A870;" id="stat-solved">0</div>
+                        <div class="stat-label">已解决</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" style="color: #0052D9;" id="stat-completed">0</div>
-                        <div class="stat-label">已更新</div>
+                        <div class="stat-value" style="color: #FF7D00;" id="stat-skipped">0</div>
+                        <div class="stat-label">无需解决</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" style="color: #FF7D00;">6</div>
-                        <div class="stat-label">待上传</div>
+                        <div class="stat-value" style="color: #0052D9;">4</div>
+                        <div class="stat-label">涉及材料</div>
                     </div>
                 </div>
             </div>
@@ -2002,21 +1672,21 @@
                     <div class="timeline-item">
                         <div class="timeline-dot" style="background: #0052D9;"></div>
                         <div class="timeline-content">
-                            <div class="timeline-title" id="timeline-current">处理中：审核报告</div>
+                            <div class="timeline-title" id="timeline-current">处理中：认证发证推荐表</div>
                             <div class="timeline-time">2026-04-02 16:18 | 归档员-李工</div>
                         </div>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-dot" style="background: #E7E7E7;"></div>
                         <div class="timeline-content">
-                            <div class="timeline-title" style="color: rgba(0,0,0,0.4);">待处理：认证发证推荐表</div>
-                            <div class="timeline-time">等待上传...</div>
+                            <div class="timeline-title" style="color: rgba(0,0,0,0.4);" id="timeline-pending">待处理：6个问题</div>
+                            <div class="timeline-time">等待全部问题处理完成</div>
                         </div>
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-dot" style="background: #E7E7E7;"></div>
                         <div class="timeline-content">
-                            <div class="timeline-title" style="color: rgba(0,0,0,0.4);">重新提交审核</div>
+                            <div class="timeline-title" style="color: rgba(0,0,0,0.4);">重新提交初次评定</div>
                             <div class="timeline-time">待完成所有处理后</div>
                         </div>
                     </div>
@@ -2026,16 +1696,267 @@
     </div>
 </div>
 
+<div class="toast-stack" id="toastStack"></div>
+
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-content">
+        <div class="modal-header" id="confirmModalTitle">操作确认</div>
+        <div class="modal-body" id="confirmModalBody"></div>
+        <div class="modal-footer">
+            <button class="t-button t-button--outline" onclick="closeConfirmModal(false)">取消</button>
+            <button class="t-button t-button--primary" onclick="closeConfirmModal(true)">确认</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="reasonModal">
+    <div class="modal-content">
+        <div class="modal-header">无需解决说明</div>
+        <div class="modal-body">
+            <div>请填写该问题无需解决的业务说明，提交后将保留处理痕迹。</div>
+            <textarea id="skipReasonInput" placeholder="请输入说明"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="t-button t-button--outline" onclick="closeReasonModal(false)">取消</button>
+            <button class="t-button t-button--primary" onclick="closeReasonModal(true)">确认</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // 从归档材料提交页面复制的筛选功能全局状态
     let selectedSystems = new Set();
-    let selectedAuditTypes = new Set();
     let currentStatusFilter = 'all';
     let searchKeyword = '';
+    let confirmResolver = null;
+    let reasonResolver = null;
     
-    // 新增：文件完成状态管理
-    let completedFiles = new Set();
-    const totalFiles = 4;
+    const MATERIAL_CATALOG = [{"id":"MSF11-20-001","category":"通用材料","name":"认证发证推荐表","systems":["Q","E","S","F"]},{"id":"MSF11-20-002","category":"通用材料","name":"证书内容确认件（标黄代表需要pdf附件）","systems":["Q","E","S","F"]},{"id":"MSF11-20-003","category":"通用材料","name":"认证申请表","systems":["Q","E","S","F"]},{"id":"MSF11-20-004","category":"通用材料","name":"全国认证认可信息公共服务平台(认e云)查询截图","systems":["Q","E","S","F"]},{"id":"MSF11-20-005","category":"通用材料","name":"获证方情况调查表","systems":["Q","E","S","F"]},{"id":"MSF11-20-006","category":"通用材料","name":"证书变更申请表","systems":["Q","E","S","F"]},{"id":"MSF11-20-007","category":"通用材料","name":"认证周期绩效评价表","systems":["Q","E","S","F"]},{"id":"MSF11-20-008","category":"通用材料","name":"认证申请评审表（或认证证书转换评审记录）","systems":["Q","E","S","F"]},{"id":"MSF11-20-009","category":"通用材料","name":"法律地位证明文件复印件（如营业执照）","systems":["Q","E","S","F"]},{"id":"MSF11-20-010","category":"通用材料","name":"相关资质证明原件复印件、守法证明（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-011","category":"通用材料","name":"生产工艺/服务流程图(适用时)","systems":["Q","E","S","F"]},{"id":"MSF11-20-012","category":"通用材料","name":"管理体系过程清单（Q/E/S）","systems":["Q","E","S","F"]},{"id":"MSF11-20-013","category":"通用材料","name":"组织机构图","systems":["Q","E","S","F"]},{"id":"MSF11-20-014","category":"通用材料","name":"认证场所清单（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-015","category":"通用材料","name":"审核项目推进表","systems":["Q","E","S","F"]},{"id":"MSF11-20-016","category":"通用材料","name":"地理位置示意图和厂区平面布置图","systems":["E","S","F"]},{"id":"MSF11-20-017","category":"通用材料","name":"组织适用的产品或服务质量标准清单","systems":["Q","F"]},{"id":"MSF11-20-018","category":"通用材料","name":"组织适用的法律法规、标准清单","systems":["E","S"]},{"id":"MSF11-20-019","category":"通用材料","name":"重要环境因素清单","systems":["E"]},{"id":"MSF11-20-020","category":"通用材料","name":"主要危险源和OHS风险","systems":["S"]},{"id":"MSF11-20-021","category":"通用材料","name":"使用的主要危险材料(适用时）","systems":["S"]},{"id":"MSF11-20-022","category":"通用材料","name":"质量/环境/职业健康/食品安全目标","systems":["Q","E","S","F"]},{"id":"MSF11-20-023","category":"通用材料","name":"需要应对的风险和机遇注","systems":["E","S"]},{"id":"MSF11-20-024","category":"通用材料","name":"污染物排放监测报告/作业场所危害因素检测报告复印件（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-025","category":"通用材料","name":"法规符合性证明文件（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-026","category":"通用材料","name":"适用性声明","systems":["Q","E","S","F"]},{"id":"MSF11-20-027","category":"通用材料","name":"详细产品（包括原辅料及终产品）及工艺描述","systems":["F"]},{"id":"MSF11-20-028","category":"通用材料","name":"生产车间平面布置图","systems":["Q","E","S","F"]},{"id":"MSF11-20-029","category":"通用材料","name":"危害分析及OPRP、CCP等针对显著危害的控制措施","systems":["Q","E","S","F"]},{"id":"MSF11-20-030","category":"通用材料","name":"FSMS（HACCP）认证申请组织添加剂使用清单","systems":["Q","E","S","F"]},{"id":"MSF11-20-031","category":"通用材料","name":"食品安全检测报告","systems":["Q","E","S","F"]},{"id":"MSF11-20-032","category":"通用材料","name":"食品安全认证申请组织自我声明","systems":["F"]},{"id":"MSF11-20-033","category":"一阶段材料","name":"一阶段不实施现场审核的申请（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-034","category":"一阶段材料","name":"审核任务书","systems":["Q","E","S","F"]},{"id":"MSF11-20-035","category":"一阶段材料","name":"首末次会议签到表（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-036","category":"一阶段材料","name":"审核计划（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-037","category":"一阶段材料","name":"第一阶段审核问题清单（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-038","category":"一阶段材料","name":"第一阶段审核报告","systems":["Q","E","S","F"]},{"id":"MSF11-20-039","category":"一阶段材料","name":"文件评审报告(适用时)","systems":["Q","E","S","F"]},{"id":"MSF11-20-040","category":"二阶段材料","name":"审核任务书","systems":["Q","E","S","F"]},{"id":"MSF11-20-041","category":"二阶段材料","name":"审核准备会记录(适用时)","systems":["Q","E","S","F"]},{"id":"MSF11-20-042","category":"二阶段材料","name":"首末次会议签到表","systems":["Q","E","S","F"]},{"id":"MSF11-20-043","category":"二阶段材料","name":"审核计划","systems":["Q","E","S","F"]},{"id":"MSF11-20-044","category":"二阶段材料","name":"不符合项报告及纠正措施见证材料（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-045","category":"二阶段材料","name":"核查记录表","systems":["Q","E","S","F"]},{"id":"MSF11-20-046","category":"二阶段材料","name":"审核报告","systems":["Q","E","S","F"]},{"id":"MSF11-20-047","category":"二阶段材料","name":"异地审核情况报备表（适用时）","systems":["Q","E","S","F"]},{"id":"MSF11-20-048","category":"二阶段材料","name":"其他拟上报的资料（适用时，请注明上报材料类型）","systems":["Q","E","S","F"]}];
+    const ISSUE_MATERIALS = {
+        "MSF11-20-001": { detailId: "recommendation", fileCount: 2 },
+        "MSF11-20-025": { detailId: "supplement-material", fileCount: 0 },
+        "MSF11-20-038": { detailId: "supplement-audit", fileCount: 0 },
+        "MSF11-20-046": { detailId: "audit-report", fileCount: 2 }
+    };
+
+    function showToast(message) {
+        const stack = document.getElementById('toastStack');
+        if (!stack) return;
+        const item = document.createElement('div');
+        item.className = 'toast-item';
+        item.textContent = message;
+        stack.appendChild(item);
+        setTimeout(() => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(-4px)';
+            item.style.transition = 'all 0.2s';
+            setTimeout(() => item.remove(), 220);
+        }, 2200);
+    }
+
+    function showConfirm(message, title = '操作确认') {
+        const modal = document.getElementById('confirmModal');
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalBody').textContent = message;
+        modal.classList.add('active');
+        return new Promise(resolve => {
+            confirmResolver = resolve;
+        });
+    }
+
+    function closeConfirmModal(result) {
+        document.getElementById('confirmModal').classList.remove('active');
+        if (confirmResolver) {
+            confirmResolver(result);
+            confirmResolver = null;
+        }
+    }
+
+    function showReasonModal() {
+        const input = document.getElementById('skipReasonInput');
+        input.value = '';
+        document.getElementById('reasonModal').classList.add('active');
+        setTimeout(() => input.focus(), 50);
+        return new Promise(resolve => {
+            reasonResolver = resolve;
+        });
+    }
+
+    function closeReasonModal(result) {
+        const modal = document.getElementById('reasonModal');
+        const value = document.getElementById('skipReasonInput').value.trim();
+        modal.classList.remove('active');
+        if (reasonResolver) {
+            reasonResolver(result ? value : null);
+            reasonResolver = null;
+        }
+    }
+
+    function normalizeSystemTags() {
+        document.querySelectorAll('.material-item').forEach(item => {
+            const systems = (item.getAttribute('data-systems') || '').split(',').map(s => s.trim()).filter(Boolean);
+            const uniqueSystems = Array.from(new Set(systems.filter(s => ['Q','E','S','F'].includes(s))));
+            item.setAttribute('data-systems', uniqueSystems.join(','));
+
+            const seen = new Set();
+            item.querySelectorAll('.item-system-tag').forEach(tag => {
+                const sys = tag.getAttribute('data-sys');
+                if (seen.has(sys)) {
+                    tag.remove();
+                } else {
+                    seen.add(sys);
+                }
+            });
+        });
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[char]));
+    }
+
+    function renderMaterialNav() {
+        const nav = document.querySelector('.material-nav');
+        if (!nav) return;
+
+        const groups = ['通用材料', '一阶段材料', '二阶段材料'];
+        nav.innerHTML = groups.map(groupName => {
+            const groupItems = MATERIAL_CATALOG.filter(item => item.category === groupName);
+            const itemsHtml = groupItems.map(item => renderMaterialItem(item)).join('');
+            const issueCount = groupItems.filter(item => ISSUE_MATERIALS[item.id]).length;
+            const fileCount = groupItems.reduce((sum, item) => sum + getMaterialFileCount(item), 0);
+            return `
+                <div class="material-group" data-group="${escapeHtml(groupName)}">
+                    <div class="group-title" onclick="toggleGroup(this)">
+                        <span class="group-title-main">
+                            <span>${escapeHtml(groupName)}（<span class="group-count">${groupItems.length}</span>项）</span>
+                            <span class="group-title-meta">${fileCount}个文件 | ${issueCount}项有问题</span>
+                        </span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="group-items">
+                        <div class="empty-filter-tip">无匹配材料</div>
+                        ${itemsHtml}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderMaterialItem(item) {
+        const issue = ISSUE_MATERIALS[item.id];
+        const detailId = issue ? issue.detailId : item.id;
+        const isActive = detailId === 'recommendation';
+        const fileCount = getMaterialFileCount(item);
+        const systemsHtml = item.systems.map(sys => `<span class="item-system-tag ${sys}" data-sys="${sys}">${sys}</span>`).join('');
+        const status = getMaterialIssueStatus(detailId);
+        const statusHtml = `<span class="item-status-badge ${status.className}">${status.label}</span>`;
+        const classes = ['material-item', issue ? 'returned has-issue' : 'passed', isActive ? 'active' : ''].filter(Boolean).join(' ');
+
+        return `
+            <div class="${classes}"
+                 data-id="${escapeHtml(detailId)}"
+                 data-catalog-id="${escapeHtml(item.id)}"
+                 data-name="${escapeHtml(item.name)}"
+                 data-category="${escapeHtml(item.category)}"
+                 data-problem-count="${status.total}"
+                 data-pending-count="${status.pending}"
+                 data-handled-count="${status.handled}"
+                 data-has-issue="${issue ? 'true' : 'false'}"
+                 data-systems="${escapeHtml(item.systems.join(','))}"
+                 onclick="switchMaterial('${escapeHtml(detailId)}', this)">
+                <div class="item-header">
+                    <div class="item-name">${escapeHtml(item.name)}</div>
+                    ${statusHtml}
+                </div>
+                <div class="item-system-tags">${systemsHtml}</div>
+                <div class="item-footer">
+                    <span>${escapeHtml(item.category)}</span>
+                    <span class="file-count-pill">${fileCount > 0 ? `${fileCount}个文件` : '未上传'}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    function getMaterialFileCount(item) {
+        const issue = ISSUE_MATERIALS[item.id];
+        if (issue) return issue.fileCount;
+        return item.id === 'MSF11-20-009' ? 3 : 1;
+    }
+
+    function getCatalogItemByDetailId(detailId) {
+        return MATERIAL_CATALOG.find(item => (ISSUE_MATERIALS[item.id]?.detailId || item.id) === detailId);
+    }
+
+    function getProblemsByDetailId(detailId) {
+        const section = document.getElementById('content-' + detailId);
+        if (!section) return [];
+        return JSON.parse(section.getAttribute('data-problems') || '[]');
+    }
+
+    function getMaterialIssueStatus(detailId) {
+        const problems = getProblemsByDetailId(detailId);
+        const total = problems.length;
+        const pending = problems.filter(problem => !problem.status || problem.status === '待解决').length;
+        const handled = total - pending;
+        if (total === 0) {
+            return { total, pending, handled, label: '无退回问题', className: 'neutral' };
+        }
+        if (pending === 0) {
+            return { total, pending, handled, label: '已处理', className: 'success' };
+        }
+        return { total, pending, handled, label: `${pending}个待处理`, className: 'error' };
+    }
+
+    function refreshMaterialIssueBadges() {
+        document.querySelectorAll('.material-item').forEach(item => {
+            const detailId = item.getAttribute('data-id');
+            const status = getMaterialIssueStatus(detailId);
+            item.setAttribute('data-problem-count', status.total);
+            item.setAttribute('data-pending-count', status.pending);
+            item.setAttribute('data-handled-count', status.handled);
+            const badge = item.querySelector('.item-status-badge');
+            if (badge) {
+                badge.className = `item-status-badge ${status.className}`;
+                badge.textContent = status.label;
+            }
+        });
+    }
+
+    function getGlobalProblemStats() {
+        const allSections = document.querySelectorAll('.material-detail-section');
+        let total = 0;
+        let pending = 0;
+        let solved = 0;
+        let skipped = 0;
+
+        allSections.forEach(section => {
+            const problems = JSON.parse(section.getAttribute('data-problems') || '[]');
+            total += problems.length;
+            problems.forEach(problem => {
+                if (problem.status === '已解决') {
+                    solved++;
+                } else if (problem.status === '无需解决') {
+                    skipped++;
+                } else {
+                    pending++;
+                }
+            });
+        });
+
+        return {
+            total,
+            pending,
+            solved,
+            skipped,
+            handled: solved + skipped
+        };
+    }
 
     // 分组折叠
     function toggleGroup(element) {
@@ -2068,31 +1989,18 @@
         }
         
         // 更新标题
-        let materialName = '';
-        let problemCount = 0;
-        switch(materialType) {
-            case 'audit-report':
-                materialName = '审核报告';
-                problemCount = 2;
-                break;
-            case 'recommendation':
-                materialName = '认证发证推荐表';
-                problemCount = 2;
-                break;
-            case 'supplement-material':
-                materialName = '环境影响评价报告';
-                problemCount = 1;
-                break;
-            case 'supplement-audit':
-                materialName = '第一阶段审核记录';
-                problemCount = 1;
-                break;
-            default:
-                materialName = materialType;
-        }
+        const catalogItem = getCatalogItemByDetailId(materialType);
+        const materialName = element?.getAttribute('data-name') || catalogItem?.name || materialType;
+        const issueStatus = getMaterialIssueStatus(materialType);
         
         document.getElementById('current-material-title').textContent = materialName;
-        document.getElementById('current-material-tag').textContent = problemCount + '个待处理问题';
+        const currentTag = document.getElementById('current-material-tag');
+        currentTag.textContent = issueStatus.total > 0 ? issueStatus.label : '无退回问题';
+        currentTag.className = issueStatus.pending > 0
+            ? 't-tag t-tag--error'
+            : issueStatus.total > 0
+                ? 't-tag t-tag--success'
+                : 't-tag';
         document.getElementById('current-processing').textContent = materialName;
         document.getElementById('timeline-current').textContent = '处理中：' + materialName;
         
@@ -2103,7 +2011,22 @@
     // 加载材料数据并渲染表格
     function loadMaterialData(materialType) {
         const section = document.getElementById('content-' + materialType);
-        if (!section) return;
+        if (!section) {
+            const catalogItem = getCatalogItemByDetailId(materialType);
+            const systems = catalogItem?.systems || ['Q','E','S','F'];
+            const fileName = `${catalogItem?.name || '归档材料'}.pdf`;
+            renderProblemTable([]);
+            renderFileTable([{
+                id: `${materialType}-file`,
+                name: fileName,
+                type: 'PDF',
+                stage: '前序环节',
+                uploadDate: '2026-03-30',
+                systems,
+                size: '1.1MB'
+            }]);
+            return;
+        }
         
         const problems = JSON.parse(section.getAttribute('data-problems') || '[]');
         const files = JSON.parse(section.getAttribute('data-files') || '[]');
@@ -2137,27 +2060,26 @@
 
             // 涉及领域标签
             const systemsHtml = problem.systems.split(',').map(sys => 
-                `<span class="sys-tag-inline ${sys.trim()}">${sys.trim()}</span>`
+                `<span class="sys-tag-inline ${escapeHtml(sys.trim())}">${escapeHtml(sys.trim())}</span>`
             ).join('');
 
             // 状态管理（从problem对象读取或默认为"待解决"）
             const status = problem.status || '待解决';
             const skipReason = problem.skipReason || '';
+            tr.className = status === '待解决' ? 'problem-row-pending' : 'problem-row-handled';
 
-            // 状态标签样式
             let statusHtml = '';
             if (status === '已解决') {
-                statusHtml = '<span style="background: #D6F5E8; color: #00A870; padding: 2px 8px; border-radius: 4px; font-size: 12px; border: 1px solid #B5F5EC;">已解决</span>';
+                statusHtml = '<span class="status-pill solved">已解决</span>';
             } else if (status === '无需解决') {
                 let reasonHint = '';
                 if (skipReason) {
-                    const displayText = skipReason.length > 8 ? skipReason.substring(0, 8) + '...' : skipReason;
-                    reasonHint = `<span style="display: block; font-size: 11px; color: rgba(0,0,0,0.5); margin-top: 2px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${skipReason}">(${displayText})</span>`;
+                    const displayText = skipReason.length > 12 ? skipReason.substring(0, 12) + '...' : skipReason;
+                    reasonHint = `<span class="skip-reason" title="${escapeHtml(skipReason)}">${escapeHtml(displayText)}</span>`;
                 }
-                statusHtml = `<span style="background: #FFF0D6; color: #FF7D00; padding: 2px 8px; border-radius: 4px; font-size: 12px; border: 1px solid #FFE8B3;">无需解决</span>${reasonHint}`;
+                statusHtml = `<span class="status-pill skipped">无需解决</span>${reasonHint}`;
             } else {
-                // 待解决
-                statusHtml = '<span style="background: #F2F3FF; color: #0052D9; padding: 2px 8px; border-radius: 4px; font-size: 12px; border: 1px solid #D6E4FF;">待解决</span>';
+                statusHtml = '<span class="status-pill pending">待处理</span>';
             }
 
             // 根据状态生成不同的操作按钮
@@ -2180,9 +2102,9 @@
             tr.innerHTML = `
                 <td>${index + 1}</td>
                 <td><span class="problem-type-tag ${typeClass}">${typeText}</span></td>
-                <td class="problem-desc">${problem.description}</td>
+                <td class="problem-desc">${escapeHtml(problem.description)}</td>
                 <td><div class="sys-tags-inline">${systemsHtml}</div></td>
-                <td>${problem.submitter}</td>
+                <td>${escapeHtml(problem.submitter)}</td>
                 <td>${statusHtml}</td>
                 <td>
                     <div class="action-btns">
@@ -2194,8 +2116,9 @@
             tbody.appendChild(tr);
         });
 
-        // 更新统计
-        updateStatsBasedOnProblems(problems);
+        refreshMaterialIssueBadges();
+        updateActiveMaterialHeader();
+        updateGlobalSubmitStatus();
     }
 
     // 辅助函数：更新问题状态并刷新表格
@@ -2227,100 +2150,72 @@
         renderProblemTable(problems);
     }
 
-    // 更新统计信息（基于当前材料的问题，并与左侧栏总数联动）
-    function updateStatsBasedOnProblems(problems) {
-        const solved = problems.filter(p => p.status === '已解决').length;
-        const skipped = problems.filter(p => p.status === '无需解决').length;
-        const handled = solved + skipped;
-
-        // 获取左侧栏退回待处理总数作为基准
-        const totalReturned = getLeftReturnedCount();
-        const currentPending = totalReturned - handled;
-
-        // 更新右栏统计（与左侧栏总数联动）
-        const statPending = document.getElementById('stat-pending');
-        const statCompleted = document.getElementById('stat-completed');
-        const pendingCount = document.getElementById('pending-count');
-        const pendingProgress = document.getElementById('pending-progress');
-
-        if (statPending) statPending.textContent = currentPending;
-        if (statCompleted) statCompleted.textContent = handled;
-        if (pendingCount) pendingCount.textContent = `${currentPending}/${totalReturned}`;
-        if (pendingProgress) pendingProgress.style.width = totalReturned > 0 ? `${(handled / totalReturned) * 100}%` : '0%';
-
-        // 更新底部提交提示
-        updateGlobalSubmitStatus();
+    function updateActiveMaterialHeader() {
+        const activeItem = document.querySelector('.material-item.active');
+        if (!activeItem) return;
+        const materialType = activeItem.getAttribute('data-id');
+        const issueStatus = getMaterialIssueStatus(materialType);
+        const currentTag = document.getElementById('current-material-tag');
+        if (!currentTag) return;
+        currentTag.textContent = issueStatus.total > 0 ? issueStatus.label : '无退回问题';
+        currentTag.className = issueStatus.pending > 0
+            ? 't-tag t-tag--error'
+            : issueStatus.total > 0
+                ? 't-tag t-tag--success'
+                : 't-tag';
     }
 
-    // 检查所有材料的问题处理状态（全局）
     function updateGlobalSubmitStatus() {
-        const allSections = document.querySelectorAll('.material-detail-section');
-        let totalPending = 0;
-        let totalProblems = 0;
+        const stats = getGlobalProblemStats();
 
-        allSections.forEach(section => {
-            const problems = JSON.parse(section.getAttribute('data-problems') || '[]');
-            totalProblems += problems.length;
-            totalPending += problems.filter(p => !p.status || p.status === '待解决').length;
-        });
-
-        // 获取左侧栏"退回待处理"的总数量（作为基准）
-        const returnedGroup = document.querySelector('[data-group="returned"]');
-        const returnedCountEl = returnedGroup ? returnedGroup.querySelector('.group-count') : null;
-        const totalReturned = returnedCountEl ? parseInt(returnedCountEl.textContent) || 6 : 6;
-
-        // 获取已处理数量（已解决 + 无需解决）
-        const handled = totalProblems - totalPending;
-        const currentPending = totalReturned - handled;
-
-        // 更新右侧栏"退回处理进度"面板
         const pendingCountEl = document.getElementById('pending-count');
         const pendingProgressEl = document.getElementById('pending-progress');
         const statPendingEl = document.getElementById('stat-pending');
-        const statCompletedEl = document.getElementById('stat-completed');
+        const statSolvedEl = document.getElementById('stat-solved');
+        const statSkippedEl = document.getElementById('stat-skipped');
+        const timelinePendingEl = document.getElementById('timeline-pending');
+        const returnStatsEl = document.getElementById('returnStats');
 
-        if (pendingCountEl) pendingCountEl.textContent = `${currentPending}/${totalReturned}`;
-        if (pendingProgressEl) pendingProgressEl.style.width = totalReturned > 0 ? `${(handled / totalReturned) * 100}%` : '0%';
-        if (statPendingEl) statPendingEl.textContent = currentPending;
-        if (statCompletedEl) statCompletedEl.textContent = handled;
+        if (pendingCountEl) pendingCountEl.textContent = `${stats.handled}/${stats.total}`;
+        if (pendingProgressEl) pendingProgressEl.style.width = stats.total > 0 ? `${(stats.handled / stats.total) * 100}%` : '0%';
+        if (statPendingEl) statPendingEl.textContent = stats.pending;
+        if (statSolvedEl) statSolvedEl.textContent = stats.solved;
+        if (statSkippedEl) statSkippedEl.textContent = stats.skipped;
+        if (timelinePendingEl) timelinePendingEl.textContent = stats.pending > 0 ? `待处理：${stats.pending}个问题` : '待重新提交初次评定';
+        if (returnStatsEl) returnStatsEl.textContent = `MSF11-20 共 48 项 | 4 项有问题 | ${stats.pending} 个待处理问题`;
 
-        // 更新底部提交提示
         const submitHint = document.getElementById('submitHint');
         const resubmitBtn = document.getElementById('resubmitBtn');
         const headerResubmitBtn = document.getElementById('headerResubmitBtn');
 
         if (submitHint) {
-            if (currentPending === 0 && totalReturned > 0) {
-                submitHint.textContent = '所有问题已处理完成，可重新提交';
+            if (stats.pending === 0 && stats.total > 0) {
+                submitHint.textContent = '所有退回问题已处理完成，可重新提交初次评定';
                 submitHint.classList.add('ready');
                 if (resubmitBtn) resubmitBtn.disabled = false;
                 if (headerResubmitBtn) headerResubmitBtn.disabled = false;
             } else {
-                submitHint.textContent = `待完成 ${currentPending} 个问题的处理后可重新提交`;
+                submitHint.textContent = `仍有 ${stats.pending} 个问题待处理，全部处理后可重新提交`;
                 submitHint.classList.remove('ready');
                 if (resubmitBtn) resubmitBtn.disabled = true;
                 if (headerResubmitBtn) headerResubmitBtn.disabled = true;
             }
         }
+
+        applyLeftPanelFilter();
     }
 
-    // 获取左侧栏退回待处理总数（用于数据联动）
-    function getLeftReturnedCount() {
-        const returnedGroup = document.querySelector('[data-group="returned"]');
-        if (returnedGroup) {
-            const countEl = returnedGroup.querySelector('.group-count');
-            return countEl ? parseInt(countEl.textContent) || 6 : 6;
-        }
-        return 6; // 默认模拟值
-    }
-    
-    // 渲染文件清单表格
+    // 渲染材料明细表
     function renderFileTable(files) {
         const tbody = document.getElementById('file-table-body');
+        const meta = document.getElementById('file-section-meta');
         tbody.innerHTML = '';
+        if (meta) {
+            meta.textContent = `当前显示 ${files.length} 个具体文件，来自 1 项材料`;
+        }
         
         if (files.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: rgba(0,0,0,0.4); padding: 32px;">该材料分类下暂无可展示文件，请上传</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: rgba(0,0,0,0.4); padding: 32px;">该材料项暂无具体文件，请通过本地上传或资料库选择补充。</td></tr>';
             return;
         }
         
@@ -2328,7 +2223,7 @@
             const tr = document.createElement('tr');
             
             // 覆盖体系标签
-            const systemsHtml = file.systems.map(sys => 
+            const systemsHtml = Array.from(new Set(file.systems)).map(sys => 
                 `<span class="sys-tag-inline ${sys}">${sys}</span>`
             ).join('');
             
@@ -2341,22 +2236,18 @@
                 <td>
                     <div class="file-name-cell">
                         ${fileIcon}
-                        ${file.name}
+                        <div>
+                            <div>${file.name}</div>
+                            <div class="file-sub-meta">所属材料：${document.getElementById('current-material-title').textContent} | ${file.stage} | ${file.uploadDate} | ${file.size}</div>
+                        </div>
                     </div>
                 </td>
-                <td>${file.type}</td>
-                <td>${file.stage}</td>
-                <td>${file.uploadDate}</td>
                 <td><div class="sys-tags-inline">${systemsHtml}</div></td>
                 <td>
                     <div class="action-btns">
                         <button class="btn-mini btn-mini-outline" onclick="previewFile('${file.id}')">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             预览
-                        </button>
-                        <button class="btn-mini btn-mini-outline" onclick="deleteFile('${file.id}')">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            删除
                         </button>
                     </div>
                 </td>
@@ -2368,58 +2259,49 @@
     
     // 解决问题
     // 解决问题 - 增强版（支持状态流转和取消）
-    function solveProblem(problemId, btn) {
-        if (confirm('确定将问题标记为"已解决"吗？')) {
+    async function solveProblem(problemId, btn) {
+        if (await showConfirm('确定将问题标记为“已解决”吗？')) {
             updateProblemStatus(problemId, '已解决');
         }
     }
 
     // 标记问题为无需解决（需填写说明）
-    function skipProblem(problemId, btn) {
-        const reason = prompt('请填写无需解决的原因说明：', '');
-        if (reason && reason.trim()) {
-            updateProblemStatus(problemId, '无需解决', reason.trim());
+    async function skipProblem(problemId, btn) {
+        const reason = await showReasonModal();
+        if (reason) {
+            updateProblemStatus(problemId, '无需解决', reason);
         } else if (reason !== null) {
-            alert('请填写无需解决的原因说明，否则无法标记为无需解决。');
+            showToast('请填写无需解决的原因说明，否则无法标记为无需解决。');
         }
     }
 
     // 取消解决状态（回到待解决）
-    function cancelSolveProblem(problemId, btn) {
-        if (confirm('确定要取消"已解决"状态吗？该问题将重新回到待解决状态。')) {
+    async function cancelSolveProblem(problemId, btn) {
+        if (await showConfirm('确定要取消“已解决”状态吗？该问题将重新回到待解决状态。')) {
             updateProblemStatus(problemId, '待解决');
         }
     }
 
     // 取消无需解决状态（回到待解决）
-    function cancelSkipProblem(problemId, btn) {
-        if (confirm('确定要取消"无需解决"状态吗？该问题将重新回到待解决状态。')) {
+    async function cancelSkipProblem(problemId, btn) {
+        if (await showConfirm('确定要取消“无需解决”状态吗？该问题将重新回到待解决状态。')) {
             updateProblemStatus(problemId, '待解决', null); // 清除说明
         }
     }
     
     // 通过文件ID标记完成（表格内使用）
     function toggleFileCompleteById(fileId, checkbox) {
-        if (checkbox.checked) {
-            completedFiles.add(fileId);
-        } else {
-            completedFiles.delete(fileId);
-        }
-        updateCompletionStatus();
+        showToast(checkbox.checked ? '已记录文件处理状态' : '已取消文件处理状态');
     }
     
     // 预览文件
     function previewFile(fileId) {
-        alert('预览文件: ' + fileId);
+        showToast('正在打开文件预览：' + fileId);
     }
     
     // 本地上传（行内）
     function uploadLocal(fileId) {
-        alert('从本地上传替换文件: ' + fileId);
-        // 标记为已完成
-        completedFiles.add(fileId);
-        updateCompletionStatus();
-        // 刷新当前表格以显示完成状态
+        showToast('已模拟本地上传替换：' + fileId);
         const activeItem = document.querySelector('.material-item.active');
         if (activeItem) {
             const materialType = activeItem.getAttribute('data-id');
@@ -2429,11 +2311,7 @@
     
     // 从资料库选择（行内）
     function selectFromLibrary(fileId) {
-        alert('从资料库选择文件替换: ' + fileId);
-        // 标记为已完成
-        completedFiles.add(fileId);
-        updateCompletionStatus();
-        // 刷新当前表格
+        showToast('已模拟从资料库选择替换：' + fileId);
         const activeItem = document.querySelector('.material-item.active');
         if (activeItem) {
             const materialType = activeItem.getAttribute('data-id');
@@ -2443,7 +2321,7 @@
     
     // 本地上传（标题栏新增）
     function uploadLocalNew() {
-        alert('打开本地上传对话框，可为当前材料分类上传新文件');
+        showToast('已模拟打开本地上传入口');
         const activeItem = document.querySelector('.material-item.active');
         if (activeItem) {
             const materialType = activeItem.getAttribute('data-id');
@@ -2456,7 +2334,7 @@
     
     // 从资料库选择（标题栏新增）
     function selectFromLibraryNew() {
-        alert('打开资料库选择对话框，可为当前材料分类选择已有文件');
+        showToast('已模拟打开资料库选择入口');
         const activeItem = document.querySelector('.material-item.active');
         if (activeItem) {
             const materialType = activeItem.getAttribute('data-id');
@@ -2469,47 +2347,18 @@
     
     // 顶部保存草稿
     function saveDraft() {
-        alert('草稿已保存！');
+        showToast('草稿已保存');
     }
     
     // 顶部重新提交
-    function headerResubmit() {
+    async function headerResubmit() {
         const btn = document.getElementById('headerResubmitBtn');
         if (btn && btn.disabled) {
-            return; // 按钮禁用时不可点击
+            return;
         }
-        if (confirm('确定要重新提交审核吗？请确认所有问题已处理完毕。')) {
+        if (await showConfirm('确定要重新提交初次评定吗？请确认所有退回问题已处理完毕。')) {
             resubmitAudit();
         }
-    }
-    
-    // 新增：更新完成状态统计
-    function updateCompletionStatus() {
-        const completed = completedFiles.size;
-        const pending = totalFiles - completed;
-        
-        // 更新底部状态提示
-        const submitHint = document.getElementById('submitHint');
-        const resubmitBtn = document.getElementById('resubmitBtn');
-        
-        if (pending === 0) {
-            submitHint.textContent = '所有文件已处理完成，可重新提交';
-            submitHint.classList.add('ready');
-            resubmitBtn.disabled = false;
-        } else {
-            submitHint.textContent = `待完成 ${pending} 个文件的处理后可重新提交`;
-            submitHint.classList.remove('ready');
-            resubmitBtn.disabled = true;
-        }
-        
-        // 更新右栏统计
-        const pendingCount = document.getElementById('pending-count');
-        const pendingProgress = document.getElementById('pending-progress');
-        const statCompleted = document.getElementById('stat-completed');
-        
-        if (pendingCount) pendingCount.textContent = `${pending}/${totalFiles}`;
-        if (pendingProgress) pendingProgress.style.width = `${(completed / totalFiles) * 100}%`;
-        if (statCompleted) statCompleted.textContent = completed;
     }
     
     // 从归档材料提交页面复制的认证领域筛选功能
@@ -2529,41 +2378,14 @@
         updateTagHighlights();
     }
     
-    // 从归档材料提交页面复制的认证类型筛选功能
-    function toggleAuditTypeFilter(type) {
-        const tag = document.querySelector(`#auditTypeFilters .filter-tag[data-value="${type}"]`);
-        
-        if (selectedAuditTypes.has(type)) {
-            selectedAuditTypes.delete(type);
-            tag.classList.remove('active');
-        } else {
-            selectedAuditTypes.add(type);
-            tag.classList.add('active');
-        }
-        
-        updateFilterStats();
-        applyLeftPanelFilter();
-    }
-    
     // 从归档材料提交页面复制的更新筛选统计文本功能
     function updateFilterStats() {
         const sysStats = document.getElementById('systemFilterStats');
-        const auditStats = document.getElementById('auditFilterStats');
         
         if (selectedSystems.size === 0) {
             sysStats.textContent = '已选：全部';
         } else {
             sysStats.textContent = `已选：${Array.from(selectedSystems).join('+')}`;
-        }
-        
-        if (selectedAuditTypes.size === 0) {
-            auditStats.textContent = '已选：全部';
-        } else {
-            const names = Array.from(selectedAuditTypes).map(t => {
-                const map = {'Initial':'初次','Surveillance1':'监督一','Surveillance2':'监督二','Recertification':'再认证'};
-                return map[t];
-            });
-            auditStats.textContent = `已选：${names.join('+')}`;
         }
     }
     
@@ -2571,7 +2393,7 @@
     function filterByStatus(type, element) {
         document.querySelectorAll('.filter-tag').forEach(tag => {
             const parent = tag.parentElement;
-            if (parent && parent.id !== 'systemFilters' && parent.id !== 'auditTypeFilters') {
+            if (parent && parent.id !== 'systemFilters') {
                 tag.classList.remove('active');
             }
         });
@@ -2592,51 +2414,30 @@
     // 从归档材料提交页面复制的左侧材料列表筛选功能
     function applyLeftPanelFilter() {
         const items = document.querySelectorAll('.material-item:not([style*="center"])');
-        
-        let visibleReturned = 0;
-        let visiblePassed = 0;
         let totalVisible = 0;
         
         items.forEach(item => {
             const systems = item.getAttribute('data-systems') || '';
-            const certType = item.getAttribute('data-cert-type') || '';
+            const hasIssue = item.getAttribute('data-has-issue') === 'true';
+            const pendingCount = Number(item.getAttribute('data-pending-count') || 0);
+            const handledCount = Number(item.getAttribute('data-handled-count') || 0);
             
             const systemMatch = selectedSystems.size === 0 || 
                 systems.split(',').some(s => selectedSystems.has(s.trim()));
-            
-            const auditMatch = selectedAuditTypes.size === 0 || 
-                Array.from(selectedAuditTypes).some(type => {
-                    const typeMap = {
-                        'Initial': '初次认证',
-                        'Surveillance1': '监督一',
-                        'Surveillance2': '监督二',
-                        'Recertification': '再认证'
-                    };
-                    return certType === typeMap[type];
-                });
-            
+
             const itemName = item.querySelector('.item-name')?.textContent.toLowerCase() || '';
             const searchMatch = !searchKeyword || itemName.includes(searchKeyword.toLowerCase());
+            const statusMatch = currentStatusFilter === 'all'
+                || (currentStatusFilter === 'pending' && pendingCount > 0)
+                || (currentStatusFilter === 'handled' && hasIssue && pendingCount === 0 && handledCount > 0)
+                || (currentStatusFilter === 'issue' && hasIssue);
             
-            let statusMatch = true;
-            if (currentStatusFilter === 'missing') {
-                statusMatch = item.classList.contains('returned');
-            } else if (currentStatusFilter === 'applicable') {
-                statusMatch = item.querySelector('.applicable-tag') !== null;
-            }
-            
-            const shouldShow = systemMatch && auditMatch && searchMatch && statusMatch;
+            const shouldShow = systemMatch && searchMatch && statusMatch;
             
             if (shouldShow) {
                 item.classList.remove('hidden-by-filter');
                 totalVisible++;
-                
-                if (item.classList.contains('returned')) {
-                    visibleReturned++;
-                } else if (item.classList.contains('passed')) {
-                    visiblePassed++;
-                }
-                
+
                 const tags = item.querySelectorAll('.item-system-tag');
                 tags.forEach(tag => {
                     const sys = tag.getAttribute('data-sys');
@@ -2653,43 +2454,25 @@
             }
         });
         
-        updateGroupCounts(visibleReturned, visiblePassed, totalVisible);
-        updateEmptyStates(visibleReturned, visiblePassed);
+        updateGroupCounts();
+        updateEmptyStates();
         document.getElementById('filteredCount').textContent = totalVisible;
     }
     
-    function updateGroupCounts(returned, passed, total) {
-        const returnedGroup = document.querySelector('[data-group="returned"]');
-        if (returnedGroup) {
-            const countSpan = returnedGroup.querySelector('.group-count');
-            if (countSpan) countSpan.textContent = returned;
-        }
-        
-        const passedGroup = document.querySelector('[data-group="passed"]');
-        if (passedGroup) {
-            const countSpan = passedGroup.querySelector('.group-count');
-            if (countSpan) countSpan.textContent = passed;
-        }
+    function updateGroupCounts() {
+        document.querySelectorAll('.material-group').forEach(group => {
+            const visibleItems = group.querySelectorAll('.material-item:not(.hidden-by-filter)');
+            const countSpan = group.querySelector('.group-count');
+            if (countSpan) countSpan.textContent = visibleItems.length;
+        });
     }
 
-    function updateEmptyStates(returned, passed) {
-        const returnedEmpty = document.querySelector('[data-empty="returned"]');
-        if (returnedEmpty) {
-            if (returned === 0) {
-                returnedEmpty.classList.add('show');
-            } else {
-                returnedEmpty.classList.remove('show');
-            }
-        }
-        
-        const passedEmpty = document.querySelector('[data-empty="passed"]');
-        if (passedEmpty) {
-            if (passed === 0) {
-                passedEmpty.classList.add('show');
-            } else {
-                passedEmpty.classList.remove('show');
-            }
-        }
+    function updateEmptyStates() {
+        document.querySelectorAll('.material-group').forEach(group => {
+            const hasVisibleItems = group.querySelectorAll('.material-item:not(.hidden-by-filter)').length > 0;
+            const empty = group.querySelector('.empty-filter-tip');
+            if (empty) empty.classList.toggle('show', !hasVisibleItems);
+        });
     }
 
     function updateTagHighlights() {
@@ -2709,27 +2492,34 @@
     }
     
     // 取消退回处理
-    function cancelReturn() {
-        if (confirm('确定取消退回处理吗？未保存的修改将丢失。')) {
+    async function cancelReturn() {
+        if (await showConfirm('确定取消退回处理吗？未保存的修改将丢失。')) {
             window.location.href = '#';
         }
     }
     
-    // 重新提交审核
+    // 重新提交初次评定
     function resubmitAudit() {
         const btn = document.getElementById('resubmitBtn');
+        const stats = getGlobalProblemStats();
+        if (stats.pending > 0) {
+            showToast(`仍有 ${stats.pending} 个问题待处理，暂不能重新提交。`);
+            return;
+        }
         btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: rotate 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="12" stroke-linecap="round"></circle></svg> 提交中...';
         
         setTimeout(() => {
-            alert('材料已重新提交审核！\n\n系统将通知初评负责人张经理进行复核。');
+            showToast('材料已重新提交初次评定，系统将通知初评负责人张经理复核。');
             btn.innerHTML = '已提交';
             btn.disabled = true;
+            const headerBtn = document.getElementById('headerResubmitBtn');
+            if (headerBtn) headerBtn.disabled = true;
         }, 1500);
     }
 
     // 删除文件
-    function deleteFile(fileId) {
-        if (!confirm('确定要删除该文件吗？此操作不可恢复。')) {
+    async function deleteFile(fileId) {
+        if (!await showConfirm('确定要删除该文件吗？此操作不可恢复。')) {
             return;
         }
 
@@ -2750,16 +2540,17 @@
             section.setAttribute('data-files', JSON.stringify(files));
             // 刷新表格
             renderFileTable(files);
-            alert('文件已删除');
+            showToast('文件已删除');
         }
     }
 
     // 页面加载完成后初始化
     document.addEventListener('DOMContentLoaded', function() {
+        renderMaterialNav();
+        normalizeSystemTags();
         updateTagHighlights();
-        updateCompletionStatus();
         // 初始化加载第一个材料的数据
-        loadMaterialData('audit-report');
+        loadMaterialData('recommendation');
         // 初始化全局问题统计
         updateGlobalSubmitStatus();
     });
